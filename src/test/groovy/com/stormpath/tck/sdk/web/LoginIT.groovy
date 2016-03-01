@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stormpath.tck.sdk.web;
+package com.stormpath.tck.sdk.web
 
-import com.jayway.restassured.path.xml.XmlPath;
+import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.util.JwtUtils
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory;
+import org.slf4j.LoggerFactory
 import org.testng.annotations.Test
 
-import static com.jayway.restassured.RestAssured.*;
-import static com.jayway.restassured.matcher.RestAssuredMatchers.*;
-import static org.hamcrest.Matchers.*;
+import static com.jayway.restassured.RestAssured.get
+import static com.jayway.restassured.RestAssured.given
+import static org.hamcrest.Matchers.containsString
+import static org.hamcrest.Matchers.equalTo
 import static org.testng.Assert.*
-
 
 class LoginIT extends AbstractIT {
 
@@ -58,24 +58,23 @@ class LoginIT extends AbstractIT {
         //2. Post the new account
 
         response =
+            given()
+                .cookie("JSESSIONID", this.sessionId)
+                .formParam("_csrf", csrfValue)
+                .formParam("givenName", accountGivenName)
+                .formParam("surname", accountSurname)
+                .formParam("email", accountEmail)
+                .formParam("password", accountPassword)
+                .formParam("confirmPassword", accountPassword)
 
-                given()
-                    .cookie("JSESSIONID", this.sessionId)
-                    .formParam("_csrf", csrfValue)
-                    .formParam("givenName", accountGivenName)
-                    .formParam("surname", accountSurname)
-                    .formParam("email", accountEmail)
-                    .formParam("password", accountPassword)
-                    .formParam("confirmPassword", accountPassword)
+            //assert that the user is redirected to the default login.nextUri (which is '/'):
+            .expect()
+                .statusCode(302)
+                .header("Location", equalTo(qualify('/')))
 
-                //assert that the user is redirected to the default login.nextUri (which is '/'):
-                .expect()
-                    .statusCode(302)
-                    .header("Location", equalTo(qualify('/')))
-
-                //post the account
-                .post("/register")
-                    .andReturn()
+            //post the account
+            .post("/register")
+                .andReturn()
 
         //get the resulting cookie:
         this.accountCookie = response.getCookie("account");
@@ -97,12 +96,12 @@ class LoginIT extends AbstractIT {
     public void logout() throws Exception {
 
         Response response =
-                given()
-                    .cookie("JSESSIONID", this.sessionId)
-                    .cookie("account", this.accountCookie)
-                .expect()
-                    .statusCode(200)
-                .get("/logout")
+            given()
+                .cookie("JSESSIONID", this.sessionId)
+                .cookie("account", this.accountCookie)
+            .expect()
+                .statusCode(200)
+            .get("/logout")
 
         this.accountCookie = response.getCookie("account");
         assertEquals(accountCookie, '')
@@ -115,15 +114,15 @@ class LoginIT extends AbstractIT {
         this.sessionId = response.getCookie("JSESSIONID")
 
         given()
-                .cookie("JSESSIONID", this.sessionId)
-                .formParam("_csrf", "THIS-IS-NOT-A-VALID-CSRF-VALUE")
-                .formParam("login", accountEmail)
-                .formParam("password", accountPassword)
+            .cookie("JSESSIONID", this.sessionId)
+            .formParam("_csrf", "THIS-IS-NOT-A-VALID-CSRF-VALUE")
+            .formParam("login", accountEmail)
+            .formParam("password", accountPassword)
         .expect()
-                .body(containsString("Invalid CSRF Token"))
-                .statusCode(403)
+            .body(containsString("Invalid CSRF Token"))
+            .statusCode(403)
         .when()
-                .post("/login")
+            .post("/login")
     }
 
     @Test(dependsOnMethods = "formAuthenticationInvalidCsrf")
@@ -137,16 +136,16 @@ class LoginIT extends AbstractIT {
         String csrfValue = doc.get("html.body.div.div.div.div.div.children().children()[1].@value");
 
         response =
-                given()
-                    .cookie("JSESSIONID", this.sessionId)
-                    .formParam("_csrf", csrfValue)
-                    .formParam("login", accountEmail)
-                    .formParam("password", accountPassword)
-                .expect()
-                    .statusCode(302)
-                .when()
-                    .post("/login")
-                .andReturn()
+            given()
+                .cookie("JSESSIONID", this.sessionId)
+                .formParam("_csrf", csrfValue)
+                .formParam("login", accountEmail)
+                .formParam("password", accountPassword)
+            .expect()
+                .statusCode(302)
+            .when()
+                .post("/login")
+            .andReturn()
 
         assertNotNull(response.getCookie("account"))
         this.accountCookie = response.getCookie("account")
