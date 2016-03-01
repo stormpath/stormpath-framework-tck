@@ -62,7 +62,9 @@
 
     <properties>
         <easymock.version>3.1</easymock.version>
+        <httpClient.version>4.5.1</httpClient.version>
         <jdk.version>1.8</jdk.version>
+        <jjwt.version>0.6.0</jjwt.version>
         <logback.version>1.1.5</logback.version>
         <maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
         <gmavenplus.version>1.5</gmavenplus.version>
@@ -99,6 +101,17 @@
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpClient.version}</version>
+            <scope>test</scope>
         </dependency>
         <!-- JCL is needed by Rest Assured, but we want to use SLF4J's instead: -->
         <dependency>
