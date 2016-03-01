@@ -16,6 +16,8 @@
 package com.stormpath.tck
 
 import com.jayway.restassured.RestAssured
+import com.jayway.restassured.path.xml.XmlPath
+import com.jayway.restassured.response.Response
 import com.stormpath.tck.util.RestUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -66,6 +68,18 @@ abstract class AbstractIT {
     @AfterClass
     def tearDownClass() {
         deleteResources(classResourcesToDelete)
+    }
+
+    protected static String uniqify(String s) {
+        return s + UUID.randomUUID()
+    }
+
+    protected static String qualify(String uri) {
+        return webappBaseUrl + uri
+    }
+
+    protected static XmlPath getHtmlDoc(Response response) {
+        return new XmlPath(XmlPath.CompatibilityMode.HTML, response.getBody().asString());
     }
 
     private void deleteResources(List<String> hrefs) {

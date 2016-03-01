@@ -23,13 +23,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test
 
-import static com.jayway.restassured.RestAssured.get;
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo
-import static org.testng.Assert.assertEquals
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static com.jayway.restassured.RestAssured.*;
+import static com.jayway.restassured.matcher.RestAssuredMatchers.*;
+import static org.hamcrest.Matchers.*;
+import static org.testng.Assert.*
 
 
 class LoginIT extends AbstractIT {
@@ -47,14 +44,21 @@ class LoginIT extends AbstractIT {
 
     @Test
     public void accountRegistration() throws Exception {
+
+        //1.  Get the /register page
+
         Response response = get("/register");
-        this.sessionId = response.getCookie("JSESSIONID");
-        XmlPath doc = new XmlPath(XmlPath.CompatibilityMode.HTML, response.getBody().asString());
+        XmlPath doc = getHtmlDoc(response)
         assertEquals(doc.get("html.body.div.div.div.div.div.children().children()[1].@type"), "hidden");
         assertEquals(doc.get("html.body.div.div.div.div.div.children().children()[1].@name"), "_csrf");
+        this.sessionId = response.getCookie("JSESSIONID");
         String csrfValue = doc.get("html.body.div.div.div.div.div.children().children()[1].@value");
 
+
+        //2. Post the new account
+
         response =
+
                 given()
                     .cookie("JSESSIONID", this.sessionId)
                     .formParam("_csrf", csrfValue)
@@ -63,13 +67,21 @@ class LoginIT extends AbstractIT {
                     .formParam("email", accountEmail)
                     .formParam("password", accountPassword)
                     .formParam("confirmPassword", accountPassword)
+
+                //assert that the user is redirected to the default login.nextUri (which is '/'):
                 .expect()
                     .statusCode(302)
+                    .header("Location", equalTo(qualify('/')))
+
+                //post the account
                 .post("/register")
                     .andReturn()
 
+        //get the resulting cookie:
         this.accountCookie = response.getCookie("account");
         assertTrue(accountCookie.length() > 0);
+
+        //3. Get the home page and assert it reflects the new user
 
         given()
             .cookie("account", accountCookie)
@@ -78,11 +90,12 @@ class LoginIT extends AbstractIT {
         .when()
             .get()
 
-        deleteOnTeardown(JwtUtils.extractJwtClaim(accountCookie, "sub"))
+        deleteOnClassTeardown(JwtUtils.extractJwtClaim(accountCookie, "sub"))
     }
 
     @Test(dependsOnMethods = "accountRegistration")
     public void logout() throws Exception {
+
         Response response =
                 given()
                     .cookie("JSESSIONID", this.sessionId)
@@ -92,13 +105,15 @@ class LoginIT extends AbstractIT {
                 .get("/logout")
 
         this.accountCookie = response.getCookie("account");
-        assertTrue(accountCookie.equals(""));
+        assertEquals(accountCookie, '')
     }
 
     @Test(dependsOnMethods = "logout")
     public void formAuthenticationInvalidCsrf() throws Exception {
+
         Response response = get("/login")
         this.sessionId = response.getCookie("JSESSIONID")
+
         given()
                 .cookie("JSESSIONID", this.sessionId)
                 .formParam("_csrf", "THIS-IS-NOT-A-VALID-CSRF-VALUE")
@@ -109,7 +124,6 @@ class LoginIT extends AbstractIT {
                 .statusCode(403)
         .when()
                 .post("/login")
-        .andReturn()
     }
 
     @Test(dependsOnMethods = "formAuthenticationInvalidCsrf")
