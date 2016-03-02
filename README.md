@@ -16,7 +16,7 @@ development sanity :)  Comments, suggestions and/or contributions from the Open 
 
         brew install maven
 
-2. Check out the project:
+2. Clone the project:
 
         git clone git@github.com:stormpath/stormpath-framework-tck.git
 
