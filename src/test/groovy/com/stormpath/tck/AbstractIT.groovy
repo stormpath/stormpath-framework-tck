@@ -32,12 +32,15 @@ abstract class AbstractIT {
 
     protected final Logger log = LoggerFactory.getLogger(getClass())
 
-    static final String webappUrlScheme = System.getenv("STORMPATH_TCK_WEBAPP_SCHEME") ?: "http"
-    static final String webappUrlHost = System.getenv("STORMPATH_TCK_WEBAPP_HOST") ?: "localhost"
-    static final int webappUrlPort = Integer.parseInt(System.getenv("STORMPATH_TCK_WEBAPP_PORT") ?: "8080")
+    static final String webappUrlScheme = getVal("STORMPATH_TCK_WEBAPP_SCHEME", "http")
+    static final String webappUrlHost = getVal("STORMPATH_TCK_WEBAPP_HOST", "localhost")
+    static final int webappUrlPort = getVal("STORMPATH_TCK_WEBAPP_PORT", "8080") as int
     static final private String webappUrlPortSuffix = toPortSuffix(webappUrlScheme, webappUrlPort)
     static final private String defaultWebappBaseUrl = "$webappUrlScheme://$webappUrlHost$webappUrlPortSuffix"
-    static final String webappBaseUrl = System.getenv("STORMPATH_TCK_WEBAPP_URL") ?: defaultWebappBaseUrl
+    static final String webappBaseUrl = getVal("STORMPATH_TCK_WEBAPP_URL", defaultWebappBaseUrl)
+    static {
+        setupRestAssured()
+    }
 
     private final List<String> classResourcesToDelete = []
     private final List<String> methodResourcesToDelete = []
@@ -49,9 +52,33 @@ abstract class AbstractIT {
         return ":$port"
     }
 
+    private static String getVal(String name, String defaultVal) {
+
+        //convert to system property format and try that first (they have precedence over environment variables):
+        String sysPropName = name.toLowerCase().replace('_', '.')
+        String val = System.getProperty(sysPropName)
+        if (val) {
+            return val
+        }
+
+        val = System.getenv(name)
+        if (val) {
+            return val
+        }
+
+        return defaultVal
+    }
+
     @BeforeClass
     public void setUpClass() {
-        //noinspection UnnecessaryQualifiedReference
+        setupRestAssured()
+    }
+
+    @SuppressWarnings("UnnecessaryQualifiedReference")
+    private static void setupRestAssured() {
+        if (webappUrlPort != RestAssured.DEFAULT_PORT) {
+            RestAssured.port = webappUrlPort
+        }
         RestAssured.baseURI = webappBaseUrl
     }
 

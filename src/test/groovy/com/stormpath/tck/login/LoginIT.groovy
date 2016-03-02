@@ -7,6 +7,5 @@ class LoginIT extends AbstractDefaultIT {
 
     @Test
     public void testSomethingSpecCompliantAcrossAllLanguageFrameworks() {
-
     }
 }
