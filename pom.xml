@@ -74,6 +74,10 @@
         <restassured.version>2.8.0</restassured.version>
         <slf4j.version>1.7.18</slf4j.version>
         <testng.version>6.8</testng.version>
+
+        <!-- Which TestNG test groups to run.  Can be overridden by using -Dgroups=one,or,more,names,here -->
+        <groups>default</groups>
+
     </properties>
 
     <dependencies>
@@ -152,6 +156,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.19.1</version>
+                <configuration>
+                    <groups>${groups}</groups>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

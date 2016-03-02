@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stormpath.tck.sdk.web
+package com.stormpath.tck.login
 
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
+
 import com.stormpath.tck.util.JwtUtils
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.get
@@ -29,9 +28,8 @@ import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.equalTo
 import static org.testng.Assert.*
 
-class LoginIT extends AbstractIT {
-
-    private static final Logger log = LoggerFactory.getLogger(LoginIT)
+@Test(groups=['java'])
+class JavaLoginIT extends AbstractIT {
 
     private final String randomUUID = UUID.randomUUID().toString();
     private final String accountEmail = "fooemail-" + randomUUID + "@stormpath.com";

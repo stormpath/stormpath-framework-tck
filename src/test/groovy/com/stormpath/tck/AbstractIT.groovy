@@ -66,7 +66,7 @@ abstract class AbstractIT {
     }
 
     @AfterClass
-    def tearDownClass() {
+    public void tearDownClass() {
         deleteResources(classResourcesToDelete)
     }
 
