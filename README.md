@@ -57,9 +57,9 @@ Additional profile names can be added if different language environments require
 
 ### Test Groups
 
-If a `-P` is not specified, all tests in the `default` group will be executed.
+If `-P` is not specified, all tests in the `default` group will be executed.
 
-*All tests in the TCK **should** be in the `default` group*
+_All tests in the TCK **should** be in the `default` group_
 
 However, sometimes a language-specific framework may not support the specification behavior (for legacy reasons), so
 language/environment-specific tests can also be executed (in addition to the `default` tests) by specifying the specific
