@@ -37,7 +37,7 @@ Once your web app is running, you can run the TCK against this webapp:
 
 This will run all default (language-agnostic) tests against the targeted webapp.
 
-## Using Maven Profiles to customize TCK behavior
+## Using Maven Profiles to Customize TCK Behavior
 
 The TCK will attempt to interact with a web application accessible by default via `http://localhost:8080`.  You can
 tell the TCK which type of application you are using by using a
@@ -50,12 +50,12 @@ node.js environments.
 
 The currently supported profile names are:
 
-* java
-* node
+* `java`
+* `node`
 
 Additional profile names can be added if different language environments require custom settings.
 
-### Test Groups
+## Test Groups
 
 If `-P` is not specified, all tests in the `default` group will be executed.
 
