@@ -29,7 +29,6 @@
     </root>
 
     <logger name="com.stormpath" level="INFO"/>
-    <logger name="org.apache.http.wire" level="DEBUG"/>
-    <logger name="org.apache.http.headers" level="WARN"/>
+    <!-- <logger name="org.apache.http.wire" level="DEBUG"/> -->
 
 </configuration>

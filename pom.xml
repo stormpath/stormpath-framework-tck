@@ -27,7 +27,7 @@
     <groupId>com.stormpath.tck</groupId>
     <artifactId>stormpath-tck-root</artifactId>
     <version>1-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <name>Stormpath Framework TCK</name>
     <description>
@@ -107,12 +107,6 @@
             <artifactId>jjwt</artifactId>
             <version>${jjwt.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${httpClient.version}</version>
-            <scope>test</scope>
-        </dependency>
         <!-- JCL is needed by Rest Assured, but we want to use SLF4J's instead: -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -153,6 +147,19 @@
                 <configuration>
                     <invokeDynamic>true</invokeDynamic>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.19.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
