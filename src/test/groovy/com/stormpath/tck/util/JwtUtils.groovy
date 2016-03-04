@@ -30,9 +30,7 @@ public class JwtUtils {
 
     static String extractJwtClaim(String jwt, String property) {
         String secret = ApiKey.getSecret()
-        byte[] apiKeySecretBytes = Base64.decodeBase64(secret)
-        SecretKeySpec keySpec = new SecretKeySpec(apiKeySecretBytes, SignatureAlgorithm.HS256.getJcaName())
-        Claims claims = Jwts.parser().setSigningKey(keySpec).parseClaimsJws(jwt).getBody()
+        Claims claims = Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(jwt).getBody()
         return (String) claims.get(property)
     }
 }

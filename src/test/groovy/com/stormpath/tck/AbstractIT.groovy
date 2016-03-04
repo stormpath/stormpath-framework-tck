@@ -114,8 +114,8 @@ abstract class AbstractIT {
         hrefs.reverse().each { href ->
             try {
                 given()
+                    .log().all()
                     .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
-                    .and()
                     .header("User-Agent", "stormpath-framework-tck")
                 .expect()
                     .statusCode(204)

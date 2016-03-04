@@ -31,8 +31,9 @@ class ApiKey {
 
     private final static String apiKeyIdPropertyName     = "apiKey.id"
     private final static String apiKeySecretPropertyName = "apiKey.secret"
-    private final static String apiKeyIdEnvironmentVariableName = "STORMPATH_API_KEY_ID"
-    private final static String apiKeySecretEnvironmentVariableName = "STORMPATH_API_KEY_SECRET"
+
+    private final static String[] apiKeyIdEnvironmentVariableNames = ["STORMPATH_API_KEY_ID", "STORMPATH_CLIENT_APIKEY_ID"]
+    private final static String[] apiKeySecretEnvironmentVariableNames = ["STORMPATH_API_KEY_SECRET", "STORMPATH_CLIENT_APIKEY_SECRET"]
 
    static {
         //1. Try to load the default api key properties file.  All other config options have higher priority than this:
@@ -80,12 +81,20 @@ class ApiKey {
     protected static Properties getEnvironmentVariableProperties() {
         Properties props = new Properties();
 
-        String value = System.getenv(apiKeyIdEnvironmentVariableName);
+        String value = null
+        for (int i = 0; i < apiKeyIdEnvironmentVariableNames.length; i++) {
+            value = System.getenv(apiKeyIdEnvironmentVariableNames[i])
+            if (Strings.hasText(value)) { break }
+        }
         if (Strings.hasText(value)) {
-            props.put(apiKeyIdPropertyName, value);
+            props.put(apiKeyIdPropertyName, value)
         }
 
-        value = System.getenv(apiKeySecretEnvironmentVariableName);
+        value = null
+        for (int i = 0; i < apiKeySecretEnvironmentVariableNames.length; i++) {
+            value = System.getenv(apiKeySecretEnvironmentVariableNames[i])
+            if (Strings.hasText(value)) { break }
+        }
         if (Strings.hasText(value)) {
             props.put(apiKeySecretPropertyName, value);
         }
