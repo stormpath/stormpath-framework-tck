@@ -74,13 +74,7 @@
         <restassured.version>2.8.0</restassured.version>
         <slf4j.version>1.7.18</slf4j.version>
         <testng.version>6.8</testng.version>
-
-        <!-- Which TestNG test groups to run.  Can be overridden by using -Dgroups=one,or,more,names,here -->
-        <groups>default</groups>
-        <stormpath.tck.webapp.scheme>http</stormpath.tck.webapp.scheme>
-        <stormpath.tck.webapp.host>localhost</stormpath.tck.webapp.host>
-        <stormpath.tck.webapp.port>8080</stormpath.tck.webapp.port>
-
+        
     </properties>
 
     <dependencies>
@@ -160,7 +154,6 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.19.1</version>
                 <configuration>
-                    <groups>${groups}</groups>
                     <systemProperties>
                         <stormpath.tck.webapp.port>${stormpath.tck.webapp.scheme}</stormpath.tck.webapp.port>
                         <stormpath.tck.webapp.port>${stormpath.tck.webapp.host}</stormpath.tck.webapp.port>
@@ -178,21 +171,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>java</id>
-            <properties>
-                <groups>default,java</groups>
-            </properties>
-        </profile>
-        <profile>
-            <id>node</id>
-            <properties>
-                <groups>default,node</groups>
-                <stormpath.tck.webapp.port>3000</stormpath.tck.webapp.port>
-            </properties>
-        </profile>
-    </profiles>
 
 </project>
