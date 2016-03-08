@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.*
 class Oauth2IT extends AbstractIT {
 
     @Test
+    // stormpath/stormpath-framework-tck#6
     public void unsupportedGrantType() throws Exception {
         given()
             .param("grant_type", "foobar_grant")
@@ -39,6 +40,7 @@ class Oauth2IT extends AbstractIT {
     }
 
     @Test
+    // stormpath/stormpath-framework-tck#7
     public void missingGrantType() throws Exception {
         given()
             .param("grant_type", "")
@@ -51,4 +53,5 @@ class Oauth2IT extends AbstractIT {
             .header("Pragma", is("no-cache"))
             .body("error", is("invalid_request"))
     }
+    
 }
