@@ -83,6 +83,6 @@ class Oauth2IT extends AbstractIT {
     public void doNotHandleGet() throws Exception {
         get("/oauth/token")
             .then()
-            .assertThat().statusCode(404)
+            .assertThat().statusCode(405)
     }
 }
