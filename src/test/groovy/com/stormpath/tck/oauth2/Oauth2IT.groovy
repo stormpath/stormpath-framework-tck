@@ -55,8 +55,26 @@ class Oauth2IT extends AbstractIT {
     }
 
     @Test
+    // stormpath/stormpath-framework-tck#15
+    public void missingFormParameters() throws Exception {
+        given()
+            .body("""hello"" : ""world""")
+        .when()
+            .post("/oauth/token")
+        .then()
+            .statusCode(400)
+            .header("Content-Type", is("application/json;charset=UTF-8"))
+            .header("Cache-Control", is("no-store"))
+            .header("Pragma", is("no-cache"))
+            .body("error", is("invalid_request"))
+    }
+
+
+    @Test
     // stormpath/stormpath-framework-tck#16
     public void doNotHandleGet() throws Exception {
-        get("/oauth/token").statusCode(404)
+        get("/oauth/token")
+            .then()
+            .assertThat().statusCode(404)
     }
 }
