@@ -53,5 +53,10 @@ class Oauth2IT extends AbstractIT {
             .header("Pragma", is("no-cache"))
             .body("error", is("invalid_request"))
     }
-    
+
+    @Test
+    // stormpath/stormpath-framework-tck#16
+    public void doNotHandleGet() throws Exception {
+        get("/oauth/token").statusCode(404)
+    }
 }
