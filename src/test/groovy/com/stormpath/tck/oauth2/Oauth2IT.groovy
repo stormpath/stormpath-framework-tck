@@ -25,7 +25,9 @@ import static org.hamcrest.Matchers.*
 class Oauth2IT extends AbstractIT {
 
     @Test
-    // stormpath/stormpath-framework-tck#6
+    /**
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/6">#6</a>
+     */
     public void unsupportedGrantType() throws Exception {
         given()
             .param("grant_type", "foobar_grant")
@@ -40,7 +42,9 @@ class Oauth2IT extends AbstractIT {
     }
 
     @Test
-    // stormpath/stormpath-framework-tck#7
+    /**
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/7">#7</a>
+     */
     public void missingGrantType() throws Exception {
         given()
             .param("grant_type", "")
@@ -55,7 +59,9 @@ class Oauth2IT extends AbstractIT {
     }
 
     @Test
-    // stormpath/stormpath-framework-tck#15
+    /**
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/15">#15</a>
+     */
     public void missingFormParameters() throws Exception {
         given()
             .body("""hello"" : ""world""")
@@ -71,7 +77,9 @@ class Oauth2IT extends AbstractIT {
 
 
     @Test
-    // stormpath/stormpath-framework-tck#16
+    /**
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/16">#16</a>
+     */
     public void doNotHandleGet() throws Exception {
         get("/oauth/token")
             .then()
