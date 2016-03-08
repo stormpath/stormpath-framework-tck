@@ -28,8 +28,6 @@ class Oauth2IT extends AbstractIT {
     public void unsupportedGrantType() throws Exception {
         given()
             .param("grant_type", "foobar_grant")
-            .param("username", "foo")
-            .param("password", "bar")
         .when()
             .post("/oauth/token")
         .then()
@@ -38,5 +36,19 @@ class Oauth2IT extends AbstractIT {
             .header("Cache-Control", is("no-store"))
             .header("Pragma", is("no-cache"))
             .body("error", is("unsupported_grant_type"))
+    }
+
+    @Test
+    public void missingGrantType() throws Exception {
+        given()
+            .param("grant_type", "")
+        .when()
+            .post("/oauth/token")
+        .then()
+            .statusCode(400)
+            .header("Content-Type", is("application/json;charset=UTF-8"))
+            .header("Cache-Control", is("no-store"))
+            .header("Pragma", is("no-cache"))
+            .body("error", is("invalid_request"))
     }
 }
