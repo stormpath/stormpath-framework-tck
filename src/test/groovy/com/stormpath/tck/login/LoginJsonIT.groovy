@@ -29,6 +29,7 @@ class LoginJsonIT extends AbstractIT {
 
     private final String randomUUID = UUID.randomUUID().toString()
     private final String accountEmail = "fooemail-" + randomUUID + "@stormpath.com"
+    private final String accountUsername = randomUUID
     private final String accountGivenName = "GivenName-" + randomUUID
     private final String accountSurname = "Surname-" + randomUUID
     private final String accountPassword = "P@sword123!"
@@ -40,10 +41,11 @@ class LoginJsonIT extends AbstractIT {
     public void accountRegistrationJson() throws Exception {
 
         Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", accountEmail);
-        jsonAsMap.put("password", accountPassword);
-        jsonAsMap.put("givenName", accountGivenName);
+        jsonAsMap.put("email", accountEmail)
+        jsonAsMap.put("password", accountPassword)
+        jsonAsMap.put("givenName", accountGivenName)
         jsonAsMap.put("surname", accountSurname)
+        jsonAsMap.put("username", accountUsername)
 
         String createdHref =
             given()
@@ -57,7 +59,7 @@ class LoginJsonIT extends AbstractIT {
                     .body("size()", is(1))
                     .body("account.size()", is(10))
                     .body("account.href", not(isEmptyOrNullString()))
-                    .body("account.username", is(accountEmail))
+                    .body("account.username", is(accountUsername))
                     .body("account.modifiedAt", not(isEmptyOrNullString()))
                     .body("account.status", is("ENABLED"))
                     .body("account.createdAt", not(isEmptyOrNullString()))
