@@ -16,17 +16,15 @@
 package com.stormpath.tck.oauth2
 
 import com.jayway.restassured.http.ContentType
-import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.login.LoginJsonIT
-import com.stormpath.tck.util.RestUtils
+import com.stormpath.tck.util.JwtUtils
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
-import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 import static com.jayway.restassured.RestAssured.*
 import static com.jayway.restassured.matcher.RestAssuredMatchers.*
 import static org.hamcrest.Matchers.*
+import static org.testng.Assert.*
 
 @Test
 class Oauth2IT extends AbstractIT {
@@ -35,6 +33,7 @@ class Oauth2IT extends AbstractIT {
     private final String accountEmail = "fooemail-" + randomUUID + "@stormpath.com"
     private final String accountUsername = randomUUID
     private final String accountPassword = "P@ssword123"
+    private String accountHref = ""
 
     @BeforeClass
     private void createTestAccount() throws Exception {
@@ -57,6 +56,7 @@ class Oauth2IT extends AbstractIT {
                 .extract()
                     .path("account.href")
 
+        this.accountHref = createdHref
         deleteOnClassTeardown(createdHref)
     }
 
@@ -130,39 +130,48 @@ class Oauth2IT extends AbstractIT {
      */
     public void passwordGrantWithUsername() throws Exception {
 
-        given()
-            .param("grant_type", "password")
-            .param("username", accountUsername)
-            .param("password", accountPassword)
-        .when()
-            .post("/oauth/token")
-        .then()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body("access_token", not(isEmptyOrNullString()))
-            .body("expires_in", is(3600))
-            .body("refresh_token", not(isEmptyOrNullString()))
-            .body("token_type", is("Bearer"))
-    }
+        String accessToken =
+            given()
+                .param("grant_type", "password")
+                .param("username", accountUsername)
+                .param("password", accountPassword)
+            .when()
+                .post("/oauth/token")
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("access_token", not(isEmptyOrNullString()))
+                .body("expires_in", is(3600))
+                .body("refresh_token", not(isEmptyOrNullString()))
+                .body("token_type", is("Bearer"))
+            .extract()
+                .path("access_token")
 
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.accountHref)
+    }
 
     /**
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/18">#18</a>
      */
     public void passwordGrantWithEmail() throws Exception {
 
-        given()
-            .param("grant_type", "password")
-            .param("username", accountEmail)
-            .param("password", accountPassword)
-        .when()
-            .post("/oauth/token")
-        .then()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body("access_token", not(isEmptyOrNullString()))
-            .body("expires_in", is(3600))
-            .body("refresh_token", not(isEmptyOrNullString()))
-            .body("token_type", is("Bearer"))
+        String accessToken =
+            given()
+                .param("grant_type", "password")
+                .param("username", accountEmail)
+                .param("password", accountPassword)
+            .when()
+                .post("/oauth/token")
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("access_token", not(isEmptyOrNullString()))
+                .body("expires_in", is(3600))
+                .body("refresh_token", not(isEmptyOrNullString()))
+                .body("token_type", is("Bearer"))
+            .extract()
+                .path("access_token")
+
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.accountHref)
     }
 }
