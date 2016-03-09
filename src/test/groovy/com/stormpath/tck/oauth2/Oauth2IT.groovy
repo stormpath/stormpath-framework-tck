@@ -132,6 +132,27 @@ class Oauth2IT extends AbstractIT {
 
         given()
             .param("grant_type", "password")
+            .param("username", accountUsername)
+            .param("password", accountPassword)
+        .when()
+            .post("/oauth/token")
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            .body("access_token", not(isEmptyOrNullString()))
+            .body("expires_in", is(3600))
+            .body("refresh_token", not(isEmptyOrNullString()))
+            .body("token_type", is("Bearer"))
+    }
+
+
+    /**
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/18">#18</a>
+     */
+    public void passwordGrantWithEmail() throws Exception {
+
+        given()
+            .param("grant_type", "password")
             .param("username", accountEmail)
             .param("password", accountPassword)
         .when()
