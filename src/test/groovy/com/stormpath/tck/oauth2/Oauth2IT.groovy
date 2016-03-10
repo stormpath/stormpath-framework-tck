@@ -125,6 +125,7 @@ class Oauth2IT extends AbstractIT {
             .assertThat().statusCode(405)
     }
 
+    @Test
     /**
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/11">#11</a>
      */
@@ -150,6 +151,7 @@ class Oauth2IT extends AbstractIT {
         assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.accountHref)
     }
 
+    @Test
     /**
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/18">#18</a>
      */
