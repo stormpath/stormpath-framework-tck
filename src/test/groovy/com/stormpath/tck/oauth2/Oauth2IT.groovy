@@ -115,12 +115,62 @@ class Oauth2IT extends AbstractIT {
     }
 
 
-    @Test
-    /**
+    /** Anything but POST should return 405
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/16">#16</a>
      */
+    @Test
     public void doNotHandleGet() throws Exception {
         get("/oauth/token")
+            .then()
+            .assertThat().statusCode(405)
+    }
+
+    /** Anything but POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/16">#16</a>
+     */
+    @Test
+    public void doNotHandleHead() throws Exception {
+        head("/oauth/token")
+            .then()
+            .assertThat().statusCode(405)
+    }
+
+    /** Anything but POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/16">#16</a>
+     */
+    @Test
+    public void doNotHandlePut() throws Exception {
+        put("/oauth/token")
+            .then()
+            .assertThat().statusCode(405)
+    }
+
+    /** Anything but POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/16">#16</a>
+     */
+    @Test
+    public void doNotHandleDelete() throws Exception {
+        delete("/oauth/token")
+            .then()
+            .assertThat().statusCode(405)
+    }
+
+    /** Anything but POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/16">#16</a>
+     */
+    @Test
+    public void doNotHandleOptions() throws Exception {
+        options("/oauth/token")
+            .then()
+            .assertThat().statusCode(405)
+    }
+
+    /** Anything but POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/16">#16</a>
+     */
+    @Test
+    public void doNotHandlePatch() throws Exception {
+        patch("/oauth/token")
             .then()
             .assertThat().statusCode(405)
     }
