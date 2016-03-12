@@ -60,10 +60,10 @@ class Oauth2IT extends AbstractIT {
         deleteOnClassTeardown(createdHref)
     }
 
-    @Test
-    /**
+    /** Unsupported grant type returns error
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/6">#6</a>
      */
+    @Test
     public void unsupportedGrantType() throws Exception {
 
         given()
@@ -78,10 +78,11 @@ class Oauth2IT extends AbstractIT {
             .body("error", is("unsupported_grant_type"))
     }
 
-    @Test
-    /**
+
+    /** Missing grant type returns error
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/7">#7</a>
      */
+    @Test
     public void missingGrantType() throws Exception {
 
         given()
@@ -96,10 +97,11 @@ class Oauth2IT extends AbstractIT {
             .body("error", is("invalid_request"))
     }
 
-    @Test
-    /**
+
+    /** POST must include form parameters
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/15">#15</a>
      */
+    @Test
     public void missingFormParameters() throws Exception {
 
         given()
@@ -175,10 +177,10 @@ class Oauth2IT extends AbstractIT {
             .assertThat().statusCode(405)
     }
 
-    @Test
-    /**
+    /** Password grant flow with username/password
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/11">#11</a>
      */
+    @Test
     public void passwordGrantWithUsername() throws Exception {
 
         String accessToken =
@@ -201,10 +203,10 @@ class Oauth2IT extends AbstractIT {
         assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.accountHref)
     }
 
-    @Test
-    /**
+    /** Password grant flow with email/password
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/18">#18</a>
      */
+    @Test
     public void passwordGrantWithEmail() throws Exception {
 
         String accessToken =

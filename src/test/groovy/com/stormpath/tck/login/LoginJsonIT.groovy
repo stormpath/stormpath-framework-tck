@@ -34,10 +34,10 @@ class LoginJsonIT extends AbstractIT {
     private final String accountSurname = "Surname-" + randomUUID
     private final String accountPassword = "P@sword123!"
 
-    @Test
-    /**
+    /** Create account via JSON
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/27">#27</a>
      */
+    @Test
     public void accountRegistrationJson() throws Exception {
 
         Map<String, Object>  jsonAsMap = new HashMap<>();
@@ -72,5 +72,13 @@ class LoginJsonIT extends AbstractIT {
                     .path("account.href")
 
         deleteOnClassTeardown(createdHref)
+    }
+
+    /**
+     * Errors returned as JSON use API status and response
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/45">#27</a>
+     */
+    public void invalidLoginError() throws Exception {
+        // todo
     }
 }
