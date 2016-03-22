@@ -19,6 +19,8 @@ import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.path.xml.element.Node
 import com.jayway.restassured.path.xml.element.NodeChildren
+import com.jayway.restassured.response.Cookie
+import com.jayway.restassured.response.Cookies
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 
@@ -91,6 +93,23 @@ class LogoutIT extends AbstractIT {
         return cookies
     }
 
+    public void assertCookiesAreDeleted(Cookies cookies) throws Exception {
+        Date currentTime = new Date(System.currentTimeMillis())
+        Date today = currentTime.copyWith(
+            hourOfDay: 0,
+            minute: 0,
+            second: 0
+        )
+
+        Cookie accessTokenCookie = cookies.get("access_token")
+        assertTrue(accessTokenCookie.value.isEmpty())
+        assertTrue(accessTokenCookie.expiryDate < today)
+
+        Cookie refreshTokenCookie = cookies.get("refresh_token")
+        assertTrue(refreshTokenCookie.value.isEmpty())
+        assertTrue(refreshTokenCookie.expiryDate < today)
+    }
+
     /** Return 200 OK for unauthenticated JSON request
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/172">#172</a>
      * @throws Exception
@@ -104,6 +123,27 @@ class LogoutIT extends AbstractIT {
             .post(logoutPath)
         .then()
             .statusCode(200)
+    }
+
+    /** Delete cookies on JSON logout
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/174">#174</a>
+     * @throws Exception
+     */
+    @Test
+    public void deletesCookiesOnJsonLogout() throws Exception {
+        def sessionCookies = createSession()
+
+        Cookies detailedCookies =
+            given()
+                .accept(ContentType.JSON)
+                .cookies(sessionCookies)
+            .when()
+                .post(logoutPath)
+            .then()
+            .extract()
+                .detailedCookies()
+
+        assertCookiesAreDeleted(detailedCookies)
     }
 
     /** Return 200 OK for successful JSON logout
