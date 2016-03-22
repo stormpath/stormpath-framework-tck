@@ -72,7 +72,7 @@ class LogoutIT extends AbstractIT {
         deleteOnClassTeardown(createdHref)
     }
 
-    public Map<String, String> createSession() throws Exception {
+    private Map<String, String> createSession() throws Exception {
 
         Map<String, Object>  credentials = new HashMap<>();
         credentials.put("login", accountEmail)
@@ -93,7 +93,7 @@ class LogoutIT extends AbstractIT {
         return cookies
     }
 
-    public void assertCookiesAreDeleted(Cookies cookies) throws Exception {
+    private void assertCookiesAreDeleted(Cookies cookies) throws Exception {
         Date currentTime = new Date(System.currentTimeMillis())
         Date today = currentTime.copyWith(
             hourOfDay: 0,
@@ -195,5 +195,26 @@ class LogoutIT extends AbstractIT {
         .then()
             .statusCode(302)
             .header("Location", is("/"))
+    }
+
+    /** Delete cookies on logout
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/53">#53</a>
+     * @throws Exception
+     */
+    @Test
+    public void deletesCookiesOnLogout() throws Exception {
+        def sessionCookies = createSession()
+
+        Cookies detailedCookies =
+                given()
+                    .accept(ContentType.HTML)
+                    .cookies(sessionCookies)
+                .when()
+                    .post(logoutPath)
+                .then()
+                .extract()
+                    .detailedCookies()
+
+        assertCookiesAreDeleted(detailedCookies)
     }
 }
