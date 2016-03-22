@@ -19,7 +19,9 @@ import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Cookie
 import com.jayway.restassured.response.Cookies
 import com.stormpath.tck.AbstractIT
-
+import com.stormpath.tck.util.EnvUtils
+import com.stormpath.tck.util.JwtUtils
+import com.stormpath.tck.util.RestUtils
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
@@ -100,6 +102,18 @@ class LogoutIT extends AbstractIT {
         Cookie refreshTokenCookie = cookies.get("refresh_token")
         assertTrue(refreshTokenCookie.value.isEmpty())
         assertTrue(refreshTokenCookie.expiryDate < today)
+    }
+
+    private void assertTokenIsRevoked(String tokenJwt, String resourceType) throws Exception {
+        String tokenId = JwtUtils.extractJwtClaim(tokenJwt, "jti")
+
+        given()
+            .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
+            .header("User-Agent", "stormpath-framework-tck")
+        .when()
+            .get(EnvUtils.stormpathBaseUrl + '/' + resourceType + '/' + tokenId)
+        .then()
+            .statusCode(404)
     }
 
     /** Anything but POST should return 405
@@ -268,5 +282,22 @@ class LogoutIT extends AbstractIT {
                     .detailedCookies()
 
         assertCookiesAreDeleted(detailedCookies)
+    }
+
+    /** Revoke Stormpath tokens on logout
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/169">#169</a>
+     * @throws Exception
+     */
+    @Test
+    public void revokesTokensOnLogout() throws Exception {
+        def sessionCookies = createSession()
+
+        given()
+            .accept(ContentType.HTML)
+            .cookies(sessionCookies)
+        .post(logoutPath)
+
+        assertTokenIsRevoked(sessionCookies.get("access_token"), "accessTokens")
+        assertTokenIsRevoked(sessionCookies.get("refresh_token"), "refreshTokens")
     }
 }

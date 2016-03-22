@@ -27,6 +27,7 @@ import org.testng.annotations.BeforeClass
 import org.testng.annotations.BeforeTest
 
 import static com.jayway.restassured.RestAssured.*
+import static com.stormpath.tck.util.EnvUtils.getVal
 
 abstract class AbstractIT {
 
@@ -50,23 +51,6 @@ abstract class AbstractIT {
             return ""
         }
         return ":$port"
-    }
-
-    private static String getVal(String name, String defaultVal) {
-
-        //convert to system property format and try that first (they have precedence over environment variables):
-        String sysPropName = name.toLowerCase().replace('_', '.')
-        String val = System.getProperty(sysPropName)
-        if (val) {
-            return val
-        }
-
-        val = System.getenv(name)
-        if (val) {
-            return val
-        }
-
-        return defaultVal
     }
 
     @BeforeClass
