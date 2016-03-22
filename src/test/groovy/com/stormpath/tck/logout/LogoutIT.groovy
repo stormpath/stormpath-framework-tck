@@ -23,6 +23,7 @@ import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 
 import com.stormpath.tck.util.JwtUtils
+import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.get
@@ -34,5 +35,90 @@ import static org.testng.Assert.*
 @Test
 class LogoutIT extends AbstractIT {
 
+    private final String randomUUID = UUID.randomUUID().toString()
+    private final String accountEmail = "fooemail-" + randomUUID + "@stormpath.com"
+    private final String accountGivenName = "GivenName-" + randomUUID
+    private final String accountSurname = "Surname-" + randomUUID
+    private final String accountPassword = "P@sword123!"
 
+    private final String logoutPath = "/logout"
+    private final String registerPath = "/register"
+    private final String loginPath = "/login"
+
+    @BeforeClass
+    public void createDummyUser() throws Exception {
+
+        Map<String, Object>  jsonAsMap = new HashMap<>();
+        jsonAsMap.put("email", accountEmail)
+        jsonAsMap.put("password", accountPassword)
+        jsonAsMap.put("givenName", accountGivenName)
+        jsonAsMap.put("surname", accountSurname)
+
+        String createdHref =
+            given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(jsonAsMap)
+            .when()
+                .post(registerPath)
+            .then()
+                .statusCode(200)
+            .extract()
+                .path("account.href")
+
+        deleteOnClassTeardown(createdHref)
+    }
+
+    public Map<String, String> createSession() throws Exception {
+
+        Map<String, Object>  credentials = new HashMap<>();
+        credentials.put("login", accountEmail)
+        credentials.put("password", accountPassword)
+
+        Map<String, String> cookies =
+            given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(credentials)
+            .when()
+                .post(loginPath)
+            .then()
+                .statusCode(200)
+            .extract()
+                .cookies()
+
+        return cookies
+    }
+
+    /** Return 200 OK for empty JSON request
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/172">#172</a>
+     * @throws Exception
+     */
+    @Test
+    public void returnOkForEmptyJsonRequest() throws Exception {
+
+        given()
+            .accept(ContentType.JSON)
+        .when()
+            .post(logoutPath)
+        .then()
+            .statusCode(200)
+    }
+
+    /** Return 200 OK for successful JSON logout
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/171">#171</a>
+     * @throws Exception
+     */
+    @Test
+    public void returnOkForJsonLogout() throws Exception {
+        def sessionCookies = createSession()
+
+        given()
+            .accept(ContentType.JSON)
+            .cookies(sessionCookies)
+        .when()
+            .post(logoutPath)
+        .then()
+            .statusCode(200)
+    }
 }
