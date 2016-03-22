@@ -31,6 +31,7 @@ import static com.jayway.restassured.RestAssured.given
 import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.equalTo
 import static org.testng.Assert.*
+import static org.hamcrest.Matchers.*
 
 @Test
 class LogoutIT extends AbstractIT {
@@ -90,12 +91,12 @@ class LogoutIT extends AbstractIT {
         return cookies
     }
 
-    /** Return 200 OK for empty JSON request
+    /** Return 200 OK for unauthenticated JSON request
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/172">#172</a>
      * @throws Exception
      */
     @Test
-    public void returnOkForEmptyJsonRequest() throws Exception {
+    public void returnOkForUnauthenticatedJsonRequest() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -110,7 +111,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test
-    public void returnOkForJsonLogout() throws Exception {
+    public void returnOkOnSuccessfulJsonLogout() throws Exception {
         def sessionCookies = createSession()
 
         given()
@@ -120,5 +121,39 @@ class LogoutIT extends AbstractIT {
             .post(logoutPath)
         .then()
             .statusCode(200)
+    }
+
+    /** Redirect to nextUri for unauthenticated request
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/173">#173</a>
+     * @throws Exception
+     */
+    @Test
+    public void redirectForUnauthenticatedRequest() throws Exception {
+
+        given()
+            .accept(ContentType.HTML)
+        .when()
+            .post(logoutPath)
+        .then()
+            .statusCode(302)
+            .header("Location", is("/"))
+    }
+
+    /** Redirect to nextUri on successful logout
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/170">#170</a>
+     * @throws Exception
+     */
+    @Test
+    public void redirectOnSuccessfulLogout() throws Exception {
+        def sessionCookies = createSession()
+
+        given()
+            .accept(ContentType.HTML)
+            .cookies(sessionCookies)
+        .when()
+            .post(logoutPath)
+        .then()
+            .statusCode(302)
+            .header("Location", is("/"))
     }
 }
