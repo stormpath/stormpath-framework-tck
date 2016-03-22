@@ -16,22 +16,14 @@
 package com.stormpath.tck.logout
 
 import com.jayway.restassured.http.ContentType
-import com.jayway.restassured.path.xml.XmlPath
-import com.jayway.restassured.path.xml.element.Node
-import com.jayway.restassured.path.xml.element.NodeChildren
 import com.jayway.restassured.response.Cookie
 import com.jayway.restassured.response.Cookies
-import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 
-import com.stormpath.tck.util.JwtUtils
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
-import static com.jayway.restassured.RestAssured.get
-import static com.jayway.restassured.RestAssured.given
-import static org.hamcrest.Matchers.containsString
-import static org.hamcrest.Matchers.equalTo
+import static com.jayway.restassured.RestAssured.*
 import static org.testng.Assert.*
 import static org.hamcrest.Matchers.*
 
@@ -108,6 +100,66 @@ class LogoutIT extends AbstractIT {
         Cookie refreshTokenCookie = cookies.get("refresh_token")
         assertTrue(refreshTokenCookie.value.isEmpty())
         assertTrue(refreshTokenCookie.expiryDate < today)
+    }
+
+    /** Anything but POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
+     */
+    @Test
+    public void doNotHandleGet() throws Exception {
+        get(logoutPath)
+            .then()
+                .assertThat().statusCode(405)
+    }
+
+    /** Anything but POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
+     */
+    @Test
+    public void doNotHandleHead() throws Exception {
+        head(logoutPath)
+            .then()
+                .assertThat().statusCode(405)
+    }
+
+    /** Anything but POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
+     */
+    @Test
+    public void doNotHandlePut() throws Exception {
+        put(logoutPath)
+            .then()
+                .assertThat().statusCode(405)
+    }
+
+    /** Anything but POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
+     */
+    @Test
+    public void doNotHandleDelete() throws Exception {
+        delete(logoutPath)
+            .then()
+                .assertThat().statusCode(405)
+    }
+
+    /** Anything but POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
+     */
+    @Test
+    public void doNotHandleOptions() throws Exception {
+        options(logoutPath)
+            .then()
+                .assertThat().statusCode(405)
+    }
+
+    /** Anything but POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
+     */
+    @Test
+    public void doNotHandlePatch() throws Exception {
+        patch(logoutPath)
+            .then()
+                .assertThat().statusCode(405)
     }
 
     /** Return 200 OK for unauthenticated JSON request
