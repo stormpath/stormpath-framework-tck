@@ -58,6 +58,22 @@ class LoginIT extends AbstractIT {
         }
     }
 
+    private String getNodeText(Node node) {
+        StringBuilder builder = new StringBuilder()
+
+        for (Node child in node.children().list()){
+            builder.append(getNodeText(child))
+        }
+
+        if (node.value() != null) {
+            builder.append(node.value())
+        }
+
+        return builder
+                .toString()
+                .replaceAll("\\s+", " ")
+    }
+
     @BeforeClass
     private void createTestAccount() throws Exception {
 
@@ -237,5 +253,31 @@ class LoginIT extends AbstractIT {
         .then()
             .statusCode(302)
             .header("Location", is("/foo"))
+    }
+
+    /** Render unverified status message
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/102">#102</a>
+     * @throws Exception
+     */
+    @Test
+    public void rendersUnverifiedMessage() throws Exception {
+
+        Response response =
+            given()
+                .accept(ContentType.HTML)
+                .queryParam("status", "unverified")
+            .when()
+                .get(loginPath)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+            .extract()
+                .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
+        assertTrue(getNodeText(header).startsWith("Your account verification email has been sent! Before you can log into your account, you need to activate your account by clicking the link we sent to your inbox."))
+        // todo: groovy's HTML parsing sux. need to figure out how to pull the full text, not just whatever groovy chooses to see. :(
     }
 }
