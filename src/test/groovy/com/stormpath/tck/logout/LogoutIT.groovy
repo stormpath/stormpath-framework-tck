@@ -43,7 +43,7 @@ class LogoutIT extends AbstractIT {
     private final String loginPath = "/login"
 
     @BeforeClass
-    public void createDummyUser() throws Exception {
+    public void createTestUser() throws Exception {
 
         Map<String, Object>  jsonAsMap = new HashMap<>();
         jsonAsMap.put("email", accountEmail)
