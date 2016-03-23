@@ -15,6 +15,7 @@
  */
 package com.stormpath.tck.login
 
+import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.path.xml.element.Node
 import com.jayway.restassured.path.xml.element.NodeChildren
@@ -58,6 +59,23 @@ class LoginIT extends AbstractIT {
         }
 
         return ret
+    }
+
+    private Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
+        for (Node node : children.list()) {
+            def actualTag = node.name()
+            def actualAttribute = node.attributes().get(attributeKey)
+
+            if (actualTag == tag && actualAttribute == attributeValue) {
+                return node
+            }
+            else {
+                Node foundNode = findTagWithAttribute(node.children(), tag, attributeKey, attributeValue)
+                if (foundNode != null) {
+                    return foundNode
+                }
+            }
+        }
     }
 
     @Test
@@ -166,4 +184,32 @@ class LoginIT extends AbstractIT {
         assertEquals(this.accessToken, '')
     }
 
+    /** Serve a default HTML page with a login form for request type text/html
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/81">#81</a>
+     * @throws Exception
+     */
+    @Test
+    public void servesLoginForm() throws Exception {
+
+        Response response =
+            given()
+                .accept(ContentType.HTML)
+            .when()
+                .get("/login")
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+            .extract()
+                .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node loginField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "login")
+        assertEquals(loginField.attributes().get("type"), "text")
+        assertEquals(loginField.attributes().get("placeholder"), "Email")
+
+        Node passwordField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "password")
+        assertEquals(passwordField.attributes().get("type"), "password")
+        assertEquals(passwordField.attributes().get("placeholder"), "Password")
+    }
 }
