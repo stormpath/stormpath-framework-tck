@@ -58,6 +58,22 @@ class LoginIT extends AbstractIT {
         }
     }
 
+    private List<Node> findTags(NodeChildren children, String tag) {
+        def results = new ArrayList<Node>()
+
+        for (Node node in children.list()) {
+            if (node.name() == tag) {
+                results.add(node)
+            }
+            else {
+                Collection<Node> innerResults = findTags(node.children(), tag)
+                results.addAll(innerResults)
+            }
+        }
+
+        return results
+    }
+
     private String getNodeText(Node node, boolean addContentsFirst) {
         StringBuilder builder = new StringBuilder()
 
@@ -128,11 +144,9 @@ class LoginIT extends AbstractIT {
 
         Node loginField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "login")
         assertEquals(loginField.attributes().get("type"), "text")
-        assertEquals(loginField.attributes().get("placeholder"), "Email")
 
         Node passwordField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "password")
         assertEquals(passwordField.attributes().get("type"), "password")
-        assertEquals(passwordField.attributes().get("placeholder"), "Password")
     }
 
     /** Default HTML form must require username and password
@@ -442,5 +456,36 @@ class LoginIT extends AbstractIT {
 
         Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "bad-login")
         assertEquals(warning.toString(), "Invalid username or password.")
+    }
+
+    /** HTML form should contain fields ordered by fieldOrder
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/114">#114</a>
+     * @throws Exception
+     */
+    @Test
+    public void formShouldContainFieldsOrderedByFieldOrder() throws Exception {
+
+        Response response =
+            given()
+                .accept(ContentType.HTML)
+            .when()
+                .get(loginPath)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+            .extract()
+                .response()
+
+        XmlPath doc = getHtmlDoc(response)
+        List<Node> fields = findTags(doc.getNodeChildren("html.body"), "input")
+
+        // From default configuration
+        assertEquals(fields.get(0).attributes().get("name"), "login")
+        assertEquals(fields.get(0).attributes().get("placeholder"), "Username or Email")
+        assertEquals(fields.get(0).attributes().get("type"), "text")
+
+        assertEquals(fields.get(1).attributes().get("name"), "password")
+        assertEquals(fields.get(1).attributes().get("placeholder"), "Password")
+        assertEquals(fields.get(1).attributes().get("type"), "password")
     }
 }
