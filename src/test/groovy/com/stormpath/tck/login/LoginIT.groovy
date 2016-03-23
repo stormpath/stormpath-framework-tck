@@ -26,6 +26,7 @@ import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.given
+import static org.hamcrest.Matchers.*
 import static org.testng.Assert.*
 
 @Test
@@ -137,5 +138,25 @@ class LoginIT extends AbstractIT {
 
         Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "bad-login")
         assertEquals(warning.toString(), "The login and password fields are required.")
+    }
+
+    /** Default HTML form should set OAuth 2.0 cookies on successful login
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/88">#88</a>
+     * @throws Exception
+     */
+    @Test
+    public void setsCookiesOnLogin() throws Exception {
+
+        // todo: work with CSRF
+
+        given()
+            .accept(ContentType.HTML)
+            .formParam("login", accountEmail)
+            .formParam("password", accountPassword)
+        .when()
+            .post(loginPath)
+        .then()
+            .cookie("access_token", not(isEmptyOrNullString()))
+            .cookie("refresh_token", not(isEmptyOrNullString()))
     }
 }
