@@ -22,13 +22,10 @@ import com.jayway.restassured.path.xml.element.NodeChildren
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 
-import com.stormpath.tck.util.JwtUtils
+import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
-import static com.jayway.restassured.RestAssured.get
 import static com.jayway.restassured.RestAssured.given
-import static org.hamcrest.Matchers.containsString
-import static org.hamcrest.Matchers.equalTo
 import static org.testng.Assert.*
 
 @Test
@@ -39,29 +36,9 @@ class LoginIT extends AbstractIT {
     private final String accountGivenName = "GivenName-" + randomUUID
     private final String accountSurname = "Surname-" + randomUUID
     private final String accountPassword = "P@sword123!"
+    private final String accountUsername = "foo-" + randomUUID
 
     private final String loginPath = "/login"
-
-    private Map<String, String> cookies
-    private String accessToken
-
-    private Node findForm(NodeChildren children) {
-        for (Node node : children.list()) {
-            return (node.get("form") != null) ? node.get("form") : findForm(node.children())
-        }
-    }
-
-    private Map<String, String> getHiddenFormFields(Node form) {
-        Map<String, String> ret = new HashMap<String, String>()
-
-        for (Node node : form.getNodes("input")) {
-            if (node.attributes().get("type").equalsIgnoreCase("hidden")) {
-                ret.put(node.attributes().get("name"), node.attributes().get("value"))
-            }
-        }
-
-        return ret
-    }
 
     private Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
         for (Node node : children.list()) {
@@ -80,110 +57,28 @@ class LoginIT extends AbstractIT {
         }
     }
 
-    @Test
-    public void accountRegistration() throws Exception {
+    @BeforeClass
+    private void createTestAccount() throws Exception {
 
-        //1.  Get the /register page
+        Map<String, Object>  jsonAsMap = new HashMap<>();
+        jsonAsMap.put("email", accountEmail)
+        jsonAsMap.put("password", accountPassword)
+        jsonAsMap.put("givenName", accountGivenName)
+        jsonAsMap.put("surname", accountSurname)
+        jsonAsMap.put("username", accountUsername)
 
-        Response response = get("/register")
+        String createdHref =
+                given()
+                    .contentType(ContentType.JSON)
+                    .body(jsonAsMap)
+                .when()
+                    .post("/register")
+                .then()
+                    .statusCode(200)
+                .extract()
+                    .path("account.href")
 
-        // store any cookies - we'll just feed them back later
-        this.cookies = response.getCookies()
-
-        XmlPath doc = getHtmlDoc(response)
-
-        Node form = findForm(doc.get("html.body"))
-
-        // grab any hidden form fields - we'll just feed them back later
-        Map<String, String> hiddenFields = getHiddenFormFields(form)
-
-        //2. Post the new account
-
-        given()
-            .cookies(this.cookies)
-            .formParams(hiddenFields)
-            .formParam("givenName", accountGivenName)
-            .formParam("surname", accountSurname)
-            .formParam("email", accountEmail)
-            .formParam("password", accountPassword)
-
-            // no confirm for express?
-
-            // form value in java, doesn't interfere with
-            .formParam("confirmPassword", accountPassword)
-            // form value in laravel
-            //.formParam("password_confirmation", accountPassword)
-
-        //assert that the user is redirected
-        .expect()
-            .statusCode(302)
-
-        //post the account
-        .post("/register")
-            .andReturn()
-    }
-
-    @Test(dependsOnMethods = "accountRegistration")
-    public void login() throws Exception {
-
-        //1.  Get the /login page
-
-        Response response =
-            given()
-                .header("Accept", "text/html")
-            .when()
-                .get("/login")
-
-        // store any cookies - we'll just feed them back later
-        this.cookies = response.getCookies()
-
-        XmlPath doc = getHtmlDoc(response)
-
-        Node form = findForm(doc.get("html.body"))
-
-        // grab any hidden form fields - we'll just feed them back later
-        Map<String, String> hiddenFields = getHiddenFormFields(form)
-
-        //2. Post to login
-
-        response =
-            given()
-                .cookies(this.cookies)
-                .formParams(hiddenFields)
-                .formParam("login", accountEmail)
-                .formParam("password", accountPassword)
-
-            //assert that the user is redirected to the default login.nextUri (which is '/'):
-                .expect()
-                .statusCode(302)
-
-            //post the account
-                .post("/login")
-                .andReturn()
-
-        //get the resulting cookie:
-        this.accessToken = response.getCookie("access_token")
-
-        assertTrue(this.accessToken.length() > 0);
-
-        deleteOnClassTeardown(JwtUtils.extractJwtClaim(this.accessToken, "sub"))
-    }
-
-    @Test(dependsOnMethods = "login")
-    public void logout() throws Exception {
-
-        Response response =
-            given()
-                .log().all()
-                .cookies(this.cookies)
-                .header("Authorization", "Bearer " + this.accessToken)
-            .expect()
-                .statusCode(302)
-            .post("/logout")
-                .andReturn()
-
-        this.accessToken = response.getCookie("access_token");
-        assertEquals(this.accessToken, '')
+        deleteOnClassTeardown(createdHref)
     }
 
     /** Serve a default HTML page with a login form for request type text/html
@@ -223,6 +118,8 @@ class LoginIT extends AbstractIT {
      */
     @Test
     public void loginAndPasswordAreRequired() throws Exception {
+
+        // todo: work with CSRF
 
         Response response =
             given()
