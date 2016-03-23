@@ -331,4 +331,29 @@ class LoginIT extends AbstractIT {
         Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
         assertEquals(getNodeText(header), "Your Account Has Been Created. You may now login.")
     }
+
+    /** Render forgot status message
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/105">#105</a>
+     * @throws Exception
+     */
+    @Test
+    public void rendersForgotMessage() throws Exception {
+
+        Response response =
+                given()
+                    .accept(ContentType.HTML)
+                    .queryParam("status", "forgot")
+                .when()
+                    .get(loginPath)
+                .then()
+                    .statusCode(200)
+                    .contentType(ContentType.HTML)
+                .extract()
+                    .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
+        assertEquals(getNodeText(header), "Password Reset Requested. If an account exists for the email provided, you will receive an email shortly.")
+    }
 }
