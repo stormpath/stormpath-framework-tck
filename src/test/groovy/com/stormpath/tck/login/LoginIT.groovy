@@ -197,4 +197,24 @@ class LoginIT extends AbstractIT {
         .then()
             .statusCode(302)
     }
+
+    /** Redirect to nextUri on successful authorization
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/97">#97</a>
+     * @throws Exception
+     */
+    @Test
+    public void redirectsToNextUriOnLogin() throws Exception {
+
+        // todo: work with CSRF
+
+        given()
+            .accept(ContentType.HTML)
+            .formParam("login", accountEmail)
+            .formParam("password", accountPassword)
+        .when()
+            .post(loginPath)
+        .then()
+            .statusCode(302)
+            .header("Location", is("/"))
+    }
 }
