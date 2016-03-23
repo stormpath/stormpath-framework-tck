@@ -488,4 +488,32 @@ class LoginIT extends AbstractIT {
         assertEquals(fields.get(1).attributes().get("placeholder"), "Password")
         assertEquals(fields.get(1).attributes().get("type"), "password")
     }
+
+    /** Preserve value in login field on unsuccessful attempt
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/177">#177</a>
+     * @throws Exception
+     */
+    @Test
+    public void preserveValueInLoginFieldOnAttempt() throws Exception {
+
+        // todo: work with CSRF
+
+        Response response =
+                given()
+                    .accept(ContentType.HTML)
+                    .formParam("login", "blah")
+                    .formParam("password", "")
+                .when()
+                    .post(loginPath)
+                .then()
+                    .statusCode(200)
+                    .contentType(ContentType.HTML)
+                .extract()
+                    .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node loginField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "login")
+        assertEquals(loginField.attributes().get("value"), "blah")
+    }
 }
