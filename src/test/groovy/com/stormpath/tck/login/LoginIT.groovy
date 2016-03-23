@@ -236,7 +236,7 @@ class LoginIT extends AbstractIT {
     }
 
     /** Redirect to URI specified by next query parameter on successful authorization
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/97">#97</a>
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/99">#99</a>
      * @throws Exception
      */
     @Test
