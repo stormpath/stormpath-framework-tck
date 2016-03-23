@@ -415,4 +415,32 @@ class LoginIT extends AbstractIT {
         // The only header div should be the one that contains the form header
         assertEquals(getNodeText(header, true), "Log In or Create Account")
     }
+
+    /** Rerender form with error UX if login is unsuccessful
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/109">#109</a>
+     * @throws Exception
+     */
+    @Test
+    public void rerenderFormWithErrorIfLoginFails() throws Exception {
+
+        // todo: work with CSRF
+
+        Response response =
+            given()
+                .accept(ContentType.HTML)
+                .formParam("login", "blah")
+                .formParam("password", "foobar!")
+            .when()
+                .post(loginPath)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+            .extract()
+                .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "bad-login")
+        assertEquals(warning.toString(), "Invalid username or password.")
+    }
 }
