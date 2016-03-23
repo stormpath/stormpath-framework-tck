@@ -306,4 +306,29 @@ class LoginIT extends AbstractIT {
         Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
         assertEquals(getNodeText(header), "Your Account Has Been Verified. You may now login.")
     }
+
+    /** Render created status message
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/104">#104</a>
+     * @throws Exception
+     */
+    @Test
+    public void rendersCreatedMessage() throws Exception {
+
+        Response response =
+                given()
+                    .accept(ContentType.HTML)
+                    .queryParam("status", "created")
+                .when()
+                    .get(loginPath)
+                .then()
+                    .statusCode(200)
+                    .contentType(ContentType.HTML)
+                .extract()
+                    .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
+        assertEquals(getNodeText(header), "Your Account Has Been Created. You may now login.")
+    }
 }
