@@ -159,4 +159,42 @@ class LoginIT extends AbstractIT {
             .cookie("access_token", not(isEmptyOrNullString()))
             .cookie("refresh_token", not(isEmptyOrNullString()))
     }
+
+    /** Login value can either be username or email
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/92">#92</a>
+     * @throws Exception
+     */
+    @Test
+    public void loginValueCanBeEmail() throws Exception {
+
+        // todo: work with CSRF
+
+        given()
+            .accept(ContentType.HTML)
+            .formParam("login", accountEmail)
+            .formParam("password", accountPassword)
+        .when()
+            .post(loginPath)
+        .then()
+            .statusCode(302)
+    }
+
+    /** Login value can either be username or email
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/92">#92</a>
+     * @throws Exception
+     */
+    @Test
+    public void loginValueCanBeUsername() throws Exception {
+
+        // todo: work with CSRF
+
+        given()
+            .accept(ContentType.HTML)
+            .formParam("login", accountUsername)
+            .formParam("password", accountPassword)
+        .when()
+            .post(loginPath)
+        .then()
+            .statusCode(302)
+    }
 }
