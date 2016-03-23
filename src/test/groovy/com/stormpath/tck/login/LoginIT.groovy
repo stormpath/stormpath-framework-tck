@@ -40,6 +40,8 @@ class LoginIT extends AbstractIT {
     private final String accountSurname = "Surname-" + randomUUID
     private final String accountPassword = "P@sword123!"
 
+    private final String loginPath = "/login"
+
     private Map<String, String> cookies
     private String accessToken
 
@@ -66,7 +68,7 @@ class LoginIT extends AbstractIT {
             def actualTag = node.name()
             def actualAttribute = node.attributes().get(attributeKey)
 
-            if (actualTag == tag && actualAttribute == attributeValue) {
+            if (actualTag == tag && actualAttribute.contains(attributeValue)) {
                 return node
             }
             else {
@@ -195,7 +197,7 @@ class LoginIT extends AbstractIT {
             given()
                 .accept(ContentType.HTML)
             .when()
-                .get("/login")
+                .get(loginPath)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -211,5 +213,32 @@ class LoginIT extends AbstractIT {
         Node passwordField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "password")
         assertEquals(passwordField.attributes().get("type"), "password")
         assertEquals(passwordField.attributes().get("placeholder"), "Password")
+    }
+
+    /** Default HTML form must require username and password
+     *  Omitting login or password will render the form with an error
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/86">#86</a>
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/94">#94</a>
+     * @throws Exception
+     */
+    @Test
+    public void loginAndPasswordAreRequired() throws Exception {
+
+        Response response =
+            given()
+                .accept(ContentType.HTML)
+                .formParam("foo", "bar")
+            .when()
+                .post(loginPath)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+            .extract()
+                .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "bad-login")
+        assertEquals(warning.toString(), "The login and password fields are required.")
     }
 }
