@@ -58,17 +58,24 @@ class LoginIT extends AbstractIT {
         }
     }
 
-    private String getNodeText(Node node) {
+    private String getNodeText(Node node, boolean addContentsFirst) {
         StringBuilder builder = new StringBuilder()
 
+        if (addContentsFirst){
+            if (node.value() != null) {
+                builder.append(node.value())
+            }
+        }
+
         for (Node child in node.children().list()){
-            builder.append(getNodeText(child))
+            builder.append(getNodeText(child, addContentsFirst))
         }
 
-        if (node.value() != null) {
-            builder.append(node.value())
+        if (!addContentsFirst){
+            if (node.value() != null) {
+                builder.append(node.value())
+            }
         }
-
         return builder
                 .toString()
                 .replaceAll("\\s+", " ")
@@ -278,7 +285,7 @@ class LoginIT extends AbstractIT {
         XmlPath doc = getHtmlDoc(response)
 
         Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
-        assertTrue(getNodeText(header).startsWith("Your account verification email has been sent! Before you can log into your account, you need to activate your account by clicking the link we sent to your inbox."))
+        assertTrue(getNodeText(header, false).startsWith("Your account verification email has been sent! Before you can log into your account, you need to activate your account by clicking the link we sent to your inbox."))
         // todo: groovy's HTML parsing sux. need to figure out how to pull the full text, not just whatever groovy chooses to see. :(
     }
 
@@ -304,7 +311,7 @@ class LoginIT extends AbstractIT {
         XmlPath doc = getHtmlDoc(response)
 
         Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
-        assertEquals(getNodeText(header), "Your Account Has Been Verified. You may now login.")
+        assertEquals(getNodeText(header, false), "Your Account Has Been Verified. You may now login.")
     }
 
     /** Render created status message
@@ -329,7 +336,7 @@ class LoginIT extends AbstractIT {
         XmlPath doc = getHtmlDoc(response)
 
         Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
-        assertEquals(getNodeText(header), "Your Account Has Been Created. You may now login.")
+        assertEquals(getNodeText(header, false), "Your Account Has Been Created. You may now login.")
     }
 
     /** Render forgot status message
@@ -354,7 +361,7 @@ class LoginIT extends AbstractIT {
         XmlPath doc = getHtmlDoc(response)
 
         Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
-        assertEquals(getNodeText(header), "Password Reset Requested. If an account exists for the email provided, you will receive an email shortly.")
+        assertEquals(getNodeText(header, false), "Password Reset Requested. If an account exists for the email provided, you will receive an email shortly.")
     }
 
     /** Render reset status message
@@ -379,6 +386,33 @@ class LoginIT extends AbstractIT {
         XmlPath doc = getHtmlDoc(response)
 
         Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
-        assertEquals(getNodeText(header), "Password Reset Successfully. You can now login with your new password.")
+        assertEquals(getNodeText(header, false), "Password Reset Successfully. You can now login with your new password.")
+    }
+
+    /** Ignore bogus status query values
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/107">#107</a>
+     * @throws Exception
+     */
+    @Test
+    public void ignoreArbitraryStatus() throws Exception {
+
+        Response response =
+                given()
+                    .accept(ContentType.HTML)
+                    .queryParam("status", "foobar")
+                .when()
+                    .get(loginPath)
+                .then()
+                    .statusCode(200)
+                    .contentType(ContentType.HTML)
+                .extract()
+                    .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
+
+        // The only header div should be the one that contains the form header
+        assertEquals(getNodeText(header, true), "Log In or Create Account")
     }
 }
