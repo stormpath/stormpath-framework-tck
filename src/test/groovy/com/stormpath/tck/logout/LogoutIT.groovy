@@ -229,6 +229,23 @@ class LogoutIT extends AbstractIT {
             .statusCode(200)
     }
 
+    /** Revoke tokens on Stormpath for JSON request
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/175">#175</a>
+     * @throws Exception
+     */
+    @Test
+    public void revokesTokensOnJsonLogout() throws Exception {
+        def sessionCookies = createSession()
+
+        given()
+            .accept(ContentType.JSON)
+            .cookies(sessionCookies)
+        .post(logoutPath)
+
+        assertTokenIsRevoked(sessionCookies.get("access_token"), "accessTokens")
+        assertTokenIsRevoked(sessionCookies.get("refresh_token"), "refreshTokens")
+    }
+
     /** Redirect to nextUri for unauthenticated request
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/173">#173</a>
      * @throws Exception
