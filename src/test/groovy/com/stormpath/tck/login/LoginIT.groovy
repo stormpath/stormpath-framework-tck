@@ -72,6 +72,7 @@ class LoginIT extends AbstractIT {
         return builder
                 .toString()
                 .replaceAll("\\s+", " ")
+                .replaceAll("\\s+\$", "")
     }
 
     @BeforeClass
@@ -279,5 +280,30 @@ class LoginIT extends AbstractIT {
         Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
         assertTrue(getNodeText(header).startsWith("Your account verification email has been sent! Before you can log into your account, you need to activate your account by clicking the link we sent to your inbox."))
         // todo: groovy's HTML parsing sux. need to figure out how to pull the full text, not just whatever groovy chooses to see. :(
+    }
+
+    /** Render verified status message
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/102">#103</a>
+     * @throws Exception
+     */
+    @Test
+    public void rendersVerifiedMessage() throws Exception {
+
+        Response response =
+            given()
+                .accept(ContentType.HTML)
+                .queryParam("status", "verified")
+            .when()
+                .get(loginPath)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+            .extract()
+                .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
+        assertEquals(getNodeText(header), "Your Account Has Been Verified. You may now login.")
     }
 }
