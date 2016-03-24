@@ -33,6 +33,14 @@ class RegisterIT extends AbstractIT {
 
     private static final String registerPath = "/register"
 
+    private final String randomUUID = UUID.randomUUID().toString()
+    private final String accountEmail = "fooemail-$randomUUID@stormpath.com"
+    private final String accountGivenName = "GivenName-$randomUUID"
+    private final String accountSurname = "Surname-$randomUUID"
+    private final String accountMiddleName = "Foobar"
+    private final String accountPassword = "P@sword123!"
+    private final String accountUsername = "foo-$randomUUID"
+
     /**
      * Serve the registration view model for request type application/json
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/179">#179</a>
@@ -81,8 +89,9 @@ class RegisterIT extends AbstractIT {
     public void returnsErrorIfEmailIsMissing() throws Exception {
 
         Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", "foo@bar.baz")
+        jsonAsMap.put("email", accountEmail)
         jsonAsMap.put("password", "")
+
 
         given()
             .accept(ContentType.JSON)
@@ -105,9 +114,9 @@ class RegisterIT extends AbstractIT {
     public void returnsErrorIfRequiredFieldIsMissing() throws Exception {
 
         Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", "foo@bar.baz")
-        jsonAsMap.put("password", "foobar123")
-        jsonAsMap.put("surname", "Testerman")
+        jsonAsMap.put("email", accountEmail)
+        jsonAsMap.put("password", accountPassword)
+        jsonAsMap.put("surname", accountSurname)
         // givenName is required per the default configuration
 
         given()
@@ -131,10 +140,10 @@ class RegisterIT extends AbstractIT {
     public void returnsErrorForUndefinedRootCustomField() throws Exception {
 
         Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", "foo@bar.baz")
-        jsonAsMap.put("password", "foobar123")
-        jsonAsMap.put("givenName", "Test")
-        jsonAsMap.put("surname", "Testerman")
+        jsonAsMap.put("email", accountEmail)
+        jsonAsMap.put("password", accountPassword)
+        jsonAsMap.put("givenName", accountGivenName)
+        jsonAsMap.put("surname", accountSurname)
         jsonAsMap.put("customValue", "foobar")
         // field 'customValue' is not defined in the default configuration
 
@@ -159,10 +168,10 @@ class RegisterIT extends AbstractIT {
     public void returnsErrorForUndefinedCustomField() throws Exception {
 
         Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", "foo@bar.baz")
-        jsonAsMap.put("password", "foobar123")
-        jsonAsMap.put("givenName", "Test")
-        jsonAsMap.put("surname", "Testerman")
+        jsonAsMap.put("email", accountEmail)
+        jsonAsMap.put("password", accountPassword)
+        jsonAsMap.put("givenName", accountGivenName)
+        jsonAsMap.put("surname", accountSurname)
 
         Map<String, Object> customDataMap = new HashMap<>();
         customDataMap.put("hello", "world")
@@ -193,8 +202,8 @@ class RegisterIT extends AbstractIT {
         Map<String, Object>  jsonAsMap = new HashMap<>();
         jsonAsMap.put("email", "foo@bar")
         jsonAsMap.put("password", "1")
-        jsonAsMap.put("givenName", "Test")
-        jsonAsMap.put("surname", "Testerman")
+        jsonAsMap.put("givenName", accountGivenName)
+        jsonAsMap.put("surname", accountSurname)
         // Email and password will not pass Stormpath API validation and will error
 
         given()
@@ -208,5 +217,45 @@ class RegisterIT extends AbstractIT {
             .body("size()", is(2))
             .body("status", is(400))
             .body("message", not(isEmptyOrNullString()))
+    }
+
+    /**
+     * Return sanitized JSON account on success
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/202">#202</a>
+     * @throws Exception
+     */
+    public void returnsSanitizedAccountForSuccess() throws Exception {
+
+        Map<String, Object>  jsonAsMap = new HashMap<>();
+        jsonAsMap.put("email", accountEmail)
+        jsonAsMap.put("password", accountPassword)
+        jsonAsMap.put("givenName", accountGivenName)
+        jsonAsMap.put("middleName", accountMiddleName)
+        jsonAsMap.put("surname", accountSurname)
+        jsonAsMap.put("username", accountUsername)
+
+        String createdHref =
+            given()
+                .accept(ContentType.JSON)
+                .body(jsonAsMap)
+            .when()
+                .post(registerPath)
+            .then()
+                .contentType(ContentType.JSON)
+                .body("size()", is(1))
+                .body("account.href", not(isEmptyOrNullString()))
+                .body("account.username", is(accountUsername))
+                .body("account.modifiedAt", not(isEmptyOrNullString()))
+                .body("account.status", equalToIgnoringCase("ENABLED"))
+                .body("account.createdAt", not(isEmptyOrNullString()))
+                .body("account.email", is(accountEmail))
+                .body("account.middleName", is(accountMiddleName))
+                .body("account.surname", is(accountSurname))
+                .body("account.givenName", is(accountGivenName))
+                .body("account.fullName", is("$accountGivenName $accountMiddleName $accountSurname".toString()))
+            .extract()
+                .path("account.href")
+
+        deleteOnClassTeardown(createdHref)
     }
 }
