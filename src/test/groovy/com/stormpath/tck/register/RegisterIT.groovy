@@ -181,4 +181,32 @@ class RegisterIT extends AbstractIT {
             .body("status", is(400))
             .body("message", not(isEmptyOrNullString()))
     }
+
+    /**
+     * Return JSON error if server error occurs
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/201">#201</a>
+     * @throws Exception
+     */
+    @Test
+    public void returnsJsonErrorForServerError() throws Exception {
+
+        Map<String, Object>  jsonAsMap = new HashMap<>();
+        jsonAsMap.put("email", "foo@bar")
+        jsonAsMap.put("password", "1")
+        jsonAsMap.put("givenName", "Test")
+        jsonAsMap.put("surname", "Testerman")
+        // Email and password will not pass Stormpath API validation and will error
+
+        given()
+            .accept(ContentType.JSON)
+            .body(jsonAsMap)
+        .when()
+            .post(registerPath)
+        .then()
+            .statusCode(400)
+            .contentType(ContentType.JSON)
+            .body("size()", is(2))
+            .body("status", is(400))
+            .body("message", not(isEmptyOrNullString()))
+    }
 }
