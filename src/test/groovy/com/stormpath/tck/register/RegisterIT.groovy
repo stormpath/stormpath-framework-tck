@@ -52,4 +52,73 @@ class RegisterIT extends AbstractIT {
             .body(".", hasKey("form"))
             .body(".", hasKey("accountStores"))
     }
+
+    /**
+     * Return JSON error if required fields are missing
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/189">#189</a>
+     * @throws Exception
+     */
+    @Test
+    public void returnsErrorIfPostIsEmpty() throws Exception {
+
+        given()
+            .accept(ContentType.JSON)
+        .when()
+            .post(registerPath)
+        .then()
+            .statusCode(400)
+            .contentType(ContentType.JSON)
+            .body("status", is(400))
+            .body("message", not(isEmptyOrNullString()))
+    }
+
+    /**
+     * Return JSON error if required fields are missing
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/189">#189</a>
+     * @throws Exception
+     */
+    @Test
+    public void returnsErrorIfEmailIsMissing() throws Exception {
+
+        Map<String, Object>  jsonAsMap = new HashMap<>();
+        jsonAsMap.put("email", "foo@bar.baz")
+        jsonAsMap.put("password", "")
+
+        given()
+            .accept(ContentType.JSON)
+            .body(jsonAsMap)
+        .when()
+            .post(registerPath)
+        .then()
+            .statusCode(400)
+            .contentType(ContentType.JSON)
+            .body("status", is(400))
+            .body("message", not(isEmptyOrNullString()))
+    }
+
+    /**
+     * Return JSON error if required fields are missing
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/189">#189</a>
+     * @throws Exception
+     */
+    @Test
+    public void returnsErrorIfRequiredFieldIsMissing() throws Exception {
+
+        Map<String, Object>  jsonAsMap = new HashMap<>();
+        jsonAsMap.put("email", "foo@bar.baz")
+        jsonAsMap.put("password", "foobar123")
+        jsonAsMap.put("surname", "Testerman")
+        // givenName is required per the default configuration
+
+        given()
+            .accept(ContentType.JSON)
+            .body(jsonAsMap)
+        .when()
+            .post(registerPath)
+        .then()
+            .statusCode(400)
+            .contentType(ContentType.JSON)
+            .body("status", is(400))
+            .body("message", not(isEmptyOrNullString()))
+    }
 }
