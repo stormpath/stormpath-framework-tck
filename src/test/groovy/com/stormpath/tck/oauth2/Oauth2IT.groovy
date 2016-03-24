@@ -33,6 +33,10 @@ class Oauth2IT extends AbstractIT {
     private final String accountEmail = "fooemail-" + randomUUID + "@stormpath.com"
     private final String accountUsername = randomUUID
     private final String accountPassword = "P@ssword123"
+
+    private static final String registerRoute = "/register"
+    private static final String tokenRoute = "/oauth/token"
+
     private String accountHref = ""
 
     @BeforeClass
@@ -46,15 +50,15 @@ class Oauth2IT extends AbstractIT {
         jsonAsMap.put("username", accountUsername)
 
         String createdHref =
-                given()
-                    .contentType(ContentType.JSON)
-                    .body(jsonAsMap)
-                .when()
-                    .post("/register")
-                .then()
-                    .statusCode(200)
-                .extract()
-                    .path("account.href")
+            given()
+                .contentType(ContentType.JSON)
+                .body(jsonAsMap)
+            .when()
+                .post(registerRoute)
+            .then()
+                .statusCode(200)
+            .extract()
+                .path("account.href")
 
         this.accountHref = createdHref
         deleteOnClassTeardown(createdHref)
@@ -69,7 +73,7 @@ class Oauth2IT extends AbstractIT {
         given()
             .param("grant_type", "foobar_grant")
         .when()
-            .post("/oauth/token")
+            .post(tokenRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -88,7 +92,7 @@ class Oauth2IT extends AbstractIT {
         given()
             .param("grant_type", "")
         .when()
-            .post("/oauth/token")
+            .post(tokenRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -107,7 +111,7 @@ class Oauth2IT extends AbstractIT {
         given()
             .body("""hello"" : ""world""")
         .when()
-            .post("/oauth/token")
+            .post(tokenRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -122,7 +126,7 @@ class Oauth2IT extends AbstractIT {
      */
     @Test
     public void doNotHandleGet() throws Exception {
-        get("/oauth/token")
+        get(tokenRoute)
             .then()
             .assertThat().statusCode(405)
     }
@@ -132,7 +136,7 @@ class Oauth2IT extends AbstractIT {
      */
     @Test
     public void doNotHandleHead() throws Exception {
-        head("/oauth/token")
+        head(tokenRoute)
             .then()
             .assertThat().statusCode(405)
     }
@@ -142,7 +146,7 @@ class Oauth2IT extends AbstractIT {
      */
     @Test
     public void doNotHandlePut() throws Exception {
-        put("/oauth/token")
+        put(tokenRoute)
             .then()
             .assertThat().statusCode(405)
     }
@@ -162,7 +166,7 @@ class Oauth2IT extends AbstractIT {
      */
     @Test
     public void doNotHandleOptions() throws Exception {
-        options("/oauth/token")
+        options(tokenRoute)
             .then()
             .assertThat().statusCode(405)
     }
@@ -172,7 +176,7 @@ class Oauth2IT extends AbstractIT {
      */
     @Test
     public void doNotHandlePatch() throws Exception {
-        patch("/oauth/token")
+        patch(tokenRoute)
             .then()
             .assertThat().statusCode(405)
     }
@@ -189,7 +193,7 @@ class Oauth2IT extends AbstractIT {
                 .param("username", accountUsername)
                 .param("password", accountPassword)
             .when()
-                .post("/oauth/token")
+                .post(tokenRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -215,7 +219,7 @@ class Oauth2IT extends AbstractIT {
                 .param("username", accountEmail)
                 .param("password", accountPassword)
             .when()
-                .post("/oauth/token")
+                .post(tokenRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
