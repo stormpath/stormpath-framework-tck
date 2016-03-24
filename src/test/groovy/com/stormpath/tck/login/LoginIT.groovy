@@ -21,11 +21,16 @@ import com.jayway.restassured.path.xml.element.Node
 import com.jayway.restassured.path.xml.element.NodeChildren
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
-
+import com.stormpath.tck.util.Iso8601Utils
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
+import static com.jayway.restassured.RestAssured.delete
 import static com.jayway.restassured.RestAssured.given
+import static com.jayway.restassured.RestAssured.head
+import static com.jayway.restassured.RestAssured.options
+import static com.jayway.restassured.RestAssured.patch
+import static com.jayway.restassured.RestAssured.put
 import static org.hamcrest.Matchers.*
 import static org.testng.Assert.*
 
@@ -36,10 +41,12 @@ class LoginIT extends AbstractIT {
     private final String accountEmail = "fooemail-" + randomUUID + "@stormpath.com"
     private final String accountGivenName = "GivenName-" + randomUUID
     private final String accountSurname = "Surname-" + randomUUID
+    private final String accountMiddleName = "Foobar"
     private final String accountPassword = "P@sword123!"
     private final String accountUsername = "foo-" + randomUUID
 
-    private final String loginPath = "/login"
+    private final String loginRoute = "/login"
+    private final String registerRoute = "/register"
 
     private Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
         for (Node node : children.list()) {
@@ -98,6 +105,14 @@ class LoginIT extends AbstractIT {
                 .replaceAll("\\s+\$", "")
     }
 
+    private Map getJsonCredentials() {
+        Map<String, Object>  credentials = new HashMap<>();
+
+        credentials.put("login", accountEmail)
+        credentials.put("password", accountPassword)
+        return credentials
+    }
+
     @BeforeClass
     private void createTestAccount() throws Exception {
 
@@ -107,19 +122,351 @@ class LoginIT extends AbstractIT {
         jsonAsMap.put("givenName", accountGivenName)
         jsonAsMap.put("surname", accountSurname)
         jsonAsMap.put("username", accountUsername)
+        jsonAsMap.put("middleName", accountMiddleName)
 
         String createdHref =
                 given()
+                    .accept(ContentType.JSON)
                     .contentType(ContentType.JSON)
                     .body(jsonAsMap)
                 .when()
-                    .post("/register")
+                    .post(registerRoute)
                 .then()
                     .statusCode(200)
                 .extract()
                     .path("account.href")
 
         deleteOnClassTeardown(createdHref)
+    }
+
+    /** Anything but GET or POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
+     */
+    @Test
+    public void doNotHandleHead() throws Exception {
+        head(loginRoute)
+            .then()
+                .assertThat().statusCode(405)
+    }
+
+    /** Anything but GET or POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
+     */
+    @Test
+    public void doNotHandlePut() throws Exception {
+        put(loginRoute)
+            .then()
+                .assertThat().statusCode(405)
+    }
+
+    /** Anything but GET or POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
+     */
+    @Test
+    public void doNotHandleDelete() throws Exception {
+        delete(loginRoute)
+            .then()
+                .assertThat().statusCode(405)
+    }
+
+    /** Anything but GET or POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
+     */
+    @Test
+    public void doNotHandleOptions() throws Exception {
+        options(loginRoute)
+            .then()
+                .assertThat().statusCode(405)
+    }
+
+    /** Anything but GET or POST should return 405
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
+     */
+    @Test
+    public void doNotHandlePatch() throws Exception {
+        patch(loginRoute)
+            .then()
+                .assertThat().statusCode(405)
+    }
+
+    /**
+     * Serve the login view model for request type application/json
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/83">#83</a>
+     * @throws Exception
+     */
+    @Test
+    public void servesLoginViewModel() throws Exception {
+
+        given()
+            .accept(ContentType.JSON)
+        .when()
+            .get(loginRoute)
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            .body("size()", is(2))
+            .body(".", hasKey("form"))
+            .body(".", hasKey("accountStores"))
+    }
+
+    /**
+     * Login view model should have a list of fields ordered by fieldOrder
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/89">#89</a>
+     * @throws Exception
+     */
+    @Test
+    public void loginViewModelHasFields() throws Exception {
+
+        given()
+            .accept(ContentType.JSON)
+        .when()
+            .get(loginRoute)
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            .body("form.fields.size()", is(2))
+            .body("form.fields[0].label", is("Username or Email"))
+            .body("form.fields[0].name", is("login"))
+            .body("form.fields[0].placeholder", is("Username or Email"))
+            .body("form.fields[0].required", is(true))
+            .body("form.fields[0].type", is("text"))
+            .body("form.fields[1].label", is("Password"))
+            .body("form.fields[1].name", is("password"))
+            .body("form.fields[1].placeholder", is("Password"))
+            .body("form.fields[1].required", is(true))
+            .body("form.fields[1].type", is("password"))
+        // Default view model based on configuration
+    }
+
+    /** Login value can either be username or email
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/93">#93</a>
+     * @throws Exception
+     */
+    @Test
+    public void loginWithUsername() throws Exception {
+
+        Map<String, Object>  credentials = new HashMap<>();
+        credentials.put("login", accountUsername)
+        credentials.put("password", accountPassword)
+
+        given()
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .body(credentials)
+        .when()
+            .post(loginRoute)
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            .body(".", hasKey("account"))
+    }
+
+    /** Login value can either be username or email
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/93">#93</a>
+     * @throws Exception
+     */
+    @Test
+    public void loginWithEmail() throws Exception {
+
+        given()
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .body(getJsonCredentials())
+        .when()
+            .post(loginRoute)
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            .body(".", hasKey("account"))
+    }
+
+    /** Omitting login or password when posting JSON results in an error
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/95">#95</a>
+     * @throws Exception
+     */
+    @Test
+    public void missingLoginThrowsError() throws Exception {
+
+        Map<String, Object> badCredentials = new HashMap<>();
+
+        badCredentials.put("login", "")
+        badCredentials.put("password", "foo")
+
+        given()
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .body(badCredentials)
+        .when()
+            .post(loginRoute)
+        .then()
+            .statusCode(400)
+            .contentType(ContentType.JSON)
+            .body("size()", is(2))
+            .body("status", is(400))
+            .body("message", is("Missing login or password."))
+    }
+
+    /** Omitting login or password when posting JSON results in an error
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/95">#95</a>
+     * @throws Exception
+     */
+    @Test
+    public void missingPasswordThrowsError() throws Exception {
+
+        Map<String, Object> badCredentials = new HashMap<>();
+
+        badCredentials.put("login", "foo@foo.bar")
+        badCredentials.put("password", "")
+
+        given()
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .body(badCredentials)
+        .when()
+            .post(loginRoute)
+        .then()
+            .statusCode(400)
+            .contentType(ContentType.JSON)
+            .body("size()", is(2))
+            .body("status", is(400))
+            .body("message", is("Missing login or password."))
+    }
+
+    /**
+     * Return account JSON on successful authorization for application/json
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/100">#100</a>
+     * @throws Exception
+     */
+    @Test
+    public void successfulAuthorization() throws Exception {
+
+        given()
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .body(getJsonCredentials())
+        .when()
+            .post(loginRoute)
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            .body("size()", is(1))
+            .body("account.href", not(isEmptyOrNullString()))
+            .body("account.username", is(accountUsername))
+            .body("account.modifiedAt", not(isEmptyOrNullString())) // #108 ensures ISO 8601
+            .body("account.status", equalToIgnoringCase("ENABLED"))
+            .body("account.createdAt", not(isEmptyOrNullString())) // #108 ensures ISO 8601
+            .body("account.email", is(accountEmail))
+            .body("account.middleName", is(accountMiddleName))
+            .body("account.surname", is(accountSurname))
+            .body("account.givenName", is(accountGivenName))
+            .body("account.fullName", is("$accountGivenName $accountMiddleName $accountSurname".toString()))
+    }
+
+    /**
+     * Remove all linked resources from JSON account response
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/101">#101</a>
+     * @throws Exception
+     */
+    @Test
+    public void noLinkedResourcesPresent() throws Exception {
+
+        given()
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .body(getJsonCredentials())
+        .when()
+            .post(loginRoute)
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            .body("account.size()", is(10))
+            // Todo: there might be an easier way to assert "it has none of these keys", but I'm a restAssured/hamcrest n00b
+            .body("account.emailVerificationToken", is(nullValue()))
+            .body("account.customData", is(nullValue()))
+            .body("account.providerData", is(nullValue()))
+            .body("account.directory", is(nullValue()))
+            .body("account.tenant", is(nullValue()))
+            .body("account.groups", is(nullValue()))
+            .body("account.groupMemberships", is(nullValue()))
+            .body("account.applications", is(nullValue()))
+            .body("account.apiKeys", is(nullValue()))
+            .body("account.accessTokens", is(nullValue()))
+            .body("account.refreshTokens", is(nullValue()))
+    }
+
+    /**
+     * Datetime fields in JSON account response should be serialized as ISO 8601
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/108">#108</a>
+     * @throws Exception
+     */
+    @Test
+    public void datetimePropertiesAreIso8601() throws Exception {
+
+        Response response =
+            given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(getJsonCredentials())
+            .when()
+                .post(loginRoute)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+            .extract()
+                .body()
+
+        // Clunky way of doing things because this version of hamcrest doesn't have a regex matcher
+        String created = response.path("account.createdAt")
+        String modified = response.path("account.modifiedAt")
+        assertTrue(created.matches(Iso8601Utils.Pattern))
+        assertTrue(modified.matches(Iso8601Utils.Pattern))
+    }
+
+    /**
+     * Errors returned as JSON use API status and response (#45)
+     * Return JSON error from API if JSON login is unsuccessful (#110)
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/45">#45</a>
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/45">#110</a>
+     */
+    @Test
+    public void invalidLoginError() throws Exception {
+
+        Map<String, Object> badCredentials = new HashMap<>();
+
+        badCredentials.put("login", "foo@foo.bar")
+        badCredentials.put("password", "pwn4g3!!1")
+
+        given()
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .body(badCredentials)
+        .when()
+            .post(loginRoute)
+        .then()
+            .statusCode(400)
+            .contentType(ContentType.JSON)
+            .body("size()", is(2))
+            .body("status", is(400))
+            .body("message", is("Invalid username or password."))
+    }
+
+    /**
+     * JSON response should set OAuth 2.0 cookies on successful login
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/168">#168</a>
+     * @throws Exception
+     */
+    @Test
+    public void setsCookiesOnJsonLogin() throws Exception {
+
+        given()
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .body(getJsonCredentials())
+        .when()
+            .post(loginRoute)
+        .then()
+            .cookie("access_token", not(isEmptyOrNullString()))
+            .cookie("refresh_token", not(isEmptyOrNullString()))
     }
 
     /** Serve a default HTML page with a login form for request type text/html
@@ -133,7 +480,7 @@ class LoginIT extends AbstractIT {
             given()
                 .accept(ContentType.HTML)
             .when()
-                .get(loginPath)
+                .get(loginRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -165,7 +512,7 @@ class LoginIT extends AbstractIT {
                 .accept(ContentType.HTML)
                 .formParam("foo", "bar")
             .when()
-                .post(loginPath)
+                .post(loginRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -192,7 +539,7 @@ class LoginIT extends AbstractIT {
             .formParam("login", accountEmail)
             .formParam("password", accountPassword)
         .when()
-            .post(loginPath)
+            .post(loginRoute)
         .then()
             .cookie("access_token", not(isEmptyOrNullString()))
             .cookie("refresh_token", not(isEmptyOrNullString()))
@@ -212,7 +559,7 @@ class LoginIT extends AbstractIT {
             .formParam("login", accountEmail)
             .formParam("password", accountPassword)
         .when()
-            .post(loginPath)
+            .post(loginRoute)
         .then()
             .statusCode(302)
     }
@@ -231,7 +578,7 @@ class LoginIT extends AbstractIT {
             .formParam("login", accountUsername)
             .formParam("password", accountPassword)
         .when()
-            .post(loginPath)
+            .post(loginRoute)
         .then()
             .statusCode(302)
     }
@@ -250,7 +597,7 @@ class LoginIT extends AbstractIT {
             .formParam("login", accountEmail)
             .formParam("password", accountPassword)
         .when()
-            .post(loginPath)
+            .post(loginRoute)
         .then()
             .statusCode(302)
             .header("Location", is("/"))
@@ -271,7 +618,7 @@ class LoginIT extends AbstractIT {
             .formParam("password", accountPassword)
             .queryParam("next", "/foo")
         .when()
-            .post(loginPath)
+            .post(loginRoute)
         .then()
             .statusCode(302)
             .header("Location", is("/foo"))
@@ -289,7 +636,7 @@ class LoginIT extends AbstractIT {
                 .accept(ContentType.HTML)
                 .queryParam("status", "unverified")
             .when()
-                .get(loginPath)
+                .get(loginRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -315,7 +662,7 @@ class LoginIT extends AbstractIT {
                 .accept(ContentType.HTML)
                 .queryParam("status", "verified")
             .when()
-                .get(loginPath)
+                .get(loginRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -340,7 +687,7 @@ class LoginIT extends AbstractIT {
                     .accept(ContentType.HTML)
                     .queryParam("status", "created")
                 .when()
-                    .get(loginPath)
+                    .get(loginRoute)
                 .then()
                     .statusCode(200)
                     .contentType(ContentType.HTML)
@@ -365,7 +712,7 @@ class LoginIT extends AbstractIT {
                     .accept(ContentType.HTML)
                     .queryParam("status", "forgot")
                 .when()
-                    .get(loginPath)
+                    .get(loginRoute)
                 .then()
                     .statusCode(200)
                     .contentType(ContentType.HTML)
@@ -390,7 +737,7 @@ class LoginIT extends AbstractIT {
                     .accept(ContentType.HTML)
                     .queryParam("status", "reset")
                 .when()
-                    .get(loginPath)
+                    .get(loginRoute)
                 .then()
                     .statusCode(200)
                     .contentType(ContentType.HTML)
@@ -415,7 +762,7 @@ class LoginIT extends AbstractIT {
                     .accept(ContentType.HTML)
                     .queryParam("status", "foobar")
                 .when()
-                    .get(loginPath)
+                    .get(loginRoute)
                 .then()
                     .statusCode(200)
                     .contentType(ContentType.HTML)
@@ -445,7 +792,7 @@ class LoginIT extends AbstractIT {
                 .formParam("login", "blah")
                 .formParam("password", "foobar!")
             .when()
-                .post(loginPath)
+                .post(loginRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -469,7 +816,7 @@ class LoginIT extends AbstractIT {
             given()
                 .accept(ContentType.HTML)
             .when()
-                .get(loginPath)
+                .get(loginRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -504,7 +851,7 @@ class LoginIT extends AbstractIT {
                     .formParam("login", "blah")
                     .formParam("password", "")
                 .when()
-                    .post(loginPath)
+                    .post(loginRoute)
                 .then()
                     .statusCode(200)
                     .contentType(ContentType.HTML)
