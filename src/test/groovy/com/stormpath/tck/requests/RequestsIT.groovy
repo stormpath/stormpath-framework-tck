@@ -15,6 +15,7 @@
  */
 package com.stormpath.tck.requests
 
+import com.jayway.restassured.http.ContentType
 import com.stormpath.tck.AbstractIT
 import org.testng.annotations.Test
 import static com.jayway.restassured.RestAssured.given
@@ -31,13 +32,13 @@ class RequestsIT extends AbstractIT {
     public void emptyAccept() {
 
         given()
-                .header("Accept", "")
-                .when()
-                .get("/login")
-                .then()
-                .statusCode(200)
-                .header("Content-Type", is("text/html;charset=UTF-8"))
-                // text/html is the default Content-Type
+            .header("Accept", "")
+        .when()
+            .get("/login")
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            // application/json is the default Content-Type
     }
 
     /**
@@ -52,25 +53,25 @@ class RequestsIT extends AbstractIT {
             .get("/login")
         .then()
             .statusCode(200)
-            .header("Content-Type", is("text/html;charset=UTF-8"))
-            // text/html is the default Content-Type
+            .contentType(ContentType.JSON)
+            // application/json is the default Content-Type
     }
 
     /**
-     * Accept: * / * uses first value in web:produces as Content-Type
+     * Accept: * / * uses first value in web.produces as Content-Type
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/73">#73</a>
      */
     @Test
     public void acceptAny() {
 
         given()
-                .header("Accept", "*/*")
-            .when()
-                .get("/login")
-            .then()
-                .statusCode(200)
-                .header("Content-Type", is("text/html;charset=UTF-8"))
-                // text/html is the default Content-Type
+            .accept(ContentType.ANY)
+        .when()
+            .get("/login")
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            // application/json is the default Content-Type
     }
 
     /**
@@ -81,12 +82,28 @@ class RequestsIT extends AbstractIT {
     public void acceptJson() {
 
         given()
-                .header("Accept", "application/json")
-            .when()
-                .get("/login")
-            .then()
-                .statusCode(200)
-                .header("Content-Type", is("application/json;charset=UTF-8"))
+            .accept(ContentType.JSON)
+        .when()
+            .get("/login")
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+    }
+
+    /**
+     * Specifying valid Accept Content-Type returns that Content-Type
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/75">#75</a>
+     */
+    @Test
+    public void acceptHtml() {
+
+        given()
+            .accept(ContentType.HTML)
+        .when()
+            .get("/login")
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.HTML)
     }
 
     /**
