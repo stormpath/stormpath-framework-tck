@@ -121,4 +121,64 @@ class RegisterIT extends AbstractIT {
             .body("status", is(400))
             .body("message", not(isEmptyOrNullString()))
     }
+
+    /**
+     * Return JSON error if undefined custom field is present
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/195">#195</a>
+     * @throws Exception
+     */
+    @Test
+    public void returnsErrorForUndefinedRootCustomField() throws Exception {
+
+        Map<String, Object>  jsonAsMap = new HashMap<>();
+        jsonAsMap.put("email", "foo@bar.baz")
+        jsonAsMap.put("password", "foobar123")
+        jsonAsMap.put("givenName", "Test")
+        jsonAsMap.put("surname", "Testerman")
+        jsonAsMap.put("customValue", "foobar")
+        // field 'customValue' is not defined in the default configuration
+
+        given()
+            .accept(ContentType.JSON)
+            .body(jsonAsMap)
+        .when()
+            .post(registerPath)
+        .then()
+            .statusCode(400)
+            .contentType(ContentType.JSON)
+            .body("status", is(400))
+            .body("message", not(isEmptyOrNullString()))
+    }
+
+    /**
+     * Return JSON error if undefined custom field is present
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/195">#195</a>
+     * @throws Exception
+     */
+    @Test
+    public void returnsErrorForUndefinedCustomField() throws Exception {
+
+        Map<String, Object>  jsonAsMap = new HashMap<>();
+        jsonAsMap.put("email", "foo@bar.baz")
+        jsonAsMap.put("password", "foobar123")
+        jsonAsMap.put("givenName", "Test")
+        jsonAsMap.put("surname", "Testerman")
+
+        Map<String, Object> customDataMap = new HashMap<>();
+        customDataMap.put("hello", "world")
+
+        jsonAsMap.put("customData", customDataMap)
+        // field 'hello' is not defined in the default configuration
+
+        given()
+            .accept(ContentType.JSON)
+            .body(jsonAsMap)
+        .when()
+            .post(registerPath)
+        .then()
+            .statusCode(400)
+            .contentType(ContentType.JSON)
+            .body("status", is(400))
+            .body("message", not(isEmptyOrNullString()))
+    }
 }
