@@ -32,6 +32,7 @@ import static org.testng.Assert.*
 class RegisterIT extends AbstractIT {
 
     private static final String registerRoute = "/register"
+    private static final String loginRoute = "/login"
 
     private final String randomUUID = UUID.randomUUID().toString()
     private final String accountEmail = "fooemail-$randomUUID@stormpath.com"
@@ -261,7 +262,7 @@ class RegisterIT extends AbstractIT {
     public void returnsSanitizedAccountForSuccess() throws Exception {
 
         Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", accountEmail)
+        jsonAsMap.put("email", "json-$accountEmail")
         jsonAsMap.put("password", accountPassword)
         jsonAsMap.put("givenName", accountGivenName)
         jsonAsMap.put("middleName", accountMiddleName)
@@ -282,7 +283,7 @@ class RegisterIT extends AbstractIT {
                 .body("account.modifiedAt", not(isEmptyOrNullString()))
                 .body("account.status", equalToIgnoringCase("ENABLED"))
                 .body("account.createdAt", not(isEmptyOrNullString()))
-                .body("account.email", is(accountEmail))
+                .body("account.email", is("json-$accountEmail"))
                 .body("account.middleName", is(accountMiddleName))
                 .body("account.surname", is(accountSurname))
                 .body("account.givenName", is(accountGivenName))
@@ -504,5 +505,29 @@ class RegisterIT extends AbstractIT {
 
         Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "alert-danger")
         assertThat(warning.toString(), not(isEmptyOrNullString()))
+    }
+
+    /**
+     * Redirect to login page with status=created on success
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/203">#203</a>
+     * @throws Exception
+     */
+    @Test
+    public void redirectsToLoginOnSuccess() throws Exception {
+
+        given()
+            .accept(ContentType.HTML)
+            .formParam("email", accountEmail)
+            .formParam("password", accountPassword)
+            .formParam("givenName", accountGivenName)
+            .formParam("surname", accountSurname)
+        .when()
+            .post(registerRoute)
+        .then()
+            .statusCode(302)
+            .header("Location", is(loginRoute + "?status=created"))
+
+        // TODO: cleanup!
+        //deleteAccountOnClassTeardown(accountEmail)
     }
 }
