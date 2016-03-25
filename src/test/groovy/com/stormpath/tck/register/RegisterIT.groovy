@@ -24,6 +24,7 @@ import com.stormpath.tck.AbstractIT
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.given
+import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.*
 import static org.testng.Assert.*
 
@@ -354,5 +355,88 @@ class RegisterIT extends AbstractIT {
         assertEquals(fields.get(3).attributes().get("name"), "password")
         assertEquals(fields.get(3).attributes().get("placeholder"), "Password")
         assertEquals(fields.get(3).attributes().get("type"), "password")
+    }
+
+    /**
+     * Re-render form with error if required fields are missing
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/188">#188</a>
+     * @throws Exception
+     */
+    @Test
+    public void displaysErrorIfPostIsEmpty() throws Exception {
+
+        // todo: work with CSRF
+
+        Response response =
+            given()
+                .accept(ContentType.HTML)
+            .when()
+                .post(registerRoute)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+            .extract()
+                .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "alert-danger")
+        assertThat(warning.toString(), not(isEmptyOrNullString()))
+    }
+
+    /**
+     * Re-render form with error if required fields are missing
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/188">#188</a>
+     * @throws Exception
+     */
+    @Test
+    public void displaysErrorIfEmailIsMissing() throws Exception {
+
+        Response response =
+            given()
+                .accept(ContentType.HTML)
+                .formParam("email", accountEmail)
+                .formParam("password", "")
+            .when()
+                .post(registerRoute)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+            .extract()
+                .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "alert-danger")
+        assertThat(warning.toString(), not(isEmptyOrNullString()))
+    }
+
+    /**
+     * Re-render form with error if required fields are missing
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/188">#188</a>
+     * @throws Exception
+     */
+    @Test
+    public void displaysErrorIfRequiredFieldIsMissing() throws Exception {
+
+        Response response =
+            given()
+                .accept(ContentType.HTML)
+                .formParam("email", accountEmail)
+                .formParam("password", accountPassword)
+                .formParam("surname", accountSurname)
+                // givenName is required per the default configuration
+            .when()
+                .post(registerRoute)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+            .extract()
+                .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "alert-danger")
+        assertThat(warning.toString(), not(isEmptyOrNullString()))
     }
 }
