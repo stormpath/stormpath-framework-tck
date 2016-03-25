@@ -439,4 +439,34 @@ class RegisterIT extends AbstractIT {
         Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "alert-danger")
         assertThat(warning.toString(), not(isEmptyOrNullString()))
     }
+
+    /**
+     * Re-render form with error if undefined custom field is present
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/194">#194</a>
+     * @throws Exception
+     */
+    @Test
+    public void displaysErrorForUndefinedCustomField() throws Exception {
+
+        Response response =
+            given()
+                .accept(ContentType.HTML)
+                .formParam("email", accountEmail)
+                .formParam("password", accountPassword)
+                .formParam("givenName", accountGivenName)
+                .formParam("surname", accountSurname)
+                .formParam("customValue", "foobar") // not defined in default configuration
+            .when()
+                .post(registerRoute)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+            .extract()
+                .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "alert-danger")
+        assertThat(warning.toString(), not(isEmptyOrNullString()))
+    }
 }
