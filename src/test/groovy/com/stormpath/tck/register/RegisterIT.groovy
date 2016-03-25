@@ -57,6 +57,22 @@ class RegisterIT extends AbstractIT {
         }
     }
 
+    private List<Node> findTags(NodeChildren children, String tag) {
+        def results = new ArrayList<Node>()
+
+        for (Node node in children.list()) {
+            if (node.name() == tag) {
+                results.add(node)
+            }
+            else {
+                Collection<Node> innerResults = findTags(node.children(), tag)
+                results.addAll(innerResults)
+            }
+        }
+
+        return results
+    }
+
     /**
      * Serve the registration view model for request type application/json
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/179">#179</a>
@@ -299,5 +315,44 @@ class RegisterIT extends AbstractIT {
 
         Node submitButton = findTagWithAttribute(doc.getNodeChildren("html.body"), "button", "type", "submit")
         assertEquals(submitButton.value(), "Create Account")
+    }
+
+    /** Default form should include fields ordered by fieldOrder
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/181">#181</a>
+     * @throws Exception
+     */
+    @Test
+    public void formShouldContainFieldsOrderedByFieldOrder() throws Exception {
+
+        Response response =
+            given()
+                .accept(ContentType.HTML)
+            .when()
+                .get(registerRoute)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+            .extract()
+                .response()
+
+        XmlPath doc = getHtmlDoc(response)
+        List<Node> fields = findTags(doc.getNodeChildren("html.body"), "input")
+
+        // From default configuration
+        assertEquals(fields.get(0).attributes().get("name"), "givenName")
+        assertEquals(fields.get(0).attributes().get("placeholder"), "First Name")
+        assertEquals(fields.get(0).attributes().get("type"), "text")
+
+        assertEquals(fields.get(1).attributes().get("name"), "surname")
+        assertEquals(fields.get(1).attributes().get("placeholder"), "Last Name")
+        assertEquals(fields.get(1).attributes().get("type"), "text")
+
+        assertEquals(fields.get(2).attributes().get("name"), "email")
+        assertEquals(fields.get(2).attributes().get("placeholder"), "Email")
+        assertEquals(fields.get(2).attributes().get("type"), "email")
+
+        assertEquals(fields.get(3).attributes().get("name"), "password")
+        assertEquals(fields.get(3).attributes().get("placeholder"), "Password")
+        assertEquals(fields.get(3).attributes().get("type"), "password")
     }
 }
