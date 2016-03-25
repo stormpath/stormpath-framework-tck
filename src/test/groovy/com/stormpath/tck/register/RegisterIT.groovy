@@ -16,22 +16,21 @@
 package com.stormpath.tck.register
 
 import com.jayway.restassured.http.ContentType
-import com.jayway.restassured.response.Cookie
-import com.jayway.restassured.response.Cookies
+import com.jayway.restassured.path.xml.XmlPath
+import com.jayway.restassured.path.xml.element.Node
+import com.jayway.restassured.path.xml.element.NodeChildren
+import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.JwtUtils
-import com.stormpath.tck.util.RestUtils
-import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
-import static com.jayway.restassured.RestAssured.*
-import static org.testng.Assert.*
+import static com.jayway.restassured.RestAssured.given
 import static org.hamcrest.Matchers.*
+import static org.testng.Assert.*
 
 @Test
 class RegisterIT extends AbstractIT {
 
-    private static final String registerPath = "/register"
+    private static final String registerRoute = "/register"
 
     private final String randomUUID = UUID.randomUUID().toString()
     private final String accountEmail = "fooemail-$randomUUID@stormpath.com"
@@ -40,6 +39,23 @@ class RegisterIT extends AbstractIT {
     private final String accountMiddleName = "Foobar"
     private final String accountPassword = "P@sword123!"
     private final String accountUsername = "foo-$randomUUID"
+
+    private Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
+        for (Node node : children.list()) {
+            def actualTag = node.name()
+            def actualAttribute = node.attributes().get(attributeKey)
+
+            if (actualTag == tag && actualAttribute.contains(attributeValue)) {
+                return node
+            }
+            else {
+                Node foundNode = findTagWithAttribute(node.children(), tag, attributeKey, attributeValue)
+                if (foundNode != null) {
+                    return foundNode
+                }
+            }
+        }
+    }
 
     /**
      * Serve the registration view model for request type application/json
@@ -52,7 +68,7 @@ class RegisterIT extends AbstractIT {
         given()
             .accept(ContentType.JSON)
         .when()
-            .get(registerPath)
+            .get(registerRoute)
         .then()
             .statusCode(200)
             .contentType(ContentType.JSON)
@@ -72,7 +88,7 @@ class RegisterIT extends AbstractIT {
         given()
             .accept(ContentType.JSON)
         .when()
-            .post(registerPath)
+            .post(registerRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -97,7 +113,7 @@ class RegisterIT extends AbstractIT {
             .accept(ContentType.JSON)
             .body(jsonAsMap)
         .when()
-            .post(registerPath)
+            .post(registerRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -123,7 +139,7 @@ class RegisterIT extends AbstractIT {
             .accept(ContentType.JSON)
             .body(jsonAsMap)
         .when()
-            .post(registerPath)
+            .post(registerRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -151,7 +167,7 @@ class RegisterIT extends AbstractIT {
             .accept(ContentType.JSON)
             .body(jsonAsMap)
         .when()
-            .post(registerPath)
+            .post(registerRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -183,7 +199,7 @@ class RegisterIT extends AbstractIT {
             .accept(ContentType.JSON)
             .body(jsonAsMap)
         .when()
-            .post(registerPath)
+            .post(registerRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -210,7 +226,7 @@ class RegisterIT extends AbstractIT {
             .accept(ContentType.JSON)
             .body(jsonAsMap)
         .when()
-            .post(registerPath)
+            .post(registerRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -224,6 +240,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/202">#202</a>
      * @throws Exception
      */
+    @Test
     public void returnsSanitizedAccountForSuccess() throws Exception {
 
         Map<String, Object>  jsonAsMap = new HashMap<>();
@@ -239,7 +256,7 @@ class RegisterIT extends AbstractIT {
                 .accept(ContentType.JSON)
                 .body(jsonAsMap)
             .when()
-                .post(registerPath)
+                .post(registerRoute)
             .then()
                 .contentType(ContentType.JSON)
                 .body("size()", is(1))
@@ -257,5 +274,30 @@ class RegisterIT extends AbstractIT {
                 .path("account.href")
 
         deleteOnClassTeardown(createdHref)
+    }
+
+    /**
+     * Serve a default HTML form for request type text/html
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/180">#180</a>
+     * @throws Exception
+     */
+    @Test
+    public void servesRegisterForm() throws Exception {
+
+        Response response =
+            given()
+                .accept(ContentType.HTML)
+            .when()
+                .get(registerRoute)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+            .extract()
+                .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node submitButton = findTagWithAttribute(doc.getNodeChildren("html.body"), "button", "type", "submit")
+        assertEquals(submitButton.value(), "Create Account")
     }
 }
