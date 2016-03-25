@@ -392,6 +392,8 @@ class RegisterIT extends AbstractIT {
     @Test
     public void displaysErrorIfEmailIsMissing() throws Exception {
 
+        // todo: work with CSRF
+
         Response response =
             given()
                 .accept(ContentType.HTML)
@@ -418,6 +420,8 @@ class RegisterIT extends AbstractIT {
      */
     @Test
     public void displaysErrorIfRequiredFieldIsMissing() throws Exception {
+
+        // todo: work with CSRF
 
         Response response =
             given()
@@ -448,6 +452,8 @@ class RegisterIT extends AbstractIT {
     @Test
     public void displaysErrorForUndefinedCustomField() throws Exception {
 
+        // todo: work with CSRF
+
         Response response =
             given()
                 .accept(ContentType.HTML)
@@ -456,6 +462,36 @@ class RegisterIT extends AbstractIT {
                 .formParam("givenName", accountGivenName)
                 .formParam("surname", accountSurname)
                 .formParam("customValue", "foobar") // not defined in default configuration
+            .when()
+                .post(registerRoute)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+            .extract()
+                .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "alert-danger")
+        assertThat(warning.toString(), not(isEmptyOrNullString()))
+    }
+
+    /**
+     * Re-render form and display error if server error occurs
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/200">#200</a>
+     * @throws Exception
+     */
+    @Test
+    public void displaysErrorForServerError() throws Exception {
+
+        Response response =
+            given()
+                .accept(ContentType.HTML)
+                .formParam("email", "foo@bar")
+                .formParam("password", "1")
+                .formParam("givenName", accountGivenName)
+                .formParam("surname", accountSurname)
+                // Email and password will not pass Stormpath API validation and will error
             .when()
                 .post(registerRoute)
             .then()
