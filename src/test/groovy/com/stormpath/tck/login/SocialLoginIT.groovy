@@ -97,6 +97,10 @@ class SocialLoginIT extends AbstractIT {
         this.facebookTestUserEmail = fbTestUser.path("email")
     }
 
+    /**
+     * Attempts to login with the Facebook Access Token, and expects an account object back.
+     * @throws Exception
+     */
     @Test
     public void loginWithValidFacebookAccessTokenSucceeds() throws Exception {
         def loginJSON = ["providerData": [
@@ -118,6 +122,10 @@ class SocialLoginIT extends AbstractIT {
         deleteOnClassTeardown(loginResponse.path("account.href"))
     }
 
+    /**
+     * Attempts to login with an invalid access token, and should fail. 
+     * @throws Exception
+     */
     @Test
     public void loginWithInvalidFacebookAccessTokenFails() throws Exception {
         def loginJSON = ["providerData": [
