@@ -262,7 +262,7 @@ class RegisterIT extends AbstractIT {
     public void returnsSanitizedAccountForSuccess() throws Exception {
 
         Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", "json-$accountEmail")
+        jsonAsMap.put("email", "json-$accountEmail".toString())
         jsonAsMap.put("password", accountPassword)
         jsonAsMap.put("givenName", accountGivenName)
         jsonAsMap.put("middleName", accountMiddleName)
@@ -276,6 +276,7 @@ class RegisterIT extends AbstractIT {
             .when()
                 .post(registerRoute)
             .then()
+                .statusCode(200)
                 .contentType(ContentType.JSON)
                 .body("size()", is(1))
                 .body("account.href", not(isEmptyOrNullString()))
@@ -283,7 +284,7 @@ class RegisterIT extends AbstractIT {
                 .body("account.modifiedAt", not(isEmptyOrNullString()))
                 .body("account.status", equalToIgnoringCase("ENABLED"))
                 .body("account.createdAt", not(isEmptyOrNullString()))
-                .body("account.email", is("json-$accountEmail"))
+                .body("account.email", is("json-$accountEmail".toString()))
                 .body("account.middleName", is(accountMiddleName))
                 .body("account.surname", is(accountSurname))
                 .body("account.givenName", is(accountGivenName))
