@@ -539,37 +539,37 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test
-    public void preservesValuesOnPostback() throws Exception {
+    public void registerFormPreservesValuesOnPostback() throws Exception {
 
         // todo: work with CSRF
 
         Response response =
-                given()
-                    .accept(ContentType.HTML)
-                    .formParam("email", accountEmail)
-                    .formParam("password", "1") // Too short, will fail validation
-                    .formParam("givenName", accountGivenName)
-                    .formParam("surname", accountSurname)
-                .when()
-                    .post(registerRoute)
-                .then()
-                    .statusCode(200)
-                    .contentType(ContentType.HTML)
-                .extract()
-                    .response()
+            given()
+                .accept(ContentType.HTML)
+                .formParam("email", accountEmail)
+                .formParam("password", "1") // Too short, will fail validation
+                .formParam("givenName", accountGivenName)
+                .formParam("surname", accountSurname)
+            .when()
+                .post(registerRoute)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+            .extract()
+                .response()
 
         XmlPath doc = getHtmlDoc(response)
 
         Node loginField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "email")
-        assertEquals(loginField.attributes().get("value"), accountEmail, "The 'email' field value should preserve value")
+        assertEquals(loginField.attributes().get("value"), accountEmail, "The 'email' field should preserve value")
 
         Node givenNameField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "givenName")
-        assertEquals(givenNameField.attributes().get("value"), accountGivenName, "The 'givenName' field value should preserve value")
+        assertEquals(givenNameField.attributes().get("value"), accountGivenName, "The 'givenName' field should preserve value")
 
         Node surnameField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "surname")
-        assertEquals(surnameField.attributes().get("value"), accountSurname, "The 'surname' field value should preserve value")
+        assertEquals(surnameField.attributes().get("value"), accountSurname, "The 'surname' field should preserve value")
 
         Node passwordField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "password")
-        assertFalse((passwordField.attributes().get("value")?.trim() as boolean), "The 'password' field value should NOT preserve value")
+        assertFalse((passwordField.attributes().get("value")?.trim() as boolean), "The 'password' field should NOT preserve value")
     }
 }
