@@ -16,6 +16,7 @@
 package com.stormpath.tck.oauth2
 
 import com.jayway.restassured.http.ContentType
+import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.util.JwtUtils
 import org.testng.annotations.BeforeClass
@@ -202,5 +203,69 @@ class Oauth2IT extends AbstractIT {
                 .path("access_token")
 
         assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.accountHref)
+    }
+
+    /** Refresh grant flow
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/205">#205</a>
+     */
+    @Test(dependsOnMethods = "passwordGrantWithUsername")
+    public void refreshGrantTypeWorksWithValidToken() throws Exception {
+        Response passwordGrantResponse =
+            given()
+                .param("grant_type", "password")
+                .param("username", accountEmail)
+                .param("password", accountPassword)
+            .when()
+                .post(tokenRoute)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("access_token", not(isEmptyOrNullString()))
+                .body("expires_in", is(3600))
+                .body("refresh_token", not(isEmptyOrNullString()))
+                .body("token_type", is("Bearer"))
+            .extract()
+                .response()
+
+        String accessToken = response.path("access_token")
+        String refreshToken = response.path("refresh_token")
+
+        String newAccessToken =
+            given()
+                .param("grant_type", "refresh_token")
+                .param("refresh_token", refreshToken)
+            .when()
+                .post(tokenRoute)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("access_token", not(isEmptyOrNullString()))
+                .body("expires_in", is(3600))
+                .body("refresh_token", not(isEmptyOrNullString()))
+                .body("token_type", is("Bearer"))
+            .extract()
+                .path("access_token")
+
+        assertNotEquals(accessToken, newAccessToken, "The new access token should not equal to the old access token")
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.accountHref, "The access token should be a valid jwt for the test user")
+    }
+
+    /** Refresh grant flow should fail without valid refresh token
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/205">#205</a>
+     */
+    @Test(dependsOnMethods = "passwordGrantWithUsername")
+    public void refreshGrantTypeFailsWithInvalidRefreshToken() throws Exception {
+        String refreshToken = "GARBAGE"
+
+        String newAccessToken =
+            given()
+                .param("grant_type", "refresh_token")
+                .param("refresh_token", refreshToken)
+            .when()
+                .post(tokenRoute)
+            .then()
+                .statusCode(400)
+                .contentType(ContentType.JSON)
+                .body("error", is("invalid_grant"))
     }
 }
