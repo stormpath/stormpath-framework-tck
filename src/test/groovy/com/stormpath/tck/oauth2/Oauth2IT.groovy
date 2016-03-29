@@ -227,8 +227,8 @@ class Oauth2IT extends AbstractIT {
             .extract()
                 .response()
 
-        String accessToken = response.path("access_token")
-        String refreshToken = response.path("refresh_token")
+        String accessToken = passwordGrantResponse.path("access_token")
+        String refreshToken = passwordGrantResponse.path("refresh_token")
 
         String newAccessToken =
             given()
