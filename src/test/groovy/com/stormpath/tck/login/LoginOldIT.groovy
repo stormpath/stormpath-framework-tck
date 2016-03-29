@@ -58,7 +58,7 @@ class LoginOldIT extends AbstractIT {
         return ret
     }
 
-    @Test
+    @Test(enabled = false)
     public void accountRegistration() throws Exception {
 
         //1.  Get the /register page
@@ -101,7 +101,7 @@ class LoginOldIT extends AbstractIT {
                 .andReturn()
     }
 
-    @Test(dependsOnMethods = "accountRegistration")
+    @Test(dependsOnMethods = "accountRegistration", enabled = false)
     public void login() throws Exception {
 
         //1.  Get the /login page
@@ -147,7 +147,7 @@ class LoginOldIT extends AbstractIT {
         deleteOnClassTeardown(JwtUtils.extractJwtClaim(this.accessToken, "sub"))
     }
 
-    @Test(dependsOnMethods = "login")
+    @Test(dependsOnMethods = "login", enabled = false)
     public void logout() throws Exception {
 
         Response response =
