@@ -109,64 +109,34 @@ class LogoutIT extends AbstractIT {
             .statusCode(404)
     }
 
-    /** Anything but POST should return 405
+    /** Only handle POST
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
      */
     @Test
     public void doNotHandleGet() throws Exception {
         get(logoutPath)
             .then()
-                .assertThat().statusCode(405)
+                .assertThat().statusCode(404)
     }
 
-    /** Anything but POST should return 405
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
-     */
-    @Test
-    public void doNotHandleHead() throws Exception {
-        head(logoutPath)
-            .then()
-                .assertThat().statusCode(405)
-    }
-
-    /** Anything but POST should return 405
+    /** Only handle POST
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
      */
     @Test
     public void doNotHandlePut() throws Exception {
         put(logoutPath)
             .then()
-                .assertThat().statusCode(405)
+                .assertThat().statusCode(404)
     }
 
-    /** Anything but POST should return 405
+    /** Only handle POST
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
      */
     @Test
     public void doNotHandleDelete() throws Exception {
         delete(logoutPath)
             .then()
-                .assertThat().statusCode(405)
-    }
-
-    /** Anything but POST should return 405
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
-     */
-    @Test
-    public void doNotHandleOptions() throws Exception {
-        options(logoutPath)
-            .then()
-                .assertThat().statusCode(405)
-    }
-
-    /** Anything but POST should return 405
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
-     */
-    @Test
-    public void doNotHandlePatch() throws Exception {
-        patch(logoutPath)
-            .then()
-                .assertThat().statusCode(405)
+                .assertThat().statusCode(404)
     }
 
     /** Return 200 OK for unauthenticated JSON request

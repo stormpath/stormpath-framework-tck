@@ -27,9 +27,6 @@ import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.delete
 import static com.jayway.restassured.RestAssured.given
-import static com.jayway.restassured.RestAssured.head
-import static com.jayway.restassured.RestAssured.options
-import static com.jayway.restassured.RestAssured.patch
 import static com.jayway.restassured.RestAssured.put
 import static org.hamcrest.Matchers.*
 import static org.testng.Assert.*
@@ -139,54 +136,24 @@ class LoginIT extends AbstractIT {
         deleteOnClassTeardown(createdHref)
     }
 
-    /** Anything but GET or POST should return 405
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
-     */
-    @Test
-    public void doNotHandleHead() throws Exception {
-        head(loginRoute)
-            .then()
-                .assertThat().statusCode(405)
-    }
-
-    /** Anything but GET or POST should return 405
+    /** Only respond to GET and POST
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
      */
     @Test
     public void doNotHandlePut() throws Exception {
         put(loginRoute)
             .then()
-                .assertThat().statusCode(405)
+                .assertThat().statusCode(404)
     }
 
-    /** Anything but GET or POST should return 405
+    /** Only respond to GET and POST
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
      */
     @Test
     public void doNotHandleDelete() throws Exception {
         delete(loginRoute)
             .then()
-                .assertThat().statusCode(405)
-    }
-
-    /** Anything but GET or POST should return 405
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
-     */
-    @Test
-    public void doNotHandleOptions() throws Exception {
-        options(loginRoute)
-            .then()
-                .assertThat().statusCode(405)
-    }
-
-    /** Anything but GET or POST should return 405
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
-     */
-    @Test
-    public void doNotHandlePatch() throws Exception {
-        patch(loginRoute)
-            .then()
-                .assertThat().statusCode(405)
+                .assertThat().statusCode(404)
     }
 
     /**

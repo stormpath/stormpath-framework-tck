@@ -107,17 +107,17 @@ class RequestsIT extends AbstractIT {
     }
 
     /**
-     * Specifying invalid Accept Content-Type returns 406
+     * Unknown Accept header is not handled
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/76">#76</a>
      */
     @Test
-    public void invalidAccept() {
+    public void unknownAccept() {
 
         given()
             .header("Accept", "foo/bar")
         .when()
             .get("/login")
         .then()
-            .statusCode(406)
+            .statusCode(404)
     }
 }
