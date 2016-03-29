@@ -812,6 +812,8 @@ class LoginIT extends AbstractIT {
     @Test
     public void formShouldContainFieldsOrderedByFieldOrder() throws Exception {
 
+        // todo: better CSRF handling
+
         Response response =
             given()
                 .accept(ContentType.HTML)
