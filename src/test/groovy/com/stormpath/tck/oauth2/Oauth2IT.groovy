@@ -208,7 +208,7 @@ class Oauth2IT extends AbstractIT {
     /** Refresh grant flow
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/205">#205</a>
      */
-    @Test(dependsOnMethods = "passwordGrantWithUsername")
+    @Test
     public void refreshGrantTypeWorksWithValidToken() throws Exception {
         Response passwordGrantResponse =
             given()
@@ -253,7 +253,7 @@ class Oauth2IT extends AbstractIT {
     /** Refresh grant flow should fail without valid refresh token
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/205">#205</a>
      */
-    @Test(dependsOnMethods = "passwordGrantWithUsername")
+    @Test
     public void refreshGrantTypeFailsWithInvalidRefreshToken() throws Exception {
         String refreshToken = "GARBAGE"
 
