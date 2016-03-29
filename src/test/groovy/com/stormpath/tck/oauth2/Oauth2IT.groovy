@@ -51,6 +51,7 @@ class Oauth2IT extends AbstractIT {
 
         String createdHref =
             given()
+                .accept(ContentType.JSON)
                 .contentType(ContentType.JSON)
                 .body(jsonAsMap)
             .when()
