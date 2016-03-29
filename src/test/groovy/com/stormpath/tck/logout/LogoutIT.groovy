@@ -88,20 +88,13 @@ class LogoutIT extends AbstractIT {
     }
 
     private void assertCookiesAreDeleted(Cookies cookies) throws Exception {
-        Date currentTime = new Date(System.currentTimeMillis())
-        Date today = currentTime.copyWith(
-            hourOfDay: 0,
-            minute: 0,
-            second: 0
-        )
+        def now = new Date()
 
         Cookie accessTokenCookie = cookies.get("access_token")
-        assertTrue(accessTokenCookie.value.isEmpty())
-        assertTrue(accessTokenCookie.expiryDate < today)
+        assertTrue(accessTokenCookie.expiryDate < now)
 
         Cookie refreshTokenCookie = cookies.get("refresh_token")
-        assertTrue(refreshTokenCookie.value.isEmpty())
-        assertTrue(refreshTokenCookie.expiryDate < today)
+        assertTrue(refreshTokenCookie.expiryDate < now)
     }
 
     private void assertTokenIsRevoked(String tokenJwt, String resourceType) throws Exception {
