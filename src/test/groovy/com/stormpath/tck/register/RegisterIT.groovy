@@ -326,6 +326,8 @@ class RegisterIT extends AbstractIT {
     @Test
     public void formShouldContainFieldsOrderedByFieldOrder() throws Exception {
 
+        // Todo: CSRF support
+
         Response response =
             given()
                 .accept(ContentType.HTML)
@@ -366,7 +368,7 @@ class RegisterIT extends AbstractIT {
     @Test
     public void displaysErrorIfPostIsEmpty() throws Exception {
 
-        // todo: work with CSRF
+        // Todo: CSRF support
 
         Response response =
             given()
