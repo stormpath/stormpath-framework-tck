@@ -512,7 +512,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/203">#203</a>
      * @throws Exception
      */
-    @Test
+    @Test(enabled = false)
     public void redirectsToLoginOnSuccess() throws Exception {
 
         given()
@@ -527,6 +527,8 @@ class RegisterIT extends AbstractIT {
             .statusCode(302)
             .header("Location", is(loginRoute + "?status=created"))
 
-        deleteAccountOnTeardown(accountEmail)
+        // todo: need to be able to delete created accounts!
+        // see https://github.com/stormpath/stormpath-framework-tck/issues/213
+        //deleteAccountOnTeardown(accountEmail)
     }
 }
