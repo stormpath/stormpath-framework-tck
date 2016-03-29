@@ -514,7 +514,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/203">#203</a>
      * @throws Exception
      */
-    @Test(enabled = false)
+    @Test
     public void redirectsToLoginOnSuccess() throws Exception {
 
         given()
