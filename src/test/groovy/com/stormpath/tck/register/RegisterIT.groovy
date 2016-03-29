@@ -527,7 +527,6 @@ class RegisterIT extends AbstractIT {
             .statusCode(302)
             .header("Location", is(loginRoute + "?status=created"))
 
-        // TODO: cleanup!
-        //deleteAccountOnClassTeardown(accountEmail)
+        deleteAccountOnTeardown(accountEmail)
     }
 }
