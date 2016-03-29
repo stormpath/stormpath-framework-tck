@@ -135,16 +135,6 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/16">#16</a>
      */
     @Test
-    public void doNotHandleHead() throws Exception {
-        head(tokenRoute)
-            .then()
-            .assertThat().statusCode(405)
-    }
-
-    /** Anything but POST should return 405
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/16">#16</a>
-     */
-    @Test
     public void doNotHandlePut() throws Exception {
         put(tokenRoute)
             .then()
@@ -157,26 +147,6 @@ class Oauth2IT extends AbstractIT {
     @Test
     public void doNotHandleDelete() throws Exception {
         delete("/oauth/token")
-            .then()
-            .assertThat().statusCode(405)
-    }
-
-    /** Anything but POST should return 405
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/16">#16</a>
-     */
-    @Test
-    public void doNotHandleOptions() throws Exception {
-        options(tokenRoute)
-            .then()
-            .assertThat().statusCode(405)
-    }
-
-    /** Anything but POST should return 405
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/16">#16</a>
-     */
-    @Test
-    public void doNotHandlePatch() throws Exception {
-        patch(tokenRoute)
             .then()
             .assertThat().statusCode(405)
     }
