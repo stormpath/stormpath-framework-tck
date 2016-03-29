@@ -810,26 +810,29 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test
-    public void preserveValueInLoginFieldOnAttempt() throws Exception {
+    public void loginFormPreservesValuesOnPostback() throws Exception {
 
         // todo: work with CSRF
 
         Response response =
-                given()
-                    .accept(ContentType.HTML)
-                    .formParam("login", "blah")
-                    .formParam("password", "")
-                .when()
-                    .post(loginRoute)
-                .then()
-                    .statusCode(200)
-                    .contentType(ContentType.HTML)
-                .extract()
-                    .response()
+            given()
+                .accept(ContentType.HTML)
+                .formParam("login", "blah")
+                .formParam("password", "1")
+            .when()
+                .post(loginRoute)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.HTML)
+            .extract()
+                .response()
 
         XmlPath doc = getHtmlDoc(response)
 
         Node loginField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "login")
-        assertEquals(loginField.attributes().get("value"), "blah")
+        assertEquals(loginField.attributes().get("value"), "blah", "The 'login' field should preserve value")
+
+        Node passwordField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "password")
+        assertFalse((passwordField.attributes().get("value")?.trim() as boolean), "The 'password' field should NOT preserve value")
     }
 }
