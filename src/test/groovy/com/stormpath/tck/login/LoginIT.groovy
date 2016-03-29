@@ -651,7 +651,7 @@ class LoginIT extends AbstractIT {
     }
 
     /** Render verified status message
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/102">#103</a>
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/103">#103</a>
      * @throws Exception
      */
     @Test
