@@ -33,15 +33,7 @@ import static org.testng.Assert.*
 
 @Test
 class LoginIT extends AbstractIT {
-
-    private final String randomUUID = UUID.randomUUID().toString()
-    private final String accountEmail = "fooemail-" + randomUUID + "@stormpath.com"
-    private final String accountGivenName = "GivenName-" + randomUUID
-    private final String accountSurname = "Surname-" + randomUUID
-    private final String accountMiddleName = "Foobar"
-    private final String accountPassword = "P@sword123!"
-    private final String accountUsername = "foo-" + randomUUID
-
+    private TestAccount account = new TestAccount()
     private final String loginRoute = FrameworkConstants.LoginRoute
     private final String registerRoute = FrameworkConstants.RegisterRoute
 
@@ -105,35 +97,14 @@ class LoginIT extends AbstractIT {
     private Map getJsonCredentials() {
         Map<String, Object>  credentials = new HashMap<>();
 
-        credentials.put("login", accountEmail)
-        credentials.put("password", accountPassword)
+        credentials.put("login", account.email)
+        credentials.put("password", account.password)
         return credentials
     }
 
     @BeforeClass
     private void createTestAccount() throws Exception {
-
-        Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", accountEmail)
-        jsonAsMap.put("password", accountPassword)
-        jsonAsMap.put("givenName", accountGivenName)
-        jsonAsMap.put("surname", accountSurname)
-        jsonAsMap.put("username", accountUsername)
-        jsonAsMap.put("middleName", accountMiddleName)
-
-        String createdHref =
-                given()
-                    .accept(ContentType.JSON)
-                    .contentType(ContentType.JSON)
-                    .body(jsonAsMap)
-                .when()
-                    .post(registerRoute)
-                .then()
-                    .statusCode(200)
-                .extract()
-                    .path("account.href")
-
-        deleteOnClassTeardown(createdHref)
+        deleteOnClassTeardown(account.href)
     }
 
     /** Only respond to GET and POST
@@ -213,8 +184,8 @@ class LoginIT extends AbstractIT {
     public void loginWithUsername() throws Exception {
 
         Map<String, Object>  credentials = new HashMap<>();
-        credentials.put("login", accountUsername)
-        credentials.put("password", accountPassword)
+        credentials.put("login", account.username)
+        credentials.put("password", account.password)
 
         given()
             .accept(ContentType.JSON)
@@ -318,15 +289,15 @@ class LoginIT extends AbstractIT {
             .contentType(ContentType.JSON)
             .body("size()", is(1))
             .body("account.href", not(isEmptyOrNullString()))
-            .body("account.username", is(accountUsername))
+            .body("account.username", is(account.username))
             .body("account.modifiedAt", not(isEmptyOrNullString())) // #108 ensures ISO 8601
             .body("account.status", equalToIgnoringCase("ENABLED"))
             .body("account.createdAt", not(isEmptyOrNullString())) // #108 ensures ISO 8601
-            .body("account.email", is(accountEmail))
-            .body("account.middleName", is(accountMiddleName))
-            .body("account.surname", is(accountSurname))
-            .body("account.givenName", is(accountGivenName))
-            .body("account.fullName", is("$accountGivenName $accountMiddleName $accountSurname".toString()))
+            .body("account.email", is(account.email))
+            .body("account.middleName", is(account.middleName))
+            .body("account.surname", is(account.surname))
+            .body("account.givenName", is(account.givenName))
+            .body("account.fullName", is("$account.givenName $account.middleName $account.surname".toString()))
     }
 
     /**
@@ -503,8 +474,8 @@ class LoginIT extends AbstractIT {
 
         given()
             .accept(ContentType.HTML)
-            .formParam("login", accountEmail)
-            .formParam("password", accountPassword)
+            .formParam("login", account.email)
+            .formParam("password", account.password)
         .when()
             .post(loginRoute)
         .then()
@@ -523,8 +494,8 @@ class LoginIT extends AbstractIT {
 
         given()
             .accept(ContentType.HTML)
-            .formParam("login", accountEmail)
-            .formParam("password", accountPassword)
+            .formParam("login", account.email)
+            .formParam("password", account.password)
         .when()
             .post(loginRoute)
         .then()
@@ -542,8 +513,8 @@ class LoginIT extends AbstractIT {
 
         given()
             .accept(ContentType.HTML)
-            .formParam("login", accountUsername)
-            .formParam("password", accountPassword)
+            .formParam("login", account.username)
+            .formParam("password", account.password)
         .when()
             .post(loginRoute)
         .then()
@@ -561,8 +532,8 @@ class LoginIT extends AbstractIT {
 
         given()
             .accept(ContentType.HTML)
-            .formParam("login", accountEmail)
-            .formParam("password", accountPassword)
+            .formParam("login", account.email)
+            .formParam("password", account.password)
         .when()
             .post(loginRoute)
         .then()
@@ -581,8 +552,8 @@ class LoginIT extends AbstractIT {
 
         given()
             .accept(ContentType.HTML)
-            .formParam("login", accountEmail)
-            .formParam("password", accountPassword)
+            .formParam("login", account.email)
+            .formParam("password", account.password)
             .queryParam("next", "/foo")
         .when()
             .post(loginRoute)

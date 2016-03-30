@@ -29,12 +29,7 @@ import static org.hamcrest.Matchers.*
 
 @Test
 class LogoutIT extends AbstractIT {
-
-    private final String randomUUID = UUID.randomUUID().toString()
-    private final String accountEmail = "fooemail-" + randomUUID + "@stormpath.com"
-    private final String accountGivenName = "GivenName-" + randomUUID
-    private final String accountSurname = "Surname-" + randomUUID
-    private final String accountPassword = "P@sword123!"
+    private TestAccount account = new TestAccount()
 
     private final String logoutPath = FrameworkConstants.LogoutRoute
     private final String registerPath = FrameworkConstants.RegisterRoute
@@ -42,33 +37,14 @@ class LogoutIT extends AbstractIT {
 
     @BeforeClass
     public void createTestUser() throws Exception {
-
-        Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", accountEmail)
-        jsonAsMap.put("password", accountPassword)
-        jsonAsMap.put("givenName", accountGivenName)
-        jsonAsMap.put("surname", accountSurname)
-
-        String createdHref =
-            given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .body(jsonAsMap)
-            .when()
-                .post(registerPath)
-            .then()
-                .statusCode(200)
-            .extract()
-                .path("account.href")
-
-        deleteOnClassTeardown(createdHref)
+        deleteOnClassTeardown(account.href)
     }
 
     private Map<String, String> createSession() throws Exception {
 
         Map<String, Object>  credentials = new HashMap<>();
-        credentials.put("login", accountEmail)
-        credentials.put("password", accountPassword)
+        credentials.put("login", account.email)
+        credentials.put("password", account.password)
 
         Map<String, String> cookies =
             given()

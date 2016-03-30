@@ -29,11 +29,7 @@ import static org.testng.Assert.*
 
 @Test
 class Oauth2IT extends AbstractIT {
-
-    private final String randomUUID = UUID.randomUUID().toString()
-    private final String accountEmail = "fooemail-" + randomUUID + "@stormpath.com"
-    private final String accountUsername = randomUUID
-    private final String accountPassword = "P@ssword123"
+    private TestAccount account = new TestAccount()
 
     private static final String registerRoute = FrameworkConstants.RegisterRoute
     private static final String tokenRoute = FrameworkConstants.OauthRoute
@@ -42,28 +38,7 @@ class Oauth2IT extends AbstractIT {
 
     @BeforeClass
     private void createTestAccount() throws Exception {
-
-        Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", accountEmail)
-        jsonAsMap.put("password", accountPassword)
-        jsonAsMap.put("givenName", "GivenName-" + randomUUID)
-        jsonAsMap.put("surname", "Surname-" + randomUUID)
-        jsonAsMap.put("username", accountUsername)
-
-        String createdHref =
-            given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .body(jsonAsMap)
-            .when()
-                .post(registerRoute)
-            .then()
-                .statusCode(200)
-            .extract()
-                .path("account.href")
-
-        this.accountHref = createdHref
-        deleteOnClassTeardown(createdHref)
+        deleteOnClassTeardown(account.href)
     }
 
     /** Unsupported grant type returns error
@@ -162,8 +137,8 @@ class Oauth2IT extends AbstractIT {
         String accessToken =
             given()
                 .param("grant_type", "password")
-                .param("username", accountUsername)
-                .param("password", accountPassword)
+                .param("username", account.username)
+                .param("password", account.password)
             .when()
                 .post(tokenRoute)
             .then()
@@ -188,8 +163,8 @@ class Oauth2IT extends AbstractIT {
         String accessToken =
             given()
                 .param("grant_type", "password")
-                .param("username", accountEmail)
-                .param("password", accountPassword)
+                .param("username", account.email)
+                .param("password", account.password)
             .when()
                 .post(tokenRoute)
             .then()
@@ -213,8 +188,8 @@ class Oauth2IT extends AbstractIT {
         Response passwordGrantResponse =
             given()
                 .param("grant_type", "password")
-                .param("username", accountEmail)
-                .param("password", accountPassword)
+                .param("username", account.email)
+                .param("password", account.password)
             .when()
                 .post(tokenRoute)
             .then()
