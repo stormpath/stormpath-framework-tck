@@ -19,6 +19,7 @@ package com.stormpath.tck.util
 class EnvUtils {
 
     public static final String stormpathBaseUrl = getVal("STORMPATH_CLIENT_BASEURL", "https://api.stormpath.com/v1")
+    public static final String stormpathApplicationHref = getVal("STORMPATH_APPLICATION_HREF", "")
 
     public static String getVal(String name, String defaultVal) {
 
