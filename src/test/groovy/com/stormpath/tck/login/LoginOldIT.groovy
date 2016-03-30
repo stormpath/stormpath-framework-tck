@@ -20,7 +20,7 @@ import com.jayway.restassured.path.xml.element.Node
 import com.jayway.restassured.path.xml.element.NodeChildren
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.JwtUtils
+import com.stormpath.tck.util.*
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.get
@@ -63,7 +63,7 @@ class LoginOldIT extends AbstractIT {
 
         //1.  Get the /register page
 
-        Response response = get("/register")
+        Response response = get(FrameworkConstants.RegisterRoute)
 
         // store any cookies - we'll just feed them back later
         this.cookies = response.getCookies()
@@ -97,7 +97,7 @@ class LoginOldIT extends AbstractIT {
                 .statusCode(302)
 
         //post the account
-                .post("/register")
+                .post(FrameworkConstants.RegisterRoute)
                 .andReturn()
     }
 
@@ -110,7 +110,7 @@ class LoginOldIT extends AbstractIT {
                 given()
                         .header("Accept", "text/html")
                         .when()
-                        .get("/login")
+                        .get(FrameworkConstants.LoginRoute)
 
         // store any cookies - we'll just feed them back later
         this.cookies = response.getCookies()
@@ -136,7 +136,7 @@ class LoginOldIT extends AbstractIT {
                         .statusCode(302)
 
                 //post the account
-                        .post("/login")
+                        .post(FrameworkConstants.LoginRoute)
                         .andReturn()
 
         //get the resulting cookie:
@@ -157,7 +157,7 @@ class LoginOldIT extends AbstractIT {
                         .header("Authorization", "Bearer " + this.accessToken)
                         .expect()
                         .statusCode(302)
-                        .post("/logout")
+                        .post(FrameworkConstants.LogoutRoute)
                         .andReturn()
 
         this.accessToken = response.getCookie("access_token");

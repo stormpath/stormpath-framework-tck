@@ -21,7 +21,7 @@ import com.jayway.restassured.path.xml.element.Node
 import com.jayway.restassured.path.xml.element.NodeChildren
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.Iso8601Utils
+import com.stormpath.tck.util.*
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
@@ -42,8 +42,8 @@ class LoginIT extends AbstractIT {
     private final String accountPassword = "P@sword123!"
     private final String accountUsername = "foo-" + randomUUID
 
-    private final String loginRoute = "/login"
-    private final String registerRoute = "/register"
+    private final String loginRoute = FrameworkConstants.LoginRoute
+    private final String registerRoute = FrameworkConstants.RegisterRoute
 
     private Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
         for (Node node : children.list()) {

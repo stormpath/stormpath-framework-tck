@@ -18,7 +18,7 @@ package com.stormpath.tck.oauth2
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.JwtUtils
+import com.stormpath.tck.util.*
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
@@ -35,8 +35,8 @@ class Oauth2IT extends AbstractIT {
     private final String accountUsername = randomUUID
     private final String accountPassword = "P@ssword123"
 
-    private static final String registerRoute = "/register"
-    private static final String tokenRoute = "/oauth/token"
+    private static final String registerRoute = FrameworkConstants.RegisterRoute
+    private static final String tokenRoute = FrameworkConstants.OauthRoute
 
     private String accountHref = ""
 
@@ -148,7 +148,7 @@ class Oauth2IT extends AbstractIT {
      */
     @Test
     public void doNotHandleDelete() throws Exception {
-        delete("/oauth/token")
+        delete(FrameworkConstants.OauthRoute)
             .then()
             .assertThat().statusCode(405)
     }

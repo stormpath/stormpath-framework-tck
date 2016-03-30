@@ -19,9 +19,7 @@ import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Cookie
 import com.jayway.restassured.response.Cookies
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.EnvUtils
-import com.stormpath.tck.util.JwtUtils
-import com.stormpath.tck.util.RestUtils
+import com.stormpath.tck.util.*
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
@@ -38,9 +36,9 @@ class LogoutIT extends AbstractIT {
     private final String accountSurname = "Surname-" + randomUUID
     private final String accountPassword = "P@sword123!"
 
-    private final String logoutPath = "/logout"
-    private final String registerPath = "/register"
-    private final String loginPath = "/login"
+    private final String logoutPath = FrameworkConstants.LogoutRoute
+    private final String registerPath = FrameworkConstants.RegisterRoute
+    private final String loginPath = FrameworkConstants.LoginRoute
 
     @BeforeClass
     public void createTestUser() throws Exception {
