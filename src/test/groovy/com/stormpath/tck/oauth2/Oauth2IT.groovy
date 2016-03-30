@@ -33,8 +33,6 @@ class Oauth2IT extends AbstractIT {
     private static final String registerRoute = FrameworkConstants.RegisterRoute
     private static final String tokenRoute = FrameworkConstants.OauthRoute
 
-    private String account.href = ""
-
     @BeforeClass
     private void createTestAccount() throws Exception {
         deleteOnClassTeardown(account.href)
