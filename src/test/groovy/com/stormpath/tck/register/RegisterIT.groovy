@@ -105,6 +105,7 @@ class RegisterIT extends AbstractIT {
 
         given()
             .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
         .when()
             .post(registerRoute)
         .then()
@@ -128,6 +129,7 @@ class RegisterIT extends AbstractIT {
 
         given()
             .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
             .body(jsonAsMap)
         .when()
             .post(registerRoute)
@@ -154,6 +156,7 @@ class RegisterIT extends AbstractIT {
 
         given()
             .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
             .body(jsonAsMap)
         .when()
             .post(registerRoute)
@@ -182,6 +185,7 @@ class RegisterIT extends AbstractIT {
 
         given()
             .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
             .body(jsonAsMap)
         .when()
             .post(registerRoute)
@@ -214,6 +218,7 @@ class RegisterIT extends AbstractIT {
 
         given()
             .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
             .body(jsonAsMap)
         .when()
             .post(registerRoute)
@@ -241,6 +246,7 @@ class RegisterIT extends AbstractIT {
 
         given()
             .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
             .body(jsonAsMap)
         .when()
             .post(registerRoute)
@@ -271,6 +277,7 @@ class RegisterIT extends AbstractIT {
         String createdHref =
             given()
                 .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
                 .body(jsonAsMap)
             .when()
                 .post(registerRoute)
@@ -373,6 +380,7 @@ class RegisterIT extends AbstractIT {
         Response response =
             given()
                 .accept(ContentType.HTML)
+                .contentType(ContentType.URLENC)
             .when()
                 .post(registerRoute)
             .then()
@@ -400,6 +408,7 @@ class RegisterIT extends AbstractIT {
         Response response =
             given()
                 .accept(ContentType.HTML)
+                .contentType(ContentType.URLENC)
                 .formParam("email", accountEmail)
                 .formParam("password", "")
             .when()
@@ -429,6 +438,7 @@ class RegisterIT extends AbstractIT {
         Response response =
             given()
                 .accept(ContentType.HTML)
+                .contentType(ContentType.URLENC)
                 .formParam("email", accountEmail)
                 .formParam("password", accountPassword)
                 .formParam("surname", accountSurname)
@@ -460,6 +470,7 @@ class RegisterIT extends AbstractIT {
         Response response =
             given()
                 .accept(ContentType.HTML)
+                .contentType(ContentType.URLENC)
                 .formParam("email", accountEmail)
                 .formParam("password", accountPassword)
                 .formParam("givenName", accountGivenName)
@@ -490,6 +501,7 @@ class RegisterIT extends AbstractIT {
         Response response =
             given()
                 .accept(ContentType.HTML)
+                .contentType(ContentType.URLENC)
                 .formParam("email", "foo@bar")
                 .formParam("password", "1")
                 .formParam("givenName", accountGivenName)
@@ -519,6 +531,7 @@ class RegisterIT extends AbstractIT {
 
         given()
             .accept(ContentType.HTML)
+            .contentType(ContentType.URLENC)
             .formParam("email", accountEmail)
             .formParam("password", accountPassword)
             .formParam("givenName", accountGivenName)
@@ -546,6 +559,7 @@ class RegisterIT extends AbstractIT {
         Response response =
             given()
                 .accept(ContentType.HTML)
+                .contentType(ContentType.URLENC)
                 .formParam("email", accountEmail)
                 .formParam("password", "1") // Too short, will fail validation
                 .formParam("givenName", accountGivenName)
