@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stormpath.tck.logout
 
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Cookie

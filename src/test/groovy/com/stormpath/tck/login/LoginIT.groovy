@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stormpath.tck.login
 
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
@@ -22,6 +21,7 @@ import com.jayway.restassured.path.xml.element.NodeChildren
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.util.*
+import com.stormpath.tck.responseSpecs.*
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
@@ -285,19 +285,7 @@ class LoginIT extends AbstractIT {
         .when()
             .post(loginRoute)
         .then()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body("size()", is(1))
-            .body("account.href", not(isEmptyOrNullString()))
-            .body("account.username", is(account.username))
-            .body("account.modifiedAt", not(isEmptyOrNullString())) // #108 ensures ISO 8601
-            .body("account.status", equalToIgnoringCase("ENABLED"))
-            .body("account.createdAt", not(isEmptyOrNullString())) // #108 ensures ISO 8601
-            .body("account.email", is(account.email))
-            .body("account.middleName", is(account.middleName))
-            .body("account.surname", is(account.surname))
-            .body("account.givenName", is(account.givenName))
-            .body("account.fullName", is("$account.givenName $account.middleName $account.surname".toString()))
+            .spec(AccountResponseSpec.matchesAccount(account))
     }
 
     /**
@@ -315,21 +303,7 @@ class LoginIT extends AbstractIT {
         .when()
             .post(loginRoute)
         .then()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body("account.size()", is(10))
-            // Todo: there might be an easier way to assert "it has none of these keys", but I'm a restAssured/hamcrest n00b
-            .body("account.emailVerificationToken", is(nullValue()))
-            .body("account.customData", is(nullValue()))
-            .body("account.providerData", is(nullValue()))
-            .body("account.directory", is(nullValue()))
-            .body("account.tenant", is(nullValue()))
-            .body("account.groups", is(nullValue()))
-            .body("account.groupMemberships", is(nullValue()))
-            .body("account.applications", is(nullValue()))
-            .body("account.apiKeys", is(nullValue()))
-            .body("account.accessTokens", is(nullValue()))
-            .body("account.refreshTokens", is(nullValue()))
+            .spec(AccountResponseSpec.withoutLinkedResources())
     }
 
     /**

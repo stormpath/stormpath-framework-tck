@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stormpath.tck.requests
 
 import com.jayway.restassured.http.ContentType
 import com.stormpath.tck.AbstractIT
