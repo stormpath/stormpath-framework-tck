@@ -120,12 +120,11 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test
-    public void returnsErrorIfEmailIsMissing() throws Exception {
+    public void returnsErrorIfPasswordIsMissing() throws Exception {
 
         Map<String, Object>  jsonAsMap = new HashMap<>();
         jsonAsMap.put("email", accountEmail)
         jsonAsMap.put("password", "")
-
 
         given()
             .accept(ContentType.JSON)
@@ -394,7 +393,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test
-    public void displaysErrorIfEmailIsMissing() throws Exception {
+    public void displaysErrorIfPasswordIsMissing() throws Exception {
 
         // todo: work with CSRF
 
