@@ -51,6 +51,8 @@ class SocialLoginIT extends AbstractIT {
     }
 
     private void getSocialProviderIdsFromStormpath() {
+        assertNotNull(EnvUtils.stormpathApplicationHref, "We need the Application HREF to perform this test.")
+
         // Pull account stores
         List<String> accountStores = given()
             .header("User-Agent", "stormpath-framework-tck")
