@@ -33,7 +33,7 @@ class Oauth2IT extends AbstractIT {
     private static final String registerRoute = FrameworkConstants.RegisterRoute
     private static final String tokenRoute = FrameworkConstants.OauthRoute
 
-    private String accountHref = ""
+    private String account.href = ""
 
     @BeforeClass
     private void createTestAccount() throws Exception {
@@ -150,7 +150,7 @@ class Oauth2IT extends AbstractIT {
             .extract()
                 .path("access_token")
 
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.accountHref)
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.account.href)
     }
 
     /** Password grant flow with email/password
@@ -176,7 +176,7 @@ class Oauth2IT extends AbstractIT {
             .extract()
                 .path("access_token")
 
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.accountHref)
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.account.href)
     }
 
     /** Refresh grant flow
@@ -221,7 +221,7 @@ class Oauth2IT extends AbstractIT {
                 .path("access_token")
 
         assertNotEquals(accessToken, newAccessToken, "The new access token should not equal to the old access token")
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.accountHref, "The access token should be a valid jwt for the test user")
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.account.href, "The access token should be a valid jwt for the test user")
     }
 
     /** Refresh grant flow should fail without valid refresh token
