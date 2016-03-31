@@ -30,10 +30,7 @@ import static org.testng.Assert.*
 
 @Test
 class RegisterIT extends AbstractIT {
-
-    private static final String registerRoute = "/register"
-    private static final String loginRoute = "/login"
-
+    
     private final String randomUUID = UUID.randomUUID().toString()
     private final String accountEmail = "fooemail-$randomUUID@stormpath.com"
     private final String accountGivenName = "GivenName-$randomUUID"
@@ -86,7 +83,7 @@ class RegisterIT extends AbstractIT {
         given()
             .accept(ContentType.JSON)
         .when()
-            .get(registerRoute)
+            .get(FrameworkConstants.RegisterRoute)
         .then()
             .statusCode(200)
             .contentType(ContentType.JSON)
@@ -107,7 +104,7 @@ class RegisterIT extends AbstractIT {
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
         .when()
-            .post(registerRoute)
+            .post(FrameworkConstants.RegisterRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -132,7 +129,7 @@ class RegisterIT extends AbstractIT {
             .contentType(ContentType.JSON)
             .body(jsonAsMap)
         .when()
-            .post(registerRoute)
+            .post(FrameworkConstants.RegisterRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -159,7 +156,7 @@ class RegisterIT extends AbstractIT {
             .contentType(ContentType.JSON)
             .body(jsonAsMap)
         .when()
-            .post(registerRoute)
+            .post(FrameworkConstants.RegisterRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -188,7 +185,7 @@ class RegisterIT extends AbstractIT {
             .contentType(ContentType.JSON)
             .body(jsonAsMap)
         .when()
-            .post(registerRoute)
+            .post(FrameworkConstants.RegisterRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -221,7 +218,7 @@ class RegisterIT extends AbstractIT {
             .contentType(ContentType.JSON)
             .body(jsonAsMap)
         .when()
-            .post(registerRoute)
+            .post(FrameworkConstants.RegisterRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -249,7 +246,7 @@ class RegisterIT extends AbstractIT {
             .contentType(ContentType.JSON)
             .body(jsonAsMap)
         .when()
-            .post(registerRoute)
+            .post(FrameworkConstants.RegisterRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -280,7 +277,7 @@ class RegisterIT extends AbstractIT {
                 .contentType(ContentType.JSON)
                 .body(jsonAsMap)
             .when()
-                .post(registerRoute)
+                .post(FrameworkConstants.RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -313,7 +310,7 @@ class RegisterIT extends AbstractIT {
             given()
                 .accept(ContentType.HTML)
             .when()
-                .get(registerRoute)
+                .get(FrameworkConstants.RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -339,7 +336,7 @@ class RegisterIT extends AbstractIT {
             given()
                 .accept(ContentType.HTML)
             .when()
-                .get(registerRoute)
+                .get(FrameworkConstants.RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -382,7 +379,7 @@ class RegisterIT extends AbstractIT {
                 .accept(ContentType.HTML)
                 .contentType(ContentType.URLENC)
             .when()
-                .post(registerRoute)
+                .post(FrameworkConstants.RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -412,7 +409,7 @@ class RegisterIT extends AbstractIT {
                 .formParam("email", accountEmail)
                 .formParam("password", "")
             .when()
-                .post(registerRoute)
+                .post(FrameworkConstants.RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -444,7 +441,7 @@ class RegisterIT extends AbstractIT {
                 .formParam("surname", accountSurname)
                 // givenName is required per the default configuration
             .when()
-                .post(registerRoute)
+                .post(FrameworkConstants.RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -477,7 +474,7 @@ class RegisterIT extends AbstractIT {
                 .formParam("surname", accountSurname)
                 .formParam("customValue", "foobar") // not defined in default configuration
             .when()
-                .post(registerRoute)
+                .post(FrameworkConstants.RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -508,7 +505,7 @@ class RegisterIT extends AbstractIT {
                 .formParam("surname", accountSurname)
                 // Email and password will not pass Stormpath API validation and will error
             .when()
-                .post(registerRoute)
+                .post(FrameworkConstants.RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -537,10 +534,10 @@ class RegisterIT extends AbstractIT {
             .formParam("givenName", accountGivenName)
             .formParam("surname", accountSurname)
         .when()
-            .post(registerRoute)
+            .post(FrameworkConstants.RegisterRoute)
         .then()
             .statusCode(302)
-            .header("Location", is(loginRoute + "?status=created"))
+            .header("Location", is(FrameworkConstants.LoginRoute + "?status=created"))
 
         // todo: need to be able to delete created accounts!
         // see https://github.com/stormpath/stormpath-framework-tck/issues/213
@@ -565,7 +562,7 @@ class RegisterIT extends AbstractIT {
                 .formParam("givenName", accountGivenName)
                 .formParam("surname", accountSurname)
             .when()
-                .post(registerRoute)
+                .post(FrameworkConstants.RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
