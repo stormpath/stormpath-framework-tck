@@ -50,6 +50,12 @@ class MeIT extends AbstractIT {
         deleteOnClassTeardown(account.href)
     }
 
+    /**
+     * We should be returning a user, and it should always be JSON.
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/61
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/63
+     * @throws Exception
+     */
     @Test
     public void testThatMeReturnsJsonUser() throws Exception {
         given()
@@ -60,6 +66,11 @@ class MeIT extends AbstractIT {
             .spec(AccountResponseSpec.matchesAccount(account))
     }
 
+    /**
+     * We should not have linked resources.
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/64
+     * @throws Exception
+     */
     @Test
     public void testThatMeStripsLinkedResources() throws Exception {
         given()
@@ -70,6 +81,11 @@ class MeIT extends AbstractIT {
             .spec(AccountResponseSpec.withoutLinkedResources())
     }
 
+    /**
+     * We should not set cache headers.
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/65
+     * @throws Exception
+     */
     @Test
     public void testThatMeHasNoCacheHeaders() throws Exception {
         given()
