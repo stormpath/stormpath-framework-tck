@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stormpath.tck.logout
 
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Cookie
 import com.jayway.restassured.response.Cookies
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.EnvUtils
-import com.stormpath.tck.util.JwtUtils
-import com.stormpath.tck.util.RestUtils
+import com.stormpath.tck.util.*
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
@@ -31,46 +28,22 @@ import static org.hamcrest.Matchers.*
 
 @Test
 class LogoutIT extends AbstractIT {
+    private TestAccount account = new TestAccount()
 
-    private final String randomUUID = UUID.randomUUID().toString()
-    private final String accountEmail = "fooemail-" + randomUUID + "@stormpath.com"
-    private final String accountGivenName = "GivenName-" + randomUUID
-    private final String accountSurname = "Surname-" + randomUUID
-    private final String accountPassword = "P@sword123!"
-
-    private final String logoutPath = "/logout"
-    private final String registerPath = "/register"
-    private final String loginPath = "/login"
+    private final String logoutPath = FrameworkConstants.LogoutRoute
+    private final String registerPath = FrameworkConstants.RegisterRoute
+    private final String loginPath = FrameworkConstants.LoginRoute
 
     @BeforeClass
     public void createTestUser() throws Exception {
-
-        Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", accountEmail)
-        jsonAsMap.put("password", accountPassword)
-        jsonAsMap.put("givenName", accountGivenName)
-        jsonAsMap.put("surname", accountSurname)
-
-        String createdHref =
-            given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .body(jsonAsMap)
-            .when()
-                .post(registerPath)
-            .then()
-                .statusCode(200)
-            .extract()
-                .path("account.href")
-
-        deleteOnClassTeardown(createdHref)
+        deleteOnClassTeardown(account.href)
     }
 
     private Map<String, String> createSession() throws Exception {
 
         Map<String, Object>  credentials = new HashMap<>();
-        credentials.put("login", accountEmail)
-        credentials.put("password", accountPassword)
+        credentials.put("login", account.email)
+        credentials.put("password", account.password)
 
         Map<String, String> cookies =
             given()

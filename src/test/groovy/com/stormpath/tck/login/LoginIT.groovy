@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stormpath.tck.login
 
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
@@ -21,7 +20,8 @@ import com.jayway.restassured.path.xml.element.Node
 import com.jayway.restassured.path.xml.element.NodeChildren
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.Iso8601Utils
+import com.stormpath.tck.util.*
+import com.stormpath.tck.responseSpecs.*
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
@@ -33,17 +33,9 @@ import static org.testng.Assert.*
 
 @Test
 class LoginIT extends AbstractIT {
-
-    private final String randomUUID = UUID.randomUUID().toString()
-    private final String accountEmail = "fooemail-" + randomUUID + "@stormpath.com"
-    private final String accountGivenName = "GivenName-" + randomUUID
-    private final String accountSurname = "Surname-" + randomUUID
-    private final String accountMiddleName = "Foobar"
-    private final String accountPassword = "P@sword123!"
-    private final String accountUsername = "foo-" + randomUUID
-
-    private final String loginRoute = "/login"
-    private final String registerRoute = "/register"
+    private TestAccount account = new TestAccount()
+    private final String loginRoute = FrameworkConstants.LoginRoute
+    private final String registerRoute = FrameworkConstants.RegisterRoute
 
     private Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
         for (Node node : children.list()) {
@@ -105,35 +97,14 @@ class LoginIT extends AbstractIT {
     private Map getJsonCredentials() {
         Map<String, Object>  credentials = new HashMap<>();
 
-        credentials.put("login", accountEmail)
-        credentials.put("password", accountPassword)
+        credentials.put("login", account.email)
+        credentials.put("password", account.password)
         return credentials
     }
 
     @BeforeClass
     private void createTestAccount() throws Exception {
-
-        Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", accountEmail)
-        jsonAsMap.put("password", accountPassword)
-        jsonAsMap.put("givenName", accountGivenName)
-        jsonAsMap.put("surname", accountSurname)
-        jsonAsMap.put("username", accountUsername)
-        jsonAsMap.put("middleName", accountMiddleName)
-
-        String createdHref =
-                given()
-                    .accept(ContentType.JSON)
-                    .contentType(ContentType.JSON)
-                    .body(jsonAsMap)
-                .when()
-                    .post(registerRoute)
-                .then()
-                    .statusCode(200)
-                .extract()
-                    .path("account.href")
-
-        deleteOnClassTeardown(createdHref)
+        deleteOnClassTeardown(account.href)
     }
 
     /** Only respond to GET and POST
@@ -213,8 +184,8 @@ class LoginIT extends AbstractIT {
     public void loginWithUsername() throws Exception {
 
         Map<String, Object>  credentials = new HashMap<>();
-        credentials.put("login", accountUsername)
-        credentials.put("password", accountPassword)
+        credentials.put("login", account.username)
+        credentials.put("password", account.password)
 
         given()
             .accept(ContentType.JSON)
@@ -314,19 +285,7 @@ class LoginIT extends AbstractIT {
         .when()
             .post(loginRoute)
         .then()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body("size()", is(1))
-            .body("account.href", not(isEmptyOrNullString()))
-            .body("account.username", is(accountUsername))
-            .body("account.modifiedAt", not(isEmptyOrNullString())) // #108 ensures ISO 8601
-            .body("account.status", equalToIgnoringCase("ENABLED"))
-            .body("account.createdAt", not(isEmptyOrNullString())) // #108 ensures ISO 8601
-            .body("account.email", is(accountEmail))
-            .body("account.middleName", is(accountMiddleName))
-            .body("account.surname", is(accountSurname))
-            .body("account.givenName", is(accountGivenName))
-            .body("account.fullName", is("$accountGivenName $accountMiddleName $accountSurname".toString()))
+            .spec(AccountResponseSpec.matchesAccount(account))
     }
 
     /**
@@ -344,21 +303,7 @@ class LoginIT extends AbstractIT {
         .when()
             .post(loginRoute)
         .then()
-            .statusCode(200)
-            .contentType(ContentType.JSON)
-            .body("account.size()", is(10))
-            // Todo: there might be an easier way to assert "it has none of these keys", but I'm a restAssured/hamcrest n00b
-            .body("account.emailVerificationToken", is(nullValue()))
-            .body("account.customData", is(nullValue()))
-            .body("account.providerData", is(nullValue()))
-            .body("account.directory", is(nullValue()))
-            .body("account.tenant", is(nullValue()))
-            .body("account.groups", is(nullValue()))
-            .body("account.groupMemberships", is(nullValue()))
-            .body("account.applications", is(nullValue()))
-            .body("account.apiKeys", is(nullValue()))
-            .body("account.accessTokens", is(nullValue()))
-            .body("account.refreshTokens", is(nullValue()))
+            .spec(AccountResponseSpec.withoutLinkedResources())
     }
 
     /**
@@ -503,8 +448,8 @@ class LoginIT extends AbstractIT {
 
         given()
             .accept(ContentType.HTML)
-            .formParam("login", accountEmail)
-            .formParam("password", accountPassword)
+            .formParam("login", account.email)
+            .formParam("password", account.password)
         .when()
             .post(loginRoute)
         .then()
@@ -523,8 +468,8 @@ class LoginIT extends AbstractIT {
 
         given()
             .accept(ContentType.HTML)
-            .formParam("login", accountEmail)
-            .formParam("password", accountPassword)
+            .formParam("login", account.email)
+            .formParam("password", account.password)
         .when()
             .post(loginRoute)
         .then()
@@ -542,8 +487,8 @@ class LoginIT extends AbstractIT {
 
         given()
             .accept(ContentType.HTML)
-            .formParam("login", accountUsername)
-            .formParam("password", accountPassword)
+            .formParam("login", account.username)
+            .formParam("password", account.password)
         .when()
             .post(loginRoute)
         .then()
@@ -561,8 +506,8 @@ class LoginIT extends AbstractIT {
 
         given()
             .accept(ContentType.HTML)
-            .formParam("login", accountEmail)
-            .formParam("password", accountPassword)
+            .formParam("login", account.email)
+            .formParam("password", account.password)
         .when()
             .post(loginRoute)
         .then()
@@ -581,8 +526,8 @@ class LoginIT extends AbstractIT {
 
         given()
             .accept(ContentType.HTML)
-            .formParam("login", accountEmail)
-            .formParam("password", accountPassword)
+            .formParam("login", account.email)
+            .formParam("password", account.password)
             .queryParam("next", "/foo")
         .when()
             .post(loginRoute)

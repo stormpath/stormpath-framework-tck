@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stormpath.tck.requests
 
 import com.jayway.restassured.http.ContentType
 import com.stormpath.tck.AbstractIT
+import com.stormpath.tck.util.*
 import org.testng.annotations.Test
 import static com.jayway.restassured.RestAssured.given
 import static org.hamcrest.Matchers.*
@@ -34,7 +34,7 @@ class RequestsIT extends AbstractIT {
         given()
             .header("Accept", "")
         .when()
-            .get("/login")
+            .get(FrameworkConstants.LoginRoute)
         .then()
             .statusCode(200)
             .contentType(ContentType.JSON)
@@ -50,7 +50,7 @@ class RequestsIT extends AbstractIT {
 
         given()
         .when()
-            .get("/login")
+            .get(FrameworkConstants.LoginRoute)
         .then()
             .statusCode(200)
             .contentType(ContentType.JSON)
@@ -67,7 +67,7 @@ class RequestsIT extends AbstractIT {
         given()
             .accept(ContentType.ANY)
         .when()
-            .get("/login")
+            .get(FrameworkConstants.LoginRoute)
         .then()
             .statusCode(200)
             .contentType(ContentType.JSON)
@@ -84,7 +84,7 @@ class RequestsIT extends AbstractIT {
         given()
             .accept(ContentType.JSON)
         .when()
-            .get("/login")
+            .get(FrameworkConstants.LoginRoute)
         .then()
             .statusCode(200)
             .contentType(ContentType.JSON)
@@ -100,7 +100,7 @@ class RequestsIT extends AbstractIT {
         given()
             .accept(ContentType.HTML)
         .when()
-            .get("/login")
+            .get(FrameworkConstants.LoginRoute)
         .then()
             .statusCode(200)
             .contentType(ContentType.HTML)
@@ -116,7 +116,7 @@ class RequestsIT extends AbstractIT {
         given()
             .header("Accept", "foo/bar")
         .when()
-            .get("/login")
+            .get(FrameworkConstants.LoginRoute)
         .then()
             .statusCode(404)
     }

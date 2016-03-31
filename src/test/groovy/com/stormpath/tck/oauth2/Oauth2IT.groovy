@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stormpath.tck.oauth2
 
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.JwtUtils
+import com.stormpath.tck.util.*
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
@@ -29,41 +28,14 @@ import static org.testng.Assert.*
 
 @Test
 class Oauth2IT extends AbstractIT {
+    private TestAccount account = new TestAccount()
 
-    private final String randomUUID = UUID.randomUUID().toString()
-    private final String accountEmail = "fooemail-" + randomUUID + "@stormpath.com"
-    private final String accountUsername = randomUUID
-    private final String accountPassword = "P@ssword123"
-
-    private static final String registerRoute = "/register"
-    private static final String tokenRoute = "/oauth/token"
-
-    private String accountHref = ""
+    private static final String registerRoute = FrameworkConstants.RegisterRoute
+    private static final String tokenRoute = FrameworkConstants.OauthRoute
 
     @BeforeClass
     private void createTestAccount() throws Exception {
-
-        Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", accountEmail)
-        jsonAsMap.put("password", accountPassword)
-        jsonAsMap.put("givenName", "GivenName-" + randomUUID)
-        jsonAsMap.put("surname", "Surname-" + randomUUID)
-        jsonAsMap.put("username", accountUsername)
-
-        String createdHref =
-            given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .body(jsonAsMap)
-            .when()
-                .post(registerRoute)
-            .then()
-                .statusCode(200)
-            .extract()
-                .path("account.href")
-
-        this.accountHref = createdHref
-        deleteOnClassTeardown(createdHref)
+        deleteOnClassTeardown(account.href)
     }
 
     /** Unsupported grant type returns error
@@ -148,7 +120,7 @@ class Oauth2IT extends AbstractIT {
      */
     @Test
     public void doNotHandleDelete() throws Exception {
-        delete("/oauth/token")
+        delete(FrameworkConstants.OauthRoute)
             .then()
             .assertThat().statusCode(405)
     }
@@ -162,8 +134,8 @@ class Oauth2IT extends AbstractIT {
         String accessToken =
             given()
                 .param("grant_type", "password")
-                .param("username", accountUsername)
-                .param("password", accountPassword)
+                .param("username", account.username)
+                .param("password", account.password)
             .when()
                 .post(tokenRoute)
             .then()
@@ -176,7 +148,7 @@ class Oauth2IT extends AbstractIT {
             .extract()
                 .path("access_token")
 
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.accountHref)
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.account.href)
     }
 
     /** Password grant flow with email/password
@@ -188,8 +160,8 @@ class Oauth2IT extends AbstractIT {
         String accessToken =
             given()
                 .param("grant_type", "password")
-                .param("username", accountEmail)
-                .param("password", accountPassword)
+                .param("username", account.email)
+                .param("password", account.password)
             .when()
                 .post(tokenRoute)
             .then()
@@ -202,7 +174,7 @@ class Oauth2IT extends AbstractIT {
             .extract()
                 .path("access_token")
 
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.accountHref)
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.account.href)
     }
 
     /** Refresh grant flow
@@ -213,8 +185,8 @@ class Oauth2IT extends AbstractIT {
         Response passwordGrantResponse =
             given()
                 .param("grant_type", "password")
-                .param("username", accountEmail)
-                .param("password", accountPassword)
+                .param("username", account.email)
+                .param("password", account.password)
             .when()
                 .post(tokenRoute)
             .then()
@@ -247,7 +219,7 @@ class Oauth2IT extends AbstractIT {
                 .path("access_token")
 
         assertNotEquals(accessToken, newAccessToken, "The new access token should not equal to the old access token")
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.accountHref, "The access token should be a valid jwt for the test user")
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.account.href, "The access token should be a valid jwt for the test user")
     }
 
     /** Refresh grant flow should fail without valid refresh token
