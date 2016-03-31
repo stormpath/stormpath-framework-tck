@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stormpath.tck.register
 
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
@@ -21,6 +20,8 @@ import com.jayway.restassured.path.xml.element.Node
 import com.jayway.restassured.path.xml.element.NodeChildren
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
+import com.stormpath.tck.util.*
+import com.stormpath.tck.responseSpecs.*
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.given
@@ -30,14 +31,8 @@ import static org.testng.Assert.*
 
 @Test
 class RegisterIT extends AbstractIT {
-    
-    private final String randomUUID = UUID.randomUUID().toString()
-    private final String accountEmail = "fooemail-$randomUUID@stormpath.com"
-    private final String accountGivenName = "GivenName-$randomUUID"
-    private final String accountSurname = "Surname-$randomUUID"
-    private final String accountMiddleName = "Foobar"
-    private final String accountPassword = "P@sword123!"
-    private final String accountUsername = "foo-$randomUUID"
+
+    private final testAccount = new TestAccount()
 
     private Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
         for (Node node : children.list()) {
@@ -106,10 +101,7 @@ class RegisterIT extends AbstractIT {
         .when()
             .post(FrameworkConstants.RegisterRoute)
         .then()
-            .statusCode(400)
-            .contentType(ContentType.JSON)
-            .body("status", is(400))
-            .body("message", not(isEmptyOrNullString()))
+            .spec(JsonResponseSpec.isError(400))
     }
 
     /**
@@ -120,21 +112,17 @@ class RegisterIT extends AbstractIT {
     @Test(groups=["json10"])
     public void returnsErrorIfPasswordIsMissing() throws Exception {
 
-        Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", accountEmail)
-        jsonAsMap.put("password", "")
+        def jsonMap = [email: testAccount.email,
+                         password: ""]
 
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
-            .body(jsonAsMap)
+            .body(jsonMap)
         .when()
             .post(FrameworkConstants.RegisterRoute)
         .then()
-            .statusCode(400)
-            .contentType(ContentType.JSON)
-            .body("status", is(400))
-            .body("message", not(isEmptyOrNullString()))
+            .spec(JsonResponseSpec.isError(400))
     }
 
     /**
@@ -145,23 +133,19 @@ class RegisterIT extends AbstractIT {
     @Test(groups=["json10"])
     public void returnsErrorIfRequiredFieldIsMissing() throws Exception {
 
-        Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", accountEmail)
-        jsonAsMap.put("password", accountPassword)
-        jsonAsMap.put("surname", accountSurname)
+        def jsonMap = [email: testAccount.email,
+                       password: testAccount.password,
+                       surname: testAccount.surname]
         // givenName is required per the default configuration
 
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
-            .body(jsonAsMap)
+            .body(jsonMap)
         .when()
             .post(FrameworkConstants.RegisterRoute)
         .then()
-            .statusCode(400)
-            .contentType(ContentType.JSON)
-            .body("status", is(400))
-            .body("message", not(isEmptyOrNullString()))
+            .spec(JsonResponseSpec.isError(400))
     }
 
     /**
@@ -172,25 +156,21 @@ class RegisterIT extends AbstractIT {
     @Test(groups=["json10"])
     public void returnsErrorForUndefinedRootCustomField() throws Exception {
 
-        Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", accountEmail)
-        jsonAsMap.put("password", accountPassword)
-        jsonAsMap.put("givenName", accountGivenName)
-        jsonAsMap.put("surname", accountSurname)
-        jsonAsMap.put("customValue", "foobar")
+        def jsonMap = [email: testAccount.email,
+                       password: testAccount.password,
+                       givenName: testAccount.givenName,
+                       surname: testAccount.surname,
+                       customValue: "foobar"]
         // field 'customValue' is not defined in the default configuration
 
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
-            .body(jsonAsMap)
+            .body(jsonMap)
         .when()
             .post(FrameworkConstants.RegisterRoute)
         .then()
-            .statusCode(400)
-            .contentType(ContentType.JSON)
-            .body("status", is(400))
-            .body("message", not(isEmptyOrNullString()))
+            .spec(JsonResponseSpec.isError(400))
     }
 
     /**
@@ -201,29 +181,22 @@ class RegisterIT extends AbstractIT {
     @Test(groups=["json10"])
     public void returnsErrorForUndefinedCustomField() throws Exception {
 
-        Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", accountEmail)
-        jsonAsMap.put("password", accountPassword)
-        jsonAsMap.put("givenName", accountGivenName)
-        jsonAsMap.put("surname", accountSurname)
+        def jsonMap = [email: testAccount.email,
+                       password: testAccount.password,
+                       givenName: testAccount.givenName,
+                       surname: testAccount.surname,
+                       cusotmData: [ hello: "world" ]]
 
-        Map<String, Object> customDataMap = new HashMap<>();
-        customDataMap.put("hello", "world")
-
-        jsonAsMap.put("customData", customDataMap)
         // field 'hello' is not defined in the default configuration
 
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
-            .body(jsonAsMap)
+            .body(jsonMap)
         .when()
             .post(FrameworkConstants.RegisterRoute)
         .then()
-            .statusCode(400)
-            .contentType(ContentType.JSON)
-            .body("status", is(400))
-            .body("message", not(isEmptyOrNullString()))
+            .spec(JsonResponseSpec.isError(400))
     }
 
     /**
@@ -234,25 +207,20 @@ class RegisterIT extends AbstractIT {
     @Test(groups=["json10"])
     public void returnsJsonErrorForServerError() throws Exception {
 
-        Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", "foo@bar")
-        jsonAsMap.put("password", "1")
-        jsonAsMap.put("givenName", accountGivenName)
-        jsonAsMap.put("surname", accountSurname)
+        def jsonMap = [email: "foo@bar",
+                       password: "1",
+                       givenName: testAccount.givenName,
+                       surname: testAccount.surname]
         // Email and password will not pass Stormpath API validation and will error
 
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
-            .body(jsonAsMap)
+            .body(jsonMap)
         .when()
             .post(FrameworkConstants.RegisterRoute)
         .then()
-            .statusCode(400)
-            .contentType(ContentType.JSON)
-            .body("size()", is(2))
-            .body("status", is(400))
-            .body("message", not(isEmptyOrNullString()))
+            .spec(JsonResponseSpec.isError(400))
     }
 
     /**
@@ -263,35 +231,17 @@ class RegisterIT extends AbstractIT {
     @Test(groups=["json10"])
     public void returnsSanitizedAccountForSuccess() throws Exception {
 
-        Map<String, Object>  jsonAsMap = new HashMap<>();
-        jsonAsMap.put("email", "json-$accountEmail".toString())
-        jsonAsMap.put("password", accountPassword)
-        jsonAsMap.put("givenName", accountGivenName)
-        jsonAsMap.put("middleName", accountMiddleName)
-        jsonAsMap.put("surname", accountSurname)
-        jsonAsMap.put("username", accountUsername)
+        def testAccount = new TestAccount()
 
         String createdHref =
             given()
                 .accept(ContentType.JSON)
                 .contentType(ContentType.JSON)
-                .body(jsonAsMap)
+                .body(testAccount.getPropertiesMap())
             .when()
                 .post(FrameworkConstants.RegisterRoute)
             .then()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .body("size()", is(1))
-                .body("account.href", not(isEmptyOrNullString()))
-                .body("account.username", is(accountUsername))
-                .body("account.modifiedAt", not(isEmptyOrNullString()))
-                .body("account.status", equalToIgnoringCase("ENABLED"))
-                .body("account.createdAt", not(isEmptyOrNullString()))
-                .body("account.email", is("json-$accountEmail".toString()))
-                .body("account.middleName", is(accountMiddleName))
-                .body("account.surname", is(accountSurname))
-                .body("account.givenName", is(accountGivenName))
-                .body("account.fullName", is("$accountGivenName $accountMiddleName $accountSurname".toString()))
+                .spec(AccountResponseSpec.matchesAccount(testAccount))
             .extract()
                 .path("account.href")
 
@@ -406,7 +356,7 @@ class RegisterIT extends AbstractIT {
             given()
                 .accept(ContentType.HTML)
                 .contentType(ContentType.URLENC)
-                .formParam("email", accountEmail)
+                .formParam("email", testAccount.email)
                 .formParam("password", "")
             .when()
                 .post(FrameworkConstants.RegisterRoute)
@@ -436,9 +386,9 @@ class RegisterIT extends AbstractIT {
             given()
                 .accept(ContentType.HTML)
                 .contentType(ContentType.URLENC)
-                .formParam("email", accountEmail)
-                .formParam("password", accountPassword)
-                .formParam("surname", accountSurname)
+                .formParam("email", testAccount.email)
+                .formParam("password", testAccount.password)
+                .formParam("surname", testAccount.surname)
                 // givenName is required per the default configuration
             .when()
                 .post(FrameworkConstants.RegisterRoute)
@@ -468,10 +418,10 @@ class RegisterIT extends AbstractIT {
             given()
                 .accept(ContentType.HTML)
                 .contentType(ContentType.URLENC)
-                .formParam("email", accountEmail)
-                .formParam("password", accountPassword)
-                .formParam("givenName", accountGivenName)
-                .formParam("surname", accountSurname)
+                .formParam("email", testAccount.email)
+                .formParam("password", testAccount.password)
+                .formParam("givenName", testAccount.givenName)
+                .formParam("surname", testAccount.surname)
                 .formParam("customValue", "foobar") // not defined in default configuration
             .when()
                 .post(FrameworkConstants.RegisterRoute)
@@ -501,8 +451,8 @@ class RegisterIT extends AbstractIT {
                 .contentType(ContentType.URLENC)
                 .formParam("email", "foo@bar")
                 .formParam("password", "1")
-                .formParam("givenName", accountGivenName)
-                .formParam("surname", accountSurname)
+                .formParam("givenName", testAccount.givenName)
+                .formParam("surname", testAccount.surname)
                 // Email and password will not pass Stormpath API validation and will error
             .when()
                 .post(FrameworkConstants.RegisterRoute)
@@ -529,10 +479,10 @@ class RegisterIT extends AbstractIT {
         given()
             .accept(ContentType.HTML)
             .contentType(ContentType.URLENC)
-            .formParam("email", accountEmail)
-            .formParam("password", accountPassword)
-            .formParam("givenName", accountGivenName)
-            .formParam("surname", accountSurname)
+            .formParam("email", testAccount.email)
+            .formParam("password", testAccount.password)
+            .formParam("givenName", testAccount.givenName)
+            .formParam("surname", testAccount.surname)
         .when()
             .post(FrameworkConstants.RegisterRoute)
         .then()
@@ -557,10 +507,10 @@ class RegisterIT extends AbstractIT {
             given()
                 .accept(ContentType.HTML)
                 .contentType(ContentType.URLENC)
-                .formParam("email", accountEmail)
+                .formParam("email", testAccount.email)
                 .formParam("password", "1") // Too short, will fail validation
-                .formParam("givenName", accountGivenName)
-                .formParam("surname", accountSurname)
+                .formParam("givenName", testAccount.givenName)
+                .formParam("surname", testAccount.surname)
             .when()
                 .post(FrameworkConstants.RegisterRoute)
             .then()
@@ -572,13 +522,13 @@ class RegisterIT extends AbstractIT {
         XmlPath doc = getHtmlDoc(response)
 
         Node loginField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "email")
-        assertEquals(loginField.attributes().get("value"), accountEmail, "The 'email' field should preserve value")
+        assertEquals(loginField.attributes().get("value"), testAccount.email, "The 'email' field should preserve value")
 
         Node givenNameField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "givenName")
-        assertEquals(givenNameField.attributes().get("value"), accountGivenName, "The 'givenName' field should preserve value")
+        assertEquals(givenNameField.attributes().get("value"), testAccount.givenName, "The 'givenName' field should preserve value")
 
         Node surnameField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "surname")
-        assertEquals(surnameField.attributes().get("value"), accountSurname, "The 'surname' field should preserve value")
+        assertEquals(surnameField.attributes().get("value"), testAccount.surname, "The 'surname' field should preserve value")
 
         Node passwordField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "password")
         assertFalse((passwordField.attributes().get("value")?.trim() as boolean), "The 'password' field should NOT preserve value")

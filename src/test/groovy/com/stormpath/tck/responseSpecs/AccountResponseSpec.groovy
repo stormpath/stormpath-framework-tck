@@ -2,14 +2,11 @@
  * Created by edjiang on 3/30/16.
  */
 
-
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.builder.ResponseSpecBuilder
 import com.jayway.restassured.specification.ResponseSpecification
 import com.stormpath.tck.util.*
 
-import static com.jayway.restassured.RestAssured.*
-import static com.jayway.restassured.matcher.RestAssuredMatchers.*
 import static org.hamcrest.Matchers.*
 
 class AccountResponseSpec {
