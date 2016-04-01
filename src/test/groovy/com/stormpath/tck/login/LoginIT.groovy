@@ -104,6 +104,7 @@ class LoginIT extends AbstractIT {
 
     @BeforeClass
     private void createTestAccount() throws Exception {
+        account.registerOnServer()
         deleteOnClassTeardown(account.href)
     }
 

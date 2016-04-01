@@ -36,6 +36,7 @@ class LogoutIT extends AbstractIT {
 
     @BeforeClass
     public void createTestUser() throws Exception {
+        account.registerOnServer()
         deleteOnClassTeardown(account.href)
     }
 
