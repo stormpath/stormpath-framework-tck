@@ -16,23 +16,25 @@ class TestAccount {
     final String username = "foo-" + randomUUID
     String href
 
-    def TestAccount() {
-        def account = [email: email,
-            password: password,
-            givenName: givenName,
-            surname: surname,
-            middleName: middleName,
-            username: username]
-
+    public void registerOnServer() {
         href = given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .body(account)
-            .when()
-                .post(FrameworkConstants.RegisterRoute)
-            .then()
-                .statusCode(200)
-            .extract()
-                .path("account.href")
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .body(getPropertiesMap())
+        .when()
+            .post(FrameworkConstants.RegisterRoute)
+        .then()
+            .statusCode(200)
+        .extract()
+            .path("account.href")
+    }
+
+    def getPropertiesMap() {
+        return [email: email,
+                password: password,
+                givenName: givenName,
+                surname: surname,
+                middleName: middleName,
+                username: username]
     }
 }

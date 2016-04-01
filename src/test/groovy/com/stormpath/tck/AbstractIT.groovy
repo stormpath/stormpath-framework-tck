@@ -19,6 +19,7 @@ import com.jayway.restassured.RestAssured
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.util.RestUtils
+import org.junit.After
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.testng.annotations.AfterClass
@@ -45,6 +46,7 @@ abstract class AbstractIT {
 
     private final List<String> classResourcesToDelete = []
     private final List<String> methodResourcesToDelete = []
+    private final List<String> methodAccountsToDelete = []
 
     private static String toPortSuffix(String scheme, int port) {
         if (("http".equalsIgnoreCase(scheme) && port == 80) || ("https".equalsIgnoreCase(scheme) && port == 443)) {
@@ -74,6 +76,7 @@ abstract class AbstractIT {
     @AfterTest
     public void tearDown() {
         deleteResources(methodResourcesToDelete)
+        deleteAccounts(methodAccountsToDelete)
     }
 
     @AfterClass
@@ -111,10 +114,21 @@ abstract class AbstractIT {
         }
     }
 
+    private void deleteAccounts(List<String> emails) {
+        // todo
+    }
+
     @SuppressWarnings("GroovyUnusedDeclaration")
     protected void deleteOnTeardown(String resourceHref) {
         if (resourceHref) {
             this.methodResourcesToDelete.add(resourceHref)
+        }
+    }
+
+    @SuppressWarnings("GroovyUnusedDeclaration")
+    protected void deleteAccountOnTeardown(String accountEmail) {
+        if (accountEmail) {
+            this.methodAccountsToDelete.add(accountEmail)
         }
     }
 
