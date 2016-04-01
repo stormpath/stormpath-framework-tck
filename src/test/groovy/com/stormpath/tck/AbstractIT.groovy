@@ -19,7 +19,6 @@ import com.jayway.restassured.RestAssured
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.util.RestUtils
-import org.junit.After
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.testng.annotations.AfterClass
