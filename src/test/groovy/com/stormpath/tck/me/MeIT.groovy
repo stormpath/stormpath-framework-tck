@@ -31,8 +31,9 @@ import static org.hamcrest.Matchers.*
 class MeIT extends AbstractIT {
     private TestAccount account = new TestAccount()
     private String accessToken
+
     @BeforeClass
-    private void createSession() throws Exception {
+    private void getTestAccountAccessToken() throws Exception {
         account.registerOnServer()
 
         accessToken =
@@ -48,7 +49,6 @@ class MeIT extends AbstractIT {
                 .body("access_token", not(isEmptyOrNullString()))
             .extract()
                 .path("access_token")
-
         deleteOnClassTeardown(account.href)
     }
 
