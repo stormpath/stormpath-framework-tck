@@ -31,9 +31,8 @@ import static org.hamcrest.Matchers.*
 class MeIT extends AbstractIT {
     private TestAccount account = new TestAccount()
     private String accessToken
-
     @BeforeClass
-    private void getTestAccountAccessToken() throws Exception {
+    private void createSession() throws Exception {
         account.registerOnServer()
 
         accessToken =
@@ -72,6 +71,22 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test
+    public void testThatMeWithCookieAuthReturnsJsonUser() throws Exception {
+        given()
+            .cookie("access_token", accessToken)
+        .when()
+            .get(FrameworkConstants.MeRoute)
+        .then()
+            .spec(AccountResponseSpec.matchesAccount(account))
+    }
+
+    /**
+     * We should be returning a user, and it should always be JSON.
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/61
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/63
+     * @throws Exception
+     */
+    @Test
     public void testThatMeWithBearerAuthReturnsJsonUser() throws Exception {
         given()
             .auth().oauth2(accessToken)
@@ -87,6 +102,21 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test
+    public void testThatMeWithCookieAuthStripsLinkedResources() throws Exception {
+        given()
+            .cookie("access_token", accessToken)
+        .when()
+            .get(FrameworkConstants.MeRoute)
+        .then()
+            .spec(AccountResponseSpec.withoutLinkedResources())
+    }
+
+    /**
+     * We should not have linked resources.
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/64
+     * @throws Exception
+     */
+    @Test
     public void testThatMeWithBearerAuthStripsLinkedResources() throws Exception {
         given()
             .auth().oauth2(accessToken)
@@ -94,6 +124,24 @@ class MeIT extends AbstractIT {
             .get(FrameworkConstants.MeRoute)
         .then()
             .spec(AccountResponseSpec.withoutLinkedResources())
+    }
+
+    /**
+     * We should not set cache headers.
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/65
+     * @throws Exception
+     */
+    @Test
+    public void testThatMeWithCookieAuthHasNoCacheHeaders() throws Exception {
+        given()
+            .cookie("access_token", accessToken)
+        .when()
+            .get(FrameworkConstants.MeRoute)
+        .then()
+            .spec(AccountResponseSpec.matchesAccount(account))
+            .header("Cache-Control", containsString("no-cache"))
+            .header("Cache-Control", containsString("no-store"))
+            .header("Pragma", is("no-cache"))
     }
 
     /**
