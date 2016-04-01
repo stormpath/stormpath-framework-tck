@@ -21,10 +21,7 @@ import com.jayway.restassured.response.Response
 import com.stormpath.tck.util.RestUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.testng.annotations.AfterClass
-import org.testng.annotations.AfterTest
-import org.testng.annotations.BeforeClass
-import org.testng.annotations.BeforeTest
+import org.testng.annotations.*
 
 import static com.jayway.restassured.RestAssured.*
 import static com.stormpath.tck.util.EnvUtils.getVal
@@ -54,7 +51,7 @@ abstract class AbstractIT {
         return ":$port"
     }
 
-    @BeforeClass
+    @BeforeSuite
     public void setUpClass() {
         setupRestAssured()
     }
@@ -78,7 +75,7 @@ abstract class AbstractIT {
         deleteAccounts(methodAccountsToDelete)
     }
 
-    @AfterClass
+    @AfterSuite
     public void tearDownClass() {
         deleteResources(classResourcesToDelete)
     }
