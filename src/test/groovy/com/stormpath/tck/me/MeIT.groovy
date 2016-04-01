@@ -72,7 +72,7 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test
-    public void testThatMeReturnsJsonUser() throws Exception {
+    public void testThatMeWithBearerAuthReturnsJsonUser() throws Exception {
         given()
             .auth().oauth2(accessToken)
         .when()
@@ -87,7 +87,7 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test
-    public void testThatMeStripsLinkedResources() throws Exception {
+    public void testThatMeWithBearerAuthStripsLinkedResources() throws Exception {
         given()
             .auth().oauth2(accessToken)
         .when()
@@ -102,7 +102,7 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test
-    public void testThatMeHasNoCacheHeaders() throws Exception {
+    public void testThatMeWithBearerAuthHasNoCacheHeaders() throws Exception {
         given()
             .auth().oauth2(accessToken)
         .when()
