@@ -34,6 +34,8 @@ class MeIT extends AbstractIT {
 
     @BeforeClass
     private void getTestAccountAccessToken() throws Exception {
+        account.registerOnServer()
+
         accessToken =
             given()
                 .param("grant_type", "password")
@@ -47,7 +49,20 @@ class MeIT extends AbstractIT {
                 .body("access_token", not(isEmptyOrNullString()))
             .extract()
                 .path("access_token")
+
         deleteOnClassTeardown(account.href)
+    }
+
+    /** Respond with 401 if no user is authorized
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/62">#62</a>
+     * @throws Exception
+     */
+    @Test
+    public void unauthorizedRequestFails() throws Exception {
+        when()
+            .get(FrameworkConstants.MeRoute)
+        .then()
+            .statusCode(401)
     }
 
     /**
