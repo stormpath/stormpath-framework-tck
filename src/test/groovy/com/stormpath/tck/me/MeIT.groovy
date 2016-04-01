@@ -34,6 +34,8 @@ class MeIT extends AbstractIT {
 
     @BeforeClass
     private void getTestAccountAccessToken() throws Exception {
+        account.registerOnServer()
+
         accessToken =
             given()
                 .param("grant_type", "password")
@@ -50,6 +52,18 @@ class MeIT extends AbstractIT {
         deleteOnClassTeardown(account.href)
     }
 
+    /** Respond with 401 if no user is authorized
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/62">#62</a>
+     * @throws Exception
+     */
+    @Test
+    public void unauthorizedRequestFails() throws Exception {
+        when()
+            .get(FrameworkConstants.MeRoute)
+        .then()
+            .statusCode(401)
+    }
+
     /**
      * We should be returning a user, and it should always be JSON.
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/61
@@ -57,7 +71,23 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test
-    public void testThatMeReturnsJsonUser() throws Exception {
+    public void testThatMeWithCookieAuthReturnsJsonUser() throws Exception {
+        given()
+            .cookie("access_token", accessToken)
+        .when()
+            .get(FrameworkConstants.MeRoute)
+        .then()
+            .spec(AccountResponseSpec.matchesAccount(account))
+    }
+
+    /**
+     * We should be returning a user, and it should always be JSON.
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/61
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/63
+     * @throws Exception
+     */
+    @Test
+    public void testThatMeWithBearerAuthReturnsJsonUser() throws Exception {
         given()
             .auth().oauth2(accessToken)
         .when()
@@ -72,7 +102,22 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test
-    public void testThatMeStripsLinkedResources() throws Exception {
+    public void testThatMeWithCookieAuthStripsLinkedResources() throws Exception {
+        given()
+            .cookie("access_token", accessToken)
+        .when()
+            .get(FrameworkConstants.MeRoute)
+        .then()
+            .spec(AccountResponseSpec.withoutLinkedResources())
+    }
+
+    /**
+     * We should not have linked resources.
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/64
+     * @throws Exception
+     */
+    @Test
+    public void testThatMeWithBearerAuthStripsLinkedResources() throws Exception {
         given()
             .auth().oauth2(accessToken)
         .when()
@@ -87,7 +132,25 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test
-    public void testThatMeHasNoCacheHeaders() throws Exception {
+    public void testThatMeWithCookieAuthHasNoCacheHeaders() throws Exception {
+        given()
+            .cookie("access_token", accessToken)
+        .when()
+            .get(FrameworkConstants.MeRoute)
+        .then()
+            .spec(AccountResponseSpec.matchesAccount(account))
+            .header("Cache-Control", containsString("no-cache"))
+            .header("Cache-Control", containsString("no-store"))
+            .header("Pragma", is("no-cache"))
+    }
+
+    /**
+     * We should not set cache headers.
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/65
+     * @throws Exception
+     */
+    @Test
+    public void testThatMeWithBearerAuthHasNoCacheHeaders() throws Exception {
         given()
             .auth().oauth2(accessToken)
         .when()
