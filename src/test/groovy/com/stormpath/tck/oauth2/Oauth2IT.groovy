@@ -230,15 +230,15 @@ class Oauth2IT extends AbstractIT {
     public void refreshGrantTypeFailsWithInvalidRefreshToken() throws Exception {
         String refreshToken = "GARBAGE"
 
-        String newAccessToken =
-            given()
-                .param("grant_type", "refresh_token")
-                .param("refresh_token", refreshToken)
-            .when()
-                .post(tokenRoute)
-            .then()
-                .statusCode(400)
-                .contentType(ContentType.JSON)
-                .body("error", is("invalid_grant"))
+        given()
+            .param("grant_type", "refresh_token")
+            .param("refresh_token", refreshToken)
+        .when()
+            .post(tokenRoute)
+        .then()
+            .statusCode(400)
+            .contentType(ContentType.JSON)
+            .body("message", not(isEmptyOrNullString()))
+            .body("error", is("invalid_grant"))
     }
 }
