@@ -68,6 +68,7 @@ class MeIT extends AbstractIT {
      * We should be returning a user, and it should always be JSON.
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/61
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/63
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/234
      * @throws Exception
      */
     @Test
@@ -84,6 +85,7 @@ class MeIT extends AbstractIT {
      * We should be returning a user, and it should always be JSON.
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/61
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/63
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/235
      * @throws Exception
      */
     @Test
@@ -99,6 +101,7 @@ class MeIT extends AbstractIT {
     /**
      * We should not have linked resources.
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/64
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/234
      * @throws Exception
      */
     @Test
@@ -114,6 +117,7 @@ class MeIT extends AbstractIT {
     /**
      * We should not have linked resources.
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/64
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/235
      * @throws Exception
      */
     @Test
@@ -129,6 +133,7 @@ class MeIT extends AbstractIT {
     /**
      * We should not set cache headers.
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/65
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/234
      * @throws Exception
      */
     @Test
@@ -147,6 +152,7 @@ class MeIT extends AbstractIT {
     /**
      * We should not set cache headers.
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/65
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/235
      * @throws Exception
      */
     @Test
