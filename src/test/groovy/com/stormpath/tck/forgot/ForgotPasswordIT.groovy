@@ -75,4 +75,36 @@ class ForgotPasswordIT extends AbstractIT {
         .then()
             .statusCode(404)
     }
+
+    /** POST requests preferring application/json should respond with 200 OK
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/142">#142</a>
+     * @throws Exception
+     */
+    @Test
+    public void returnsSuccessForValidEmail() throws Exception {
+        given()
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .body([ "email": account.email ])
+        .when()
+            .post(ForgotRoute)
+        .then()
+            .statusCode(200)
+    }
+
+    /** POST requests preferring application/json should respond with 200 OK
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/142">#142</a>
+     * @throws Exception
+     */
+    @Test
+    public void returnsSuccessForInvalidEmail() throws Exception {
+        given()
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .body([ "email": "foo+notarealemail@bar.baz" ])
+        .when()
+            .post(ForgotRoute)
+        .then()
+            .statusCode(200)
+    }
 }
