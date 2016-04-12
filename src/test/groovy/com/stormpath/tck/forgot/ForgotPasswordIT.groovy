@@ -33,6 +33,7 @@ import static com.stormpath.tck.util.FrameworkConstants.ForgotRoute
 @Test
 class ForgotPasswordIT extends AbstractIT {
     private TestAccount account = new TestAccount()
+    private static final invalidEmail = "foo+notarealemail@bar.baz"
 
     @BeforeClass
     private void createTestAccount() throws Exception {
@@ -101,7 +102,7 @@ class ForgotPasswordIT extends AbstractIT {
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
-            .body([ "email": "foo+notarealemail@bar.baz" ])
+            .body([ "email": invalidEmail ])
         .when()
             .post(ForgotRoute)
         .then()
@@ -153,5 +154,39 @@ class ForgotPasswordIT extends AbstractIT {
 
         Node warningBanner = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "alert-warning")
         assertThat(warningBanner.toString(), not(isEmptyOrNullString()))
+    }
+
+    /** POST requests preferring text/html should redirect to nextUri
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/143">#143</a>
+     * @throws Exception
+     */
+    @Test
+    public void redirectsToNextUriForValidEmail() throws Exception {
+        given()
+            .accept(ContentType.HTML)
+            .contentType(ContentType.URLENC)
+            .param("email", account.email)
+        .when()
+            .post(ForgotRoute)
+        .then()
+            .statusCode(302)
+            .header("Location", is("/login?status=forgot"))
+    }
+
+    /** POST requests preferring text/html should redirect to nextUri
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/143">#143</a>
+     * @throws Exception
+     */
+    @Test
+    public void redirectsToNextUriForInvalidEmail() throws Exception {
+        given()
+            .accept(ContentType.HTML)
+            .contentType(ContentType.URLENC)
+            .param("email", invalidEmail)
+        .when()
+            .post(ForgotRoute)
+        .then()
+            .statusCode(302)
+            .header("Location", is("/login?status=forgot"))
     }
 }
