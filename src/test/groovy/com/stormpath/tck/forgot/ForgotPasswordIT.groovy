@@ -107,4 +107,19 @@ class ForgotPasswordIT extends AbstractIT {
         .then()
             .statusCode(200)
     }
+
+    /** Render form if the request type is text/html
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/140">#140</a>
+     * @throws Exception
+     */
+    @Test
+    public void rendersForm() throws Exception {
+        given()
+            .accept(ContentType.HTML)
+        .when()
+            .get(ForgotRoute)
+        .then()
+            .contentType(ContentType.HTML)
+            .statusCode(200)
+    }
 }
