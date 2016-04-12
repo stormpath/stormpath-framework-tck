@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
+package com.stormpath.tck.oauth2
+
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.util.*
+import com.stormpath.tck.responseSpecs.*
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.*
-import static com.jayway.restassured.matcher.RestAssuredMatchers.*
 import static org.hamcrest.Matchers.*
 import static org.testng.Assert.*
+import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
 
 @Test
 class Oauth2IT extends AbstractIT {
     private TestAccount account = new TestAccount()
-
-    private static final String registerRoute = FrameworkConstants.RegisterRoute
-    private static final String tokenRoute = FrameworkConstants.OauthRoute
 
     @BeforeClass
     private void createTestAccount() throws Exception {
@@ -42,13 +42,13 @@ class Oauth2IT extends AbstractIT {
     /** Unsupported grant type returns error
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/6">#6</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void unsupportedGrantType() throws Exception {
 
         given()
             .param("grant_type", "foobar_grant")
         .when()
-            .post(tokenRoute)
+            .post(OauthRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -61,13 +61,13 @@ class Oauth2IT extends AbstractIT {
     /** Missing grant type returns error
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/7">#7</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void missingGrantType() throws Exception {
 
         given()
             .param("grant_type", "")
         .when()
-            .post(tokenRoute)
+            .post(OauthRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -76,17 +76,16 @@ class Oauth2IT extends AbstractIT {
             .body("error", is("invalid_request"))
     }
 
-
     /** POST must include form parameters
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/15">#15</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void missingFormParameters() throws Exception {
 
         given()
             .body("""hello"" : ""world""")
         .when()
-            .post(tokenRoute)
+            .post(OauthRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
@@ -95,13 +94,12 @@ class Oauth2IT extends AbstractIT {
             .body("error", is("invalid_request"))
     }
 
-
     /** GET should return 405
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/16">#16</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void doNotHandleGet() throws Exception {
-        get(tokenRoute)
+        get(OauthRoute)
             .then()
             .assertThat().statusCode(405)
     }
@@ -109,7 +107,7 @@ class Oauth2IT extends AbstractIT {
     /** Password grant flow with username/password
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/11">#11</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void passwordGrantWithUsername() throws Exception {
 
         String accessToken =
@@ -118,7 +116,7 @@ class Oauth2IT extends AbstractIT {
                 .param("username", account.username)
                 .param("password", account.password)
             .when()
-                .post(tokenRoute)
+                .post(OauthRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -135,7 +133,7 @@ class Oauth2IT extends AbstractIT {
     /** Password grant flow with email/password
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/18">#18</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void passwordGrantWithEmail() throws Exception {
 
         String accessToken =
@@ -144,7 +142,7 @@ class Oauth2IT extends AbstractIT {
                 .param("username", account.email)
                 .param("password", account.password)
             .when()
-                .post(tokenRoute)
+                .post(OauthRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -161,7 +159,7 @@ class Oauth2IT extends AbstractIT {
     /** Refresh grant flow
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/205">#205</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void refreshGrantTypeWorksWithValidToken() throws Exception {
         Response passwordGrantResponse =
             given()
@@ -169,7 +167,7 @@ class Oauth2IT extends AbstractIT {
                 .param("username", account.email)
                 .param("password", account.password)
             .when()
-                .post(tokenRoute)
+                .post(OauthRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -188,7 +186,7 @@ class Oauth2IT extends AbstractIT {
                 .param("grant_type", "refresh_token")
                 .param("refresh_token", refreshToken)
             .when()
-                .post(tokenRoute)
+                .post(OauthRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -206,7 +204,7 @@ class Oauth2IT extends AbstractIT {
     /** Refresh grant flow should fail without valid refresh token
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/205">#205</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void refreshGrantTypeFailsWithInvalidRefreshToken() throws Exception {
         String refreshToken = "GARBAGE"
 
@@ -214,7 +212,7 @@ class Oauth2IT extends AbstractIT {
             .param("grant_type", "refresh_token")
             .param("refresh_token", refreshToken)
         .when()
-            .post(tokenRoute)
+            .post(OauthRoute)
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)

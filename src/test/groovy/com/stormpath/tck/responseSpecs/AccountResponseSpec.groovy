@@ -2,6 +2,8 @@
  * Created by edjiang on 3/30/16.
  */
 
+package com.stormpath.tck.responseSpecs
+
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.builder.ResponseSpecBuilder
 import com.jayway.restassured.specification.ResponseSpecification

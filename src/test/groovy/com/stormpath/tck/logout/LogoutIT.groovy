@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
+package com.stormpath.tck.logout
+
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Cookie
 import com.jayway.restassured.response.Cookies
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.util.*
+import com.stormpath.tck.responseSpecs.*
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.*
 import static org.testng.Assert.*
 import static org.hamcrest.Matchers.*
+import static com.stormpath.tck.util.FrameworkConstants.LogoutRoute
+import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
 
 @Test
 class LogoutIT extends AbstractIT {
     private TestAccount account = new TestAccount()
-
-    private final String logoutPath = FrameworkConstants.LogoutRoute
-    private final String registerPath = FrameworkConstants.RegisterRoute
-    private final String loginPath = FrameworkConstants.LoginRoute
 
     @BeforeClass
     public void createTestUser() throws Exception {
@@ -52,7 +53,7 @@ class LogoutIT extends AbstractIT {
                 .contentType(ContentType.JSON)
                 .body(credentials)
             .when()
-                .post(loginPath)
+                .post(LoginRoute)
             .then()
                 .statusCode(200)
             .extract()
@@ -86,9 +87,9 @@ class LogoutIT extends AbstractIT {
     /** Only handle POST
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void doNotHandleGet() throws Exception {
-        get(logoutPath)
+        get(LogoutRoute)
             .then()
                 .assertThat().statusCode(404)
     }
@@ -96,9 +97,9 @@ class LogoutIT extends AbstractIT {
     /** Only handle POST
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void doNotHandlePut() throws Exception {
-        put(logoutPath)
+        put(LogoutRoute)
             .then()
                 .assertThat().statusCode(404)
     }
@@ -106,9 +107,9 @@ class LogoutIT extends AbstractIT {
     /** Only handle POST
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void doNotHandleDelete() throws Exception {
-        delete(logoutPath)
+        delete(LogoutRoute)
             .then()
                 .assertThat().statusCode(404)
     }
@@ -117,13 +118,13 @@ class LogoutIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/172">#172</a>
      * @throws Exception
      */
-    @Test
+    @Test(groups=["v100"])
     public void returnOkForUnauthenticatedJsonRequest() throws Exception {
 
         given()
             .accept(ContentType.JSON)
         .when()
-            .post(logoutPath)
+            .post(LogoutRoute)
         .then()
             .statusCode(200)
     }
@@ -132,7 +133,7 @@ class LogoutIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/174">#174</a>
      * @throws Exception
      */
-    @Test
+    @Test(groups=["v100"])
     public void deletesCookiesOnJsonLogout() throws Exception {
         def sessionCookies = createSession()
 
@@ -141,7 +142,7 @@ class LogoutIT extends AbstractIT {
                 .accept(ContentType.JSON)
                 .cookies(sessionCookies)
             .when()
-                .post(logoutPath)
+                .post(LogoutRoute)
             .then()
             .extract()
                 .detailedCookies()
@@ -153,7 +154,7 @@ class LogoutIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/171">#171</a>
      * @throws Exception
      */
-    @Test
+    @Test(groups=["v100"])
     public void returnOkOnSuccessfulJsonLogout() throws Exception {
         def sessionCookies = createSession()
 
@@ -161,7 +162,7 @@ class LogoutIT extends AbstractIT {
             .accept(ContentType.JSON)
             .cookies(sessionCookies)
         .when()
-            .post(logoutPath)
+            .post(LogoutRoute)
         .then()
             .statusCode(200)
     }
@@ -170,14 +171,14 @@ class LogoutIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/175">#175</a>
      * @throws Exception
      */
-    @Test
+    @Test(groups=["v100"])
     public void revokesTokensOnJsonLogout() throws Exception {
         def sessionCookies = createSession()
 
         given()
             .accept(ContentType.JSON)
             .cookies(sessionCookies)
-        .post(logoutPath)
+        .post(LogoutRoute)
 
         assertTokenIsRevoked(sessionCookies.get("access_token"), "accessTokens")
         assertTokenIsRevoked(sessionCookies.get("refresh_token"), "refreshTokens")
@@ -187,13 +188,13 @@ class LogoutIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/173">#173</a>
      * @throws Exception
      */
-    @Test
+    @Test(groups=["v100"])
     public void redirectForUnauthenticatedRequest() throws Exception {
 
         given()
             .accept(ContentType.HTML)
         .when()
-            .post(logoutPath)
+            .post(LogoutRoute)
         .then()
             .statusCode(302)
             .header("Location", is("/"))
@@ -203,7 +204,7 @@ class LogoutIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/170">#170</a>
      * @throws Exception
      */
-    @Test
+    @Test(groups=["v100"])
     public void redirectOnSuccessfulLogout() throws Exception {
         def sessionCookies = createSession()
 
@@ -211,7 +212,7 @@ class LogoutIT extends AbstractIT {
             .accept(ContentType.HTML)
             .cookies(sessionCookies)
         .when()
-            .post(logoutPath)
+            .post(LogoutRoute)
         .then()
             .statusCode(302)
             .header("Location", is("/"))
@@ -221,7 +222,7 @@ class LogoutIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/53">#53</a>
      * @throws Exception
      */
-    @Test
+    @Test(groups=["v100"])
     public void deletesCookiesOnLogout() throws Exception {
         def sessionCookies = createSession()
 
@@ -230,7 +231,7 @@ class LogoutIT extends AbstractIT {
                     .accept(ContentType.HTML)
                     .cookies(sessionCookies)
                 .when()
-                    .post(logoutPath)
+                    .post(LogoutRoute)
                 .then()
                 .extract()
                     .detailedCookies()
@@ -242,14 +243,14 @@ class LogoutIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/169">#169</a>
      * @throws Exception
      */
-    @Test
+    @Test(groups=["v100"])
     public void revokesTokensOnLogout() throws Exception {
         def sessionCookies = createSession()
 
         given()
             .accept(ContentType.HTML)
             .cookies(sessionCookies)
-        .post(logoutPath)
+        .post(LogoutRoute)
 
         assertTokenIsRevoked(sessionCookies.get("access_token"), "accessTokens")
         assertTokenIsRevoked(sessionCookies.get("refresh_token"), "refreshTokens")

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+package com.stormpath.tck.me
+
 import com.jayway.restassured.http.ContentType
-import com.jayway.restassured.response.Cookie
-import com.jayway.restassured.response.Cookies
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.util.*
 import com.stormpath.tck.responseSpecs.*
@@ -24,8 +24,9 @@ import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.*
-import static org.testng.Assert.*
 import static org.hamcrest.Matchers.*
+import static com.stormpath.tck.util.FrameworkConstants.MeRoute
+import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
 
 @Test
 class MeIT extends AbstractIT {
@@ -42,7 +43,7 @@ class MeIT extends AbstractIT {
                 .param("username", account.username)
                 .param("password", account.password)
             .when()
-                .post(FrameworkConstants.OauthRoute)
+                .post(OauthRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -56,10 +57,10 @@ class MeIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/62">#62</a>
      * @throws Exception
      */
-    @Test
+    @Test(groups=["v100"])
     public void unauthorizedRequestFails() throws Exception {
         when()
-            .get(FrameworkConstants.MeRoute)
+            .get(MeRoute)
         .then()
             .statusCode(401)
     }
@@ -71,12 +72,12 @@ class MeIT extends AbstractIT {
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/234
      * @throws Exception
      */
-    @Test
+    @Test(groups=["v100"])
     public void testThatMeWithCookieAuthReturnsJsonUser() throws Exception {
         given()
             .cookie("access_token", accessToken)
         .when()
-            .get(FrameworkConstants.MeRoute)
+            .get(MeRoute)
         .then()
             .spec(AccountResponseSpec.matchesAccount(account))
     }
@@ -88,12 +89,12 @@ class MeIT extends AbstractIT {
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/235
      * @throws Exception
      */
-    @Test
+    @Test(groups=["v100"])
     public void testThatMeWithBearerAuthReturnsJsonUser() throws Exception {
         given()
             .auth().oauth2(accessToken)
         .when()
-            .get(FrameworkConstants.MeRoute)
+            .get(MeRoute)
         .then()
             .spec(AccountResponseSpec.matchesAccount(account))
     }
@@ -104,12 +105,12 @@ class MeIT extends AbstractIT {
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/234
      * @throws Exception
      */
-    @Test
+    @Test(groups=["v100"])
     public void testThatMeWithCookieAuthStripsLinkedResources() throws Exception {
         given()
             .cookie("access_token", accessToken)
         .when()
-            .get(FrameworkConstants.MeRoute)
+            .get(MeRoute)
         .then()
             .spec(AccountResponseSpec.withoutLinkedResources())
     }
@@ -120,12 +121,12 @@ class MeIT extends AbstractIT {
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/235
      * @throws Exception
      */
-    @Test
+    @Test(groups=["v100"])
     public void testThatMeWithBearerAuthStripsLinkedResources() throws Exception {
         given()
             .auth().oauth2(accessToken)
         .when()
-            .get(FrameworkConstants.MeRoute)
+            .get(MeRoute)
         .then()
             .spec(AccountResponseSpec.withoutLinkedResources())
     }
@@ -136,12 +137,12 @@ class MeIT extends AbstractIT {
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/234
      * @throws Exception
      */
-    @Test
+    @Test(groups=["v100"])
     public void testThatMeWithCookieAuthHasNoCacheHeaders() throws Exception {
         given()
             .cookie("access_token", accessToken)
         .when()
-            .get(FrameworkConstants.MeRoute)
+            .get(MeRoute)
         .then()
             .spec(AccountResponseSpec.matchesAccount(account))
             .header("Cache-Control", containsString("no-cache"))
@@ -155,12 +156,12 @@ class MeIT extends AbstractIT {
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/235
      * @throws Exception
      */
-    @Test
+    @Test(groups=["v100"])
     public void testThatMeWithBearerAuthHasNoCacheHeaders() throws Exception {
         given()
             .auth().oauth2(accessToken)
         .when()
-            .get(FrameworkConstants.MeRoute)
+            .get(MeRoute)
         .then()
             .spec(AccountResponseSpec.matchesAccount(account))
             .header("Cache-Control", containsString("no-cache"))

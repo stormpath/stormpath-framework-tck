@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
+package com.stormpath.tck.requests
+
 import com.jayway.restassured.http.ContentType
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.*
 import org.testng.annotations.Test
+
 import static com.jayway.restassured.RestAssured.given
-import static org.hamcrest.Matchers.*
+import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
 
 @Test
 class RequestsIT extends AbstractIT {
@@ -28,13 +30,13 @@ class RequestsIT extends AbstractIT {
      * Null or empty Accept header is treated as * / *
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/72">#72</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void emptyAccept() {
 
         given()
             .header("Accept", "")
         .when()
-            .get(FrameworkConstants.LoginRoute)
+            .get(LoginRoute)
         .then()
             .statusCode(200)
             .contentType(ContentType.JSON)
@@ -45,12 +47,12 @@ class RequestsIT extends AbstractIT {
      * Null or empty Accept header is treated as * / *
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/72">#72</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void missingAccept() {
 
         given()
         .when()
-            .get(FrameworkConstants.LoginRoute)
+            .get(LoginRoute)
         .then()
             .statusCode(200)
             .contentType(ContentType.JSON)
@@ -61,13 +63,13 @@ class RequestsIT extends AbstractIT {
      * Accept: * / * uses first value in web.produces as Content-Type
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/73">#73</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void acceptAny() {
 
         given()
             .accept(ContentType.ANY)
         .when()
-            .get(FrameworkConstants.LoginRoute)
+            .get(LoginRoute)
         .then()
             .statusCode(200)
             .contentType(ContentType.JSON)
@@ -78,13 +80,13 @@ class RequestsIT extends AbstractIT {
      * Specifying valid Accept Content-Type returns that Content-Type
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/75">#75</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void acceptJson() {
 
         given()
             .accept(ContentType.JSON)
         .when()
-            .get(FrameworkConstants.LoginRoute)
+            .get(LoginRoute)
         .then()
             .statusCode(200)
             .contentType(ContentType.JSON)
@@ -94,13 +96,13 @@ class RequestsIT extends AbstractIT {
      * Specifying valid Accept Content-Type returns that Content-Type
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/75">#75</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void acceptHtml() {
 
         given()
             .accept(ContentType.HTML)
         .when()
-            .get(FrameworkConstants.LoginRoute)
+            .get(LoginRoute)
         .then()
             .statusCode(200)
             .contentType(ContentType.HTML)
@@ -110,13 +112,13 @@ class RequestsIT extends AbstractIT {
      * Unknown Accept header is not handled
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/76">#76</a>
      */
-    @Test
+    @Test(groups=["v100"])
     public void unknownAccept() {
 
         given()
             .header("Accept", "foo/bar")
         .when()
-            .get(FrameworkConstants.LoginRoute)
+            .get(LoginRoute)
         .then()
             .statusCode(404)
     }

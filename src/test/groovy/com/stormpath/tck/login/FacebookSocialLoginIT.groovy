@@ -16,27 +16,20 @@
 package com.stormpath.tck.login
 
 import com.jayway.restassured.http.ContentType
-import com.jayway.restassured.path.xml.XmlPath
-import com.jayway.restassured.path.xml.element.Node
-import com.jayway.restassured.path.xml.element.NodeChildren
-import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.Iso8601Utils
 import com.stormpath.tck.util.*
+import com.stormpath.tck.responseSpecs.*
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
-import static com.jayway.restassured.RestAssured.delete
 import static com.jayway.restassured.RestAssured.given
-import static com.jayway.restassured.RestAssured.put
 import static org.hamcrest.Matchers.*
 import static org.testng.Assert.*
+import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
 
 @Test
-class SocialLoginIT extends AbstractIT {
+class FacebookSocialLoginIT extends AbstractIT {
     // We are really only going to try testing LoginWithFacebook for now, so might have some things hardcoded.
-
-    private String loginRoute = "/login"
 
     private String facebookClientID
     private String facebookClientSecret
@@ -115,13 +108,13 @@ class SocialLoginIT extends AbstractIT {
             .contentType(ContentType.JSON)
             .body(loginJSON)
         .when()
-            .post(loginRoute)
+            .post(LoginRoute)
         .then()
             .statusCode(200)
             .body("account.email", is(facebookTestUserEmail))
         .extract().response()
 
-        deleteOnClassTeardown(loginResponse.path("account.href"))
+        deleteOnClassTeardown(loginResponse.path("account.href").toString())
     }
 
     /**
@@ -140,9 +133,8 @@ class SocialLoginIT extends AbstractIT {
             .contentType(ContentType.JSON)
             .body(loginJSON)
         .when()
-            .post(loginRoute)
+            .post(LoginRoute)
         .then()
-            .statusCode(400)
-            .body("status", is(400))
+            .spec(JsonResponseSpec.isError(400))
     }
 }

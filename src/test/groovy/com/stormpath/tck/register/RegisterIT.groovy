@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+package com.stormpath.tck.register
+
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.path.xml.element.Node
@@ -28,6 +30,7 @@ import static com.jayway.restassured.RestAssured.given
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.*
 import static org.testng.Assert.*
+import static com.stormpath.tck.util.FrameworkConstants.RegisterRoute
 
 @Test
 class RegisterIT extends AbstractIT {
@@ -72,13 +75,13 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/179">#179</a>
      * @throws Exception
      */
-    @Test(groups=["json10"])
+    @Test(groups=["v100"])
     public void servesViewModel() throws Exception {
 
         given()
             .accept(ContentType.JSON)
         .when()
-            .get(FrameworkConstants.RegisterRoute)
+            .get(RegisterRoute)
         .then()
             .statusCode(200)
             .contentType(ContentType.JSON)
@@ -92,14 +95,14 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/189">#189</a>
      * @throws Exception
      */
-    @Test(groups=["json10"])
+    @Test(groups=["v100"])
     public void returnsErrorIfPostIsEmpty() throws Exception {
 
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
         .when()
-            .post(FrameworkConstants.RegisterRoute)
+            .post(RegisterRoute)
         .then()
             .spec(JsonResponseSpec.isError(400))
     }
@@ -109,7 +112,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/189">#189</a>
      * @throws Exception
      */
-    @Test(groups=["json10"])
+    @Test(groups=["v100"])
     public void returnsErrorIfPasswordIsMissing() throws Exception {
 
         def jsonMap = [email: testAccount.email,
@@ -120,7 +123,7 @@ class RegisterIT extends AbstractIT {
             .contentType(ContentType.JSON)
             .body(jsonMap)
         .when()
-            .post(FrameworkConstants.RegisterRoute)
+            .post(RegisterRoute)
         .then()
             .spec(JsonResponseSpec.isError(400))
     }
@@ -130,7 +133,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/189">#189</a>
      * @throws Exception
      */
-    @Test(groups=["json10"])
+    @Test(groups=["v100"])
     public void returnsErrorIfRequiredFieldIsMissing() throws Exception {
 
         def jsonMap = [email: testAccount.email,
@@ -143,7 +146,7 @@ class RegisterIT extends AbstractIT {
             .contentType(ContentType.JSON)
             .body(jsonMap)
         .when()
-            .post(FrameworkConstants.RegisterRoute)
+            .post(RegisterRoute)
         .then()
             .spec(JsonResponseSpec.isError(400))
     }
@@ -153,7 +156,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/195">#195</a>
      * @throws Exception
      */
-    @Test(groups=["json10"])
+    @Test(groups=["v100"])
     public void returnsErrorForUndefinedRootCustomField() throws Exception {
 
         def jsonMap = [email: testAccount.email,
@@ -168,7 +171,7 @@ class RegisterIT extends AbstractIT {
             .contentType(ContentType.JSON)
             .body(jsonMap)
         .when()
-            .post(FrameworkConstants.RegisterRoute)
+            .post(RegisterRoute)
         .then()
             .spec(JsonResponseSpec.isError(400))
     }
@@ -178,7 +181,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/195">#195</a>
      * @throws Exception
      */
-    @Test(groups=["json10"])
+    @Test(groups=["v100"])
     public void returnsErrorForUndefinedCustomField() throws Exception {
 
         def jsonMap = [email: testAccount.email,
@@ -194,7 +197,7 @@ class RegisterIT extends AbstractIT {
             .contentType(ContentType.JSON)
             .body(jsonMap)
         .when()
-            .post(FrameworkConstants.RegisterRoute)
+            .post(RegisterRoute)
         .then()
             .spec(JsonResponseSpec.isError(400))
     }
@@ -204,7 +207,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/201">#201</a>
      * @throws Exception
      */
-    @Test(groups=["json10"])
+    @Test(groups=["v100"])
     public void returnsJsonErrorForServerError() throws Exception {
 
         def jsonMap = [email: "foo@bar",
@@ -218,7 +221,7 @@ class RegisterIT extends AbstractIT {
             .contentType(ContentType.JSON)
             .body(jsonMap)
         .when()
-            .post(FrameworkConstants.RegisterRoute)
+            .post(RegisterRoute)
         .then()
             .spec(JsonResponseSpec.isError(400))
     }
@@ -228,7 +231,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/202">#202</a>
      * @throws Exception
      */
-    @Test(groups=["json10"])
+    @Test(groups=["v100"])
     public void returnsSanitizedAccountForSuccess() throws Exception {
 
         def testAccount = new TestAccount()
@@ -239,7 +242,7 @@ class RegisterIT extends AbstractIT {
                 .contentType(ContentType.JSON)
                 .body(testAccount.getPropertiesMap())
             .when()
-                .post(FrameworkConstants.RegisterRoute)
+                .post(RegisterRoute)
             .then()
                 .spec(AccountResponseSpec.matchesAccount(testAccount))
             .extract()
@@ -253,14 +256,14 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/180">#180</a>
      * @throws Exception
      */
-    @Test(groups=["web10"])
+    @Test(groups=["v100"])
     public void servesRegisterForm() throws Exception {
 
         Response response =
             given()
                 .accept(ContentType.HTML)
             .when()
-                .get(FrameworkConstants.RegisterRoute)
+                .get(RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -277,7 +280,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/181">#181</a>
      * @throws Exception
      */
-    @Test(groups=["web10"])
+    @Test(groups=["v100"])
     public void formShouldContainFieldsOrderedByFieldOrder() throws Exception {
 
         // Todo: CSRF support
@@ -286,7 +289,7 @@ class RegisterIT extends AbstractIT {
             given()
                 .accept(ContentType.HTML)
             .when()
-                .get(FrameworkConstants.RegisterRoute)
+                .get(RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -319,7 +322,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/188">#188</a>
      * @throws Exception
      */
-    @Test(groups=["web10"])
+    @Test(groups=["v100"])
     public void displaysErrorIfPostIsEmpty() throws Exception {
 
         // Todo: CSRF support
@@ -329,7 +332,7 @@ class RegisterIT extends AbstractIT {
                 .accept(ContentType.HTML)
                 .contentType(ContentType.URLENC)
             .when()
-                .post(FrameworkConstants.RegisterRoute)
+                .post(RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -347,7 +350,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/188">#188</a>
      * @throws Exception
      */
-    @Test(groups=["web10"])
+    @Test(groups=["v100"])
     public void displaysErrorIfPasswordIsMissing() throws Exception {
 
         // todo: work with CSRF
@@ -359,7 +362,7 @@ class RegisterIT extends AbstractIT {
                 .formParam("email", testAccount.email)
                 .formParam("password", "")
             .when()
-                .post(FrameworkConstants.RegisterRoute)
+                .post(RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -377,7 +380,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/188">#188</a>
      * @throws Exception
      */
-    @Test(groups=["web10"])
+    @Test(groups=["v100"])
     public void displaysErrorIfRequiredFieldIsMissing() throws Exception {
 
         // todo: work with CSRF
@@ -391,7 +394,7 @@ class RegisterIT extends AbstractIT {
                 .formParam("surname", testAccount.surname)
                 // givenName is required per the default configuration
             .when()
-                .post(FrameworkConstants.RegisterRoute)
+                .post(RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -409,7 +412,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/194">#194</a>
      * @throws Exception
      */
-    @Test(groups=["web10"])
+    @Test(groups=["v100"])
     public void displaysErrorForUndefinedCustomField() throws Exception {
 
         // todo: work with CSRF
@@ -424,7 +427,7 @@ class RegisterIT extends AbstractIT {
                 .formParam("surname", testAccount.surname)
                 .formParam("customValue", "foobar") // not defined in default configuration
             .when()
-                .post(FrameworkConstants.RegisterRoute)
+                .post(RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -442,7 +445,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/200">#200</a>
      * @throws Exception
      */
-    @Test(groups=["web10"])
+    @Test(groups=["v100"])
     public void displaysErrorForServerError() throws Exception {
 
         Response response =
@@ -455,7 +458,7 @@ class RegisterIT extends AbstractIT {
                 .formParam("surname", testAccount.surname)
                 // Email and password will not pass Stormpath API validation and will error
             .when()
-                .post(FrameworkConstants.RegisterRoute)
+                .post(RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
@@ -473,7 +476,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/203">#203</a>
      * @throws Exception
      */
-    @Test(groups=["web10"])
+    @Test(groups=["v100"])
     public void redirectsToLoginOnSuccess() throws Exception {
 
         given()
@@ -484,7 +487,7 @@ class RegisterIT extends AbstractIT {
             .formParam("givenName", testAccount.givenName)
             .formParam("surname", testAccount.surname)
         .when()
-            .post(FrameworkConstants.RegisterRoute)
+            .post(RegisterRoute)
         .then()
             .statusCode(302)
             .header("Location", is(FrameworkConstants.LoginRoute + "?status=created"))
@@ -498,7 +501,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/219">#219</a>
      * @throws Exception
      */
-    @Test(groups=["web10"])
+    @Test(groups=["v100"])
     public void registerFormPreservesValuesOnPostback() throws Exception {
 
         // todo: work with CSRF
@@ -512,7 +515,7 @@ class RegisterIT extends AbstractIT {
                 .formParam("givenName", testAccount.givenName)
                 .formParam("surname", testAccount.surname)
             .when()
-                .post(FrameworkConstants.RegisterRoute)
+                .post(RegisterRoute)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.HTML)
