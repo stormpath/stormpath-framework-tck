@@ -19,17 +19,15 @@ package com.stormpath.tck.forgot
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.path.xml.element.Node
-import com.jayway.restassured.response.Cookie
-import com.jayway.restassured.response.Cookies
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.util.*
-import com.stormpath.tck.responseSpecs.*
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.*
 import static org.testng.Assert.*
 import static org.hamcrest.Matchers.*
+import static org.hamcrest.MatcherAssert.assertThat
 import static com.stormpath.tck.util.FrameworkConstants.ForgotRoute
 
 @Test
@@ -131,5 +129,29 @@ class ForgotPasswordIT extends AbstractIT {
 
         Node emailField = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "email")
         assertEquals(emailField.attributes().get("type"), "text")
+    }
+
+    /** If query string contains invalid_sptoken, render message above form
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/141">#141</a>
+     * @throws Exception
+     */
+    @Test
+    public void rendersFormWithInvalidSptokenWarning() throws Exception {
+
+        def response = given()
+            .accept(ContentType.HTML)
+            .param("status", "invalid_sptoken")
+        .when()
+            .get(ForgotRoute)
+        .then()
+            .contentType(ContentType.HTML)
+            .statusCode(200)
+        .extract()
+            .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node warningBanner = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "alert-warning")
+        assertThat(warningBanner.toString(), not(isEmptyOrNullString()))
     }
 }
