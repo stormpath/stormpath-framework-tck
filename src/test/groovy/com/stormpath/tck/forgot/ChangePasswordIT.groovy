@@ -122,4 +122,24 @@ class ChangePasswordIT extends AbstractIT {
             .statusCode(302)
             .header("Location", "/forgot")
     }
+
+    /** Redirect to errorUri for invalid or expired token on POST
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/158">#158</a>
+     * @throws Exception
+     */
+    @Test(groups=["v100"])
+    public void redirectToErrorUriForInvalidSptokenWhenPosting() throws Exception {
+
+        given()
+            .accept(ContentType.HTML)
+            .contentType(ContentType.URLENC)
+            .queryParam("sptoken", "NOTEVENCLOSETOVALID")
+            .param("password", "foobar123!")
+            .param("passwordAgain", "foobar123!")
+        .when()
+            .post(ChangeRoute)
+        .then()
+            .statusCode(302)
+            .header("Location", "/forgot?status=invalid_sptoken")
+    }
 }
