@@ -19,7 +19,7 @@ package com.stormpath.tck.util
 import com.jayway.restassured.path.xml.element.Node
 import com.jayway.restassured.path.xml.element.NodeChildren
 
-static class HtmlUtils {
+class HtmlUtils {
 
     public static Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
         for (Node node : children.list()) {
