@@ -39,23 +39,6 @@ import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
 class LoginIT extends AbstractIT {
     private TestAccount account = new TestAccount()
 
-    private Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
-        for (Node node : children.list()) {
-            def actualTag = node.name()
-            def actualAttribute = node.attributes().get(attributeKey)
-
-            if (actualTag == tag && actualAttribute.contains(attributeValue)) {
-                return node
-            }
-            else {
-                Node foundNode = findTagWithAttribute(node.children(), tag, attributeKey, attributeValue)
-                if (foundNode != null) {
-                    return foundNode
-                }
-            }
-        }
-    }
-
     private List<Node> findTags(NodeChildren children, String tag) {
         def results = new ArrayList<Node>()
 
@@ -392,10 +375,10 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node loginField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "login")
+        Node loginField = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "login")
         assertEquals(loginField.attributes().get("type"), "text")
 
-        Node passwordField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "password")
+        Node passwordField = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "password")
         assertEquals(passwordField.attributes().get("type"), "password")
     }
 
@@ -673,7 +656,7 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
+        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
 
         // The only header div should be the one that contains the form header
         assertThat(getNodeText(header, true), not(isEmptyOrNullString()))
@@ -764,10 +747,10 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node loginField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "login")
+        Node loginField = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "login")
         assertEquals(loginField.attributes().get("value"), "blah", "The 'login' field should preserve value")
 
-        Node passwordField = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "password")
+        Node passwordField = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "password")
         assertFalse((passwordField.attributes().get("value")?.trim() as boolean), "The 'password' field should NOT preserve value")
     }
 }

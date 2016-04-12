@@ -17,6 +17,8 @@
 package com.stormpath.tck.forgot
 
 import com.jayway.restassured.http.ContentType
+import com.jayway.restassured.path.xml.XmlPath
+import com.jayway.restassured.path.xml.element.Node
 import com.jayway.restassured.response.Cookie
 import com.jayway.restassured.response.Cookies
 import com.stormpath.tck.AbstractIT
@@ -114,12 +116,20 @@ class ForgotPasswordIT extends AbstractIT {
      */
     @Test
     public void rendersForm() throws Exception {
-        given()
+
+        def response = given()
             .accept(ContentType.HTML)
         .when()
             .get(ForgotRoute)
         .then()
             .contentType(ContentType.HTML)
             .statusCode(200)
+        .extract()
+            .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node emailField = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "email")
+        assertEquals(emailField.attributes().get("type"), "text")
     }
 }
