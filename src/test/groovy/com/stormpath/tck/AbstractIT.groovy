@@ -16,6 +16,7 @@
 package com.stormpath.tck
 
 import com.jayway.restassured.RestAssured
+import com.jayway.restassured.config.RedirectConfig
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.util.RestUtils
@@ -62,6 +63,7 @@ abstract class AbstractIT {
             RestAssured.port = webappUrlPort
         }
         RestAssured.baseURI = webappBaseUrl
+        RestAssured.config = config().redirect(RedirectConfig.redirectConfig().followRedirects(false))
     }
 
     @BeforeTest

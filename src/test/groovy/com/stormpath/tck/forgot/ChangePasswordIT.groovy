@@ -28,7 +28,7 @@ import static com.jayway.restassured.RestAssured.*
 import static org.testng.Assert.*
 import static org.hamcrest.Matchers.*
 import static org.hamcrest.MatcherAssert.assertThat
-import static com.stormpath.tck.util.FrameworkConstants.ForgotRoute
+import static com.stormpath.tck.util.FrameworkConstants.ChangeRoute
 
 class ChangePasswordIT extends AbstractIT {
 
@@ -38,7 +38,7 @@ class ChangePasswordIT extends AbstractIT {
      */
     @Test(groups=["v100"])
     public void doNotHandlePut() throws Exception {
-        put(ForgotRoute)
+        put(ChangeRoute)
                 .then()
                 .assertThat().statusCode(404)
     }
@@ -49,10 +49,26 @@ class ChangePasswordIT extends AbstractIT {
      */
     @Test(groups=["v100"])
     public void doNotHandleDelete() throws Exception {
-        delete(ForgotRoute)
+        delete(ChangeRoute)
                 .then()
                 .assertThat().statusCode(404)
     }
 
+    /** Redirect to errorUri for invalid sptoken
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/147">#147</a>
+     * @throws Exception
+     */
+    @Test(groups=["v100"])
+    public void redirectToErrorUriForInvalidSptoken() throws Exception {
 
+        given()
+            .accept(ContentType.HTML)
+            .contentType(ContentType.HTML)
+            .queryParam("sptoken", "NOTEVENCLOSETOVALID")
+        .when()
+            .get(ChangeRoute)
+        .then()
+            .statusCode(302)
+            .header("Location", "/forgot?status=invalid_sptoken")
+    }
 }
