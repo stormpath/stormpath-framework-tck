@@ -71,4 +71,21 @@ class ChangePasswordIT extends AbstractIT {
             .statusCode(302)
             .header("Location", "/forgot?status=invalid_sptoken")
     }
+
+    /** https://github.com/stormpath/stormpath-framework-tck/issues/151
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/151">#151</a>
+     * @throws Exception
+     */
+    @Test(groups=["v100"])
+    public void redirectToForgotUriForMissingSptoken() throws Exception {
+
+        given()
+            .accept(ContentType.HTML)
+            .contentType(ContentType.HTML)
+        .when()
+            .get(ChangeRoute)
+        .then()
+            .statusCode(302)
+            .header("Location", "/forgot")
+    }
 }
