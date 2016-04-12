@@ -21,6 +21,7 @@ import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.path.xml.element.Node
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.util.*
+import com.stormpath.tck.responseSpecs.*
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
@@ -52,6 +53,39 @@ class ChangePasswordIT extends AbstractIT {
         delete(ChangeRoute)
                 .then()
                 .assertThat().statusCode(404)
+    }
+
+    /** Return JSON error if sptoken is invalid
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/239">#239</a>
+     * @throws Exception
+     */
+    @Test(groups=["v100"])
+    public void respondWithJsonErrorForInvalidSptoken() throws Exception {
+
+        given()
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .queryParam("sptoken", "NOTEVENCLOSETOVALID")
+        .when()
+            .get(ChangeRoute)
+        .then()
+            .spec(JsonResponseSpec.isError(404))
+    }
+
+    /** Return JSON error if sptoken is missing
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/216">#216</a>
+     * @throws Exception
+     */
+    @Test(groups=["v100"])
+    public void respondWithJsonErrorForMissingSptoken() throws Exception {
+
+        given()
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+        .when()
+            .get(ChangeRoute)
+        .then()
+            .spec(JsonResponseSpec.isError(400))
     }
 
     /** Redirect to errorUri for invalid sptoken
