@@ -33,6 +33,31 @@ import static com.stormpath.tck.util.FrameworkConstants.ChangeRoute
 
 class ChangePasswordIT extends AbstractIT {
 
+    def getEmailAndPasswordResetToken() {
+        assertNotNull(EnvUtils.stormpathApplicationHref, "We need the Application HREF to perform this test.")
+
+        def account = new TestAccount()
+        account.registerOnServer()
+        deleteOnClassTeardown(account.href)
+
+        String passwordResetHref = given()
+            .header("User-Agent", "stormpath-framework-tck")
+            .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
+            .contentType(ContentType.JSON)
+            .body([ "email": account.email ])
+            .port(443)
+        .when()
+            .post("$EnvUtils.stormpathApplicationHref/passwordResetTokens".toString())
+        .then()
+            .statusCode(200)
+        .extract()
+            .path("href")
+
+        String sptoken = passwordResetHref.drop(passwordResetHref.lastIndexOf("/") + 1) as String
+
+        return new Tuple2(account.email, sptoken)
+    }
+
     /** Only GET and POST should be handled
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/166">#166</a>
      * @throws Exception
@@ -162,5 +187,39 @@ class ChangePasswordIT extends AbstractIT {
         .then()
             .statusCode(302)
             .header("Location", "/forgot?status=invalid_sptoken")
+    }
+
+    /** Redirect to errorUri for invalid or expired token on POST
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/158">#158</a>
+     * @throws Exception
+     */
+    @Test(groups=["v100"])
+    public void renderFormForValidSptoken() throws Exception {
+
+        // TODO: work with CSRF?
+
+        def (String email, String sptoken) = getEmailAndPasswordResetToken()
+
+        def response = given()
+            .accept(ContentType.HTML)
+            .queryParam("sptoken", sptoken)
+        .when()
+            .get(ChangeRoute)
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.HTML)
+        .extract()
+            .response()
+
+        XmlPath doc = getHtmlDoc(response)
+        List<Node> fields = HtmlUtils.findTags(doc.getNodeChildren("html.body"), "input")
+
+        // From default configuration
+        assertEquals(fields.get(0).attributes().get("name"), "password")
+        assertEquals(fields.get(0).attributes().get("type"), "password")
+
+        // Todo: asserting the name of the second field is 1.1
+        //assertEquals(fields.get(1).attributes().get("name"), "confirmPassword")
+        assertEquals(fields.get(1).attributes().get("type"), "password")
     }
 }

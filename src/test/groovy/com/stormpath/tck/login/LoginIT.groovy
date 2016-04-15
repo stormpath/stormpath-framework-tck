@@ -39,22 +39,6 @@ import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
 class LoginIT extends AbstractIT {
     private TestAccount account = new TestAccount()
 
-    private List<Node> findTags(NodeChildren children, String tag) {
-        def results = new ArrayList<Node>()
-
-        for (Node node in children.list()) {
-            if (node.name() == tag) {
-                results.add(node)
-            }
-            else {
-                Collection<Node> innerResults = findTags(node.children(), tag)
-                results.addAll(innerResults)
-            }
-        }
-
-        return results
-    }
-
     private String getNodeText(Node node, boolean addContentsFirst) {
         StringBuilder builder = new StringBuilder()
 
@@ -711,7 +695,7 @@ class LoginIT extends AbstractIT {
                 .response()
 
         XmlPath doc = getHtmlDoc(response)
-        List<Node> fields = findTags(doc.getNodeChildren("html.body"), "input")
+        List<Node> fields = HtmlUtils.findTags(doc.getNodeChildren("html.body"), "input")
 
         // From default configuration
         assertEquals(fields.get(0).attributes().get("name"), "login")

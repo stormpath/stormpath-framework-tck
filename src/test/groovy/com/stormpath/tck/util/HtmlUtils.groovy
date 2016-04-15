@@ -37,4 +37,20 @@ class HtmlUtils {
             }
         }
     }
+
+    public static List<Node> findTags(NodeChildren children, String tag) {
+        def results = new ArrayList<Node>()
+
+        for (Node node in children.list()) {
+            if (node.name() == tag) {
+                results.add(node)
+            }
+            else {
+                Collection<Node> innerResults = findTags(node.children(), tag)
+                results.addAll(innerResults)
+            }
+        }
+
+        return results
+    }
 }
