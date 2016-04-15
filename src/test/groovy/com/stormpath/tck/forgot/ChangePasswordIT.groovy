@@ -189,8 +189,8 @@ class ChangePasswordIT extends AbstractIT {
             .header("Location", "/forgot?status=invalid_sptoken")
     }
 
-    /** Redirect to errorUri for invalid or expired token on POST
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/158">#158</a>
+    /** Render a form to collect new password for valid sptoken
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/149">#149</a>
      * @throws Exception
      */
     @Test(groups=["v100"])
@@ -221,5 +221,28 @@ class ChangePasswordIT extends AbstractIT {
         // Todo: asserting the name of the second field is 1.1
         //assertEquals(fields.get(1).attributes().get("name"), "confirmPassword")
         assertEquals(fields.get(1).attributes().get("type"), "password")
+    }
+
+    /** Return 200 OK and empty body for application/json POST
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/155">#155</a>
+     * @throws Exception
+     */
+    @Test(groups=["v100"])
+    public void returnsSuccessOnJsonPost() throws Exception {
+        def newPassword = "N3wP4ssw0rd###"
+
+        // TODO: work with CSRF?
+
+        def (String email, String sptoken) = getEmailAndPasswordResetToken()
+
+        given()
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .body([ "sptoken": sptoken, "password": newPassword ])
+        .when()
+            .post(ChangeRoute)
+        .then()
+            .statusCode(200)
+            .body(isEmptyOrNullString())
     }
 }
