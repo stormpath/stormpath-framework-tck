@@ -120,6 +120,6 @@ class RequestsIT extends AbstractIT {
         .when()
             .get(LoginRoute)
         .then()
-            .statusCode(404)
+            .statusCode(allOf(not(200), not(500)))
     }
 }
