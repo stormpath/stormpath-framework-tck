@@ -33,7 +33,7 @@ import static com.stormpath.tck.util.FrameworkConstants.ChangeRoute
 
 class ChangePasswordIT extends AbstractIT {
 
-    def getEmailAndPasswordResetToken() {
+    def getPasswordResetToken() {
         assertNotNull(EnvUtils.stormpathApplicationHref, "We need the Application HREF to perform this test.")
 
         def account = new TestAccount()
@@ -53,9 +53,7 @@ class ChangePasswordIT extends AbstractIT {
         .extract()
             .path("href")
 
-        String sptoken = passwordResetHref.drop(passwordResetHref.lastIndexOf("/") + 1) as String
-
-        return new Tuple2(account.email, sptoken)
+        return passwordResetHref.drop(passwordResetHref.lastIndexOf("/") + 1) as String
     }
 
     /** Only GET and POST should be handled
@@ -198,7 +196,7 @@ class ChangePasswordIT extends AbstractIT {
 
         // TODO: work with CSRF?
 
-        def (String email, String sptoken) = getEmailAndPasswordResetToken()
+        def sptoken = getPasswordResetToken()
 
         def response = given()
             .accept(ContentType.HTML)
@@ -229,16 +227,14 @@ class ChangePasswordIT extends AbstractIT {
      */
     @Test(groups=["v100"])
     public void returnsSuccessOnJsonPost() throws Exception {
-        def newPassword = "N3wP4ssw0rd###"
-
         // TODO: work with CSRF?
 
-        def (String email, String sptoken) = getEmailAndPasswordResetToken()
+        def sptoken = getPasswordResetToken()
 
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
-            .body([ "sptoken": sptoken, "password": newPassword ])
+            .body([ "sptoken": sptoken, "password": "N3wP4ssw0rd###" ])
         .when()
             .post(ChangeRoute)
         .then()
