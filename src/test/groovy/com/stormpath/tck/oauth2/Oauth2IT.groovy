@@ -21,6 +21,7 @@ import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.util.*
 import com.stormpath.tck.responseSpecs.*
+import oracle.jrockit.jfr.events.ContentTypeImpl
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
@@ -43,7 +44,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/6">#6</a>
      */
     @Test(groups=["v100", "json"])
-    public void unsupportedGrantType() throws Exception {
+    public void oauthErrorsOnUnsupportedGrantTypes() throws Exception {
 
         given()
             .param("grant_type", "foobar_grant")
@@ -52,8 +53,6 @@ class Oauth2IT extends AbstractIT {
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
-            .header("Cache-Control", is("no-store"))
-            .header("Pragma", is("no-cache"))
             .body("error", is("unsupported_grant_type"))
     }
 
@@ -61,8 +60,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/7">#7</a>
      */
     @Test(groups=["v100", "json"])
-    public void missingGrantType() throws Exception {
-
+    public void oauthErrorsOnMissingGrantType() throws Exception {
         given()
             .param("grant_type", "")
         .when()
@@ -70,8 +68,6 @@ class Oauth2IT extends AbstractIT {
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
-            .header("Cache-Control", is("no-store"))
-            .header("Pragma", is("no-cache"))
             .body("error", is("invalid_request"))
     }
 
@@ -79,8 +75,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/15">#15</a>
      */
     @Test(groups=["v100", "json"])
-    public void missingFormParameters() throws Exception {
-
+    public void oauthErrorsOnInvalidRequestBody() throws Exception {
         given()
             .body("""hello"" : ""world""")
         .when()
@@ -88,8 +83,6 @@ class Oauth2IT extends AbstractIT {
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
-            .header("Cache-Control", is("no-store"))
-            .header("Pragma", is("no-cache"))
             .body("error", is("invalid_request"))
     }
 
@@ -97,7 +90,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/16">#16</a>
      */
     @Test(groups=["v100", "json"])
-    public void doNotHandleGet() throws Exception {
+    public void oauthDoesntSupportGet() throws Exception {
         get(OauthRoute)
             .then()
             .assertThat().statusCode(405)
@@ -107,7 +100,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/11">#11</a>
      */
     @Test(groups=["v100", "json"])
-    public void passwordGrantWithUsername() throws Exception {
+    public void oauthPasswordGrantWithUsernameSucceeds() throws Exception {
 
         String accessToken =
             given()
@@ -117,12 +110,7 @@ class Oauth2IT extends AbstractIT {
             .when()
                 .post(OauthRoute)
             .then()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .body("access_token", not(isEmptyOrNullString()))
-                .body("expires_in", is(3600))
-                .body("refresh_token", not(isEmptyOrNullString()))
-                .body("token_type", is("Bearer"))
+                .spec(JsonResponseSpec.validAccessAndRefreshTokens())
             .extract()
                 .path("access_token")
 
@@ -133,7 +121,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/18">#18</a>
      */
     @Test(groups=["v100", "json"])
-    public void passwordGrantWithEmail() throws Exception {
+    public void oauthPasswordGrantWithEmailSucceeds() throws Exception {
 
         String accessToken =
             given()
@@ -143,12 +131,7 @@ class Oauth2IT extends AbstractIT {
             .when()
                 .post(OauthRoute)
             .then()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .body("access_token", not(isEmptyOrNullString()))
-                .body("expires_in", is(3600))
-                .body("refresh_token", not(isEmptyOrNullString()))
-                .body("token_type", is("Bearer"))
+                .spec(JsonResponseSpec.validAccessAndRefreshTokens())
             .extract()
                 .path("access_token")
 
@@ -159,7 +142,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/205">#205</a>
      */
     @Test(groups=["v100", "json"])
-    public void refreshGrantTypeWorksWithValidToken() throws Exception {
+    public void oauthRefreshGrantWorksWithValidToken() throws Exception {
         Response passwordGrantResponse =
             given()
                 .param("grant_type", "password")
@@ -168,12 +151,7 @@ class Oauth2IT extends AbstractIT {
             .when()
                 .post(OauthRoute)
             .then()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .body("access_token", not(isEmptyOrNullString()))
-                .body("expires_in", is(3600))
-                .body("refresh_token", not(isEmptyOrNullString()))
-                .body("token_type", is("Bearer"))
+                .spec(JsonResponseSpec.validAccessAndRefreshTokens())
             .extract()
                 .response()
 
@@ -187,12 +165,7 @@ class Oauth2IT extends AbstractIT {
             .when()
                 .post(OauthRoute)
             .then()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .body("access_token", not(isEmptyOrNullString()))
-                .body("expires_in", is(3600))
-                .body("refresh_token", not(isEmptyOrNullString()))
-                .body("token_type", is("Bearer"))
+                .spec(JsonResponseSpec.validAccessAndRefreshTokens())
             .extract()
                 .path("access_token")
 
@@ -204,7 +177,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/205">#205</a>
      */
     @Test(groups=["v100", "json"])
-    public void refreshGrantTypeFailsWithInvalidRefreshToken() throws Exception {
+    public void oauthRefreshGrantFailsWithInvalidRefreshToken() throws Exception {
         String refreshToken = "GARBAGE"
 
         given()
@@ -224,6 +197,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/12">#12</a>
      * @throws Exception
      */
+    @Test(groups=["v100", "json"])
     public void oauthErrorsAreTransformedProperly() throws Exception {
 
         given()
@@ -238,5 +212,89 @@ class Oauth2IT extends AbstractIT {
             .body("size()", is(2))
             .body("message", not(isEmptyOrNullString()))
             .body("error", not(isEmptyOrNullString()))
+    }
+
+    /** We should be able to use the client_credentials grant type to get an access token
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/8">#8</a>
+     */
+    @Test(groups=["v100", "json"])
+    public void oauthClientCredentialsGrantSucceeds() throws Exception {
+        TestAccount testAccount = new TestAccount()
+        testAccount.registerOnServer()
+        deleteOnClassTeardown(testAccount.href)
+
+        // Get API keys so we can use it for client credentials
+
+        Response apiKeysResource = given()
+            .header("User-Agent", "stormpath-framework-tck")
+            .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
+            .port(443)
+        .when()
+            .post(testAccount.href + "/apiKeys")
+        .then()
+            .statusCode(201)
+        .extract()
+            .response()
+
+        String apiKeyId = apiKeysResource.body().jsonPath().getString("id")
+        String apiKeySecret = apiKeysResource.body().jsonPath().getString("secret")
+
+        // Attempt to get tokens
+
+        given()
+            .param("grant_type", "client_credentials")
+            .auth()
+                .preemptive().basic(apiKeyId, apiKeySecret)
+            .contentType(ContentType.URLENC)
+        .when()
+            .post(OauthRoute)
+        .then()
+            .statusCode(200)
+            .contentType(ContentType.JSON)
+            .body("access_token", not(isEmptyOrNullString()))
+            .body("token_type", equalToIgnoringCase("Bearer"))
+            .body("expires_in", is(3600))
+            .body("refresh_token", nullValue())
+            .header("Cache-Control", is("no-store"))
+            .header("Pragma", is("no-cache"))
+    }
+
+    /** We shouldn't be able to use client credentials to get an access token without a API secret
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/8">#8</a>
+     */
+    @Test(groups=["v100", "json"])
+    public void oauthClientCredentialsGrantFailsWithoutAPISecret() throws Exception {
+        TestAccount testAccount = new TestAccount()
+        testAccount.registerOnServer()
+        deleteOnClassTeardown(testAccount.href)
+
+        // Get API keys so we can use it for client credentials
+
+        Response apiKeysResource = given()
+            .header("User-Agent", "stormpath-framework-tck")
+            .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
+            .port(443)
+        .when()
+            .post(testAccount.href + "/apiKeys")
+        .then()
+            .statusCode(201)
+        .extract()
+            .response()
+
+        String apiKeyId = apiKeysResource.body().jsonPath().getString("id")
+
+        // Attempt to get tokens
+
+        given()
+            .param("grant_type", "client_credentials")
+            .auth()
+                .preemptive().basic(apiKeyId, "NOT_A_VALID_API_SECRET")
+            .contentType(ContentType.URLENC)
+        .when()
+            .post(OauthRoute)
+        .then()
+            .statusCode(401)
+            .contentType(ContentType.JSON)
+            .body("error", is("invalid_client"))
     }
 }

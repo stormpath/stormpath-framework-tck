@@ -23,4 +23,20 @@ class JsonResponseSpec {
         return builder.build()
     }
 
+    static ResponseSpecification validAccessAndRefreshTokens() {
+        ResponseSpecBuilder builder = new ResponseSpecBuilder()
+
+        builder
+            .expectStatusCode(200)
+            .expectContentType(ContentType.JSON)
+            .expectBody("access_token", not(isEmptyOrNullString()))
+            .expectBody("expires_in", is(3600))
+            .expectBody("refresh_token", not(isEmptyOrNullString()))
+            .expectBody("token_type", equalToIgnoringCase("Bearer"))
+            .expectHeader("Cache-Control", is("no-store"))
+            .expectHeader("Pragma", is("no-cache"))
+
+        return builder.build()
+    }
+
 }
