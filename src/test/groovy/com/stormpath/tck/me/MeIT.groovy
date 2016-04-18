@@ -58,7 +58,7 @@ class MeIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/37">#37</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json", "html"])
     public void unauthorizedRequestFails() throws Exception {
         when()
             .get(MeRoute)
@@ -73,7 +73,7 @@ class MeIT extends AbstractIT {
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/234
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void testThatMeWithCookieAuthReturnsJsonUser() throws Exception {
         given()
             .cookie("access_token", accessToken)
@@ -90,7 +90,7 @@ class MeIT extends AbstractIT {
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/235
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void testThatMeWithBearerAuthReturnsJsonUser() throws Exception {
         given()
             .auth().oauth2(accessToken)
@@ -106,7 +106,7 @@ class MeIT extends AbstractIT {
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/234
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void testThatMeWithCookieAuthStripsLinkedResources() throws Exception {
         given()
             .cookie("access_token", accessToken)
@@ -122,7 +122,7 @@ class MeIT extends AbstractIT {
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/235
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void testThatMeWithBearerAuthStripsLinkedResources() throws Exception {
         given()
             .auth().oauth2(accessToken)
@@ -138,7 +138,7 @@ class MeIT extends AbstractIT {
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/234
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void testThatMeWithCookieAuthHasNoCacheHeaders() throws Exception {
         given()
             .cookie("access_token", accessToken)
@@ -157,7 +157,7 @@ class MeIT extends AbstractIT {
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/235
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void testThatMeWithBearerAuthHasNoCacheHeaders() throws Exception {
         given()
             .auth().oauth2(accessToken)

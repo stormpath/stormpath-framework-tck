@@ -75,7 +75,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/179">#179</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void servesViewModel() throws Exception {
 
         given()
@@ -95,7 +95,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/189">#189</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void returnsErrorIfPostIsEmpty() throws Exception {
 
         given()
@@ -112,7 +112,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/189">#189</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void returnsErrorIfPasswordIsMissing() throws Exception {
 
         def jsonMap = [email: testAccount.email,
@@ -133,7 +133,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/189">#189</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void returnsErrorIfRequiredFieldIsMissing() throws Exception {
 
         def jsonMap = [email: testAccount.email,
@@ -156,7 +156,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/195">#195</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void returnsErrorForUndefinedRootCustomField() throws Exception {
 
         def jsonMap = [email: testAccount.email,
@@ -181,7 +181,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/195">#195</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void returnsErrorForUndefinedCustomField() throws Exception {
 
         def jsonMap = [email: testAccount.email,
@@ -207,7 +207,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/201">#201</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void returnsJsonErrorForServerError() throws Exception {
 
         def jsonMap = [email: "foo@bar",
@@ -231,7 +231,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/202">#202</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void returnsSanitizedAccountForSuccess() throws Exception {
 
         def testAccount = new TestAccount()
@@ -256,7 +256,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/180">#180</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void servesRegisterForm() throws Exception {
 
         Response response =
@@ -280,7 +280,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/181">#181</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void formShouldContainFieldsOrderedByFieldOrder() throws Exception {
 
         // Todo: CSRF support
@@ -322,7 +322,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/188">#188</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void displaysErrorIfPostIsEmpty() throws Exception {
 
         // Todo: CSRF support
@@ -350,7 +350,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/188">#188</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void displaysErrorIfPasswordIsMissing() throws Exception {
 
         // todo: work with CSRF
@@ -380,7 +380,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/188">#188</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void displaysErrorIfRequiredFieldIsMissing() throws Exception {
 
         // todo: work with CSRF
@@ -412,7 +412,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/194">#194</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void displaysErrorForUndefinedCustomField() throws Exception {
 
         // todo: work with CSRF
@@ -445,7 +445,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/200">#200</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void displaysErrorForServerError() throws Exception {
 
         Response response =
@@ -476,7 +476,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/203">#203</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void redirectsToLoginOnSuccess() throws Exception {
 
         given()
@@ -501,7 +501,7 @@ class RegisterIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/219">#219</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void registerFormPreservesValuesOnPostback() throws Exception {
 
         // todo: work with CSRF

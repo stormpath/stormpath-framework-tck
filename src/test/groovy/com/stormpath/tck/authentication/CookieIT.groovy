@@ -58,7 +58,7 @@ class CookieIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/34">#34</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json", "html"])
     public void serverRefreshesAccessTokenWhenMissing() throws Exception {
         def (String accessToken, String refreshToken) = createTestAccountTokens()
 
@@ -76,7 +76,7 @@ class CookieIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/35">#35</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json", "html"])
     public void serverDeletesCookiesWhenRefreshingWithInvalidToken() throws Exception {
         def response = given()
             .cookie("refresh_token", "not_a_valid_refresh_token_at_all")
@@ -97,7 +97,7 @@ class CookieIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/121">#121</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void unauthorizedHtmlRequestIsForwardedToLogin() throws Exception {
 
         // TODO: This test will probably have to change because we will be updating the spec.
@@ -115,7 +115,7 @@ class CookieIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/36">#38</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void cookieExpirationMatchesTokenTtl() throws Exception {
         def account = new TestAccount()
         account.registerOnServer()
@@ -145,7 +145,7 @@ class CookieIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/232">#232</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json", "html"])
     public void refreshTokenAsAccessTokenFails() throws Exception {
         def (String accessToken, String refreshToken) = createTestAccountTokens()
 

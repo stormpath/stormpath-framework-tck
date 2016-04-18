@@ -96,7 +96,7 @@ class FacebookSocialLoginIT extends AbstractIT {
      * Attempts to login with the Facebook Access Token, and expects an account object back.
      * @throws Exception
      */
-    @Test
+    @Test(groups = ["v100", "json"])
     public void loginWithValidFacebookAccessTokenSucceeds() throws Exception {
         def loginJSON = ["providerData": [
                 "providerId": "facebook",
@@ -121,7 +121,7 @@ class FacebookSocialLoginIT extends AbstractIT {
      * Attempts to login with an invalid access token, and should fail. 
      * @throws Exception
      */
-    @Test
+    @Test(groups = ["v100", "json"])
     public void loginWithInvalidFacebookAccessTokenFails() throws Exception {
         def loginJSON = ["providerData": [
                 "providerId": "facebook",

@@ -45,7 +45,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/165">#165</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json", "html"])
     public void forgotDoesNotHandlePut() throws Exception {
         put(ForgotRoute)
             .then()
@@ -56,7 +56,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/165">#165</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json", "html"])
     public void forgotDoesNotHandleDelete() throws Exception {
         delete(ForgotRoute)
             .then()
@@ -67,7 +67,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/215">#215</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void forgotDoesNotHandleJsonGet() throws Exception {
         given()
             .accept(ContentType.JSON)
@@ -81,7 +81,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/142">#142</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void forgotSucceedsWhenPostingValidEmailJson() throws Exception {
         given()
             .accept(ContentType.JSON)
@@ -97,7 +97,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/142">#142</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void forgotSucceedsWhenPostingInvalidEmailJson() throws Exception {
         given()
             .accept(ContentType.JSON)
@@ -113,7 +113,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/140">#140</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void forgotRendersForm() throws Exception {
 
         def response = given()
@@ -136,7 +136,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/141">#141</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void forgotRendersFormWithInvalidSptokenBanner() throws Exception {
 
         def response = given()
@@ -160,7 +160,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/143">#143</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void forgotRedirectsToNextUriWhenPostingValidEmail() throws Exception {
         given()
             .accept(ContentType.HTML)
@@ -177,7 +177,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/143">#143</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void forgotRedirectsToNextUriWhenPostingInvalidEmail() throws Exception {
         given()
             .accept(ContentType.HTML)

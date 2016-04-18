@@ -42,7 +42,7 @@ class Oauth2IT extends AbstractIT {
     /** Unsupported grant type returns error
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/6">#6</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void unsupportedGrantType() throws Exception {
 
         given()
@@ -57,11 +57,10 @@ class Oauth2IT extends AbstractIT {
             .body("error", is("unsupported_grant_type"))
     }
 
-
     /** Missing grant type returns error
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/7">#7</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void missingGrantType() throws Exception {
 
         given()
@@ -79,7 +78,7 @@ class Oauth2IT extends AbstractIT {
     /** POST must include form parameters
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/15">#15</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void missingFormParameters() throws Exception {
 
         given()
@@ -97,7 +96,7 @@ class Oauth2IT extends AbstractIT {
     /** GET should return 405
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/16">#16</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void doNotHandleGet() throws Exception {
         get(OauthRoute)
             .then()
@@ -107,7 +106,7 @@ class Oauth2IT extends AbstractIT {
     /** Password grant flow with username/password
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/11">#11</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void passwordGrantWithUsername() throws Exception {
 
         String accessToken =
@@ -133,7 +132,7 @@ class Oauth2IT extends AbstractIT {
     /** Password grant flow with email/password
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/18">#18</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void passwordGrantWithEmail() throws Exception {
 
         String accessToken =
@@ -159,7 +158,7 @@ class Oauth2IT extends AbstractIT {
     /** Refresh grant flow
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/205">#205</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void refreshGrantTypeWorksWithValidToken() throws Exception {
         Response passwordGrantResponse =
             given()
@@ -204,7 +203,7 @@ class Oauth2IT extends AbstractIT {
     /** Refresh grant flow should fail without valid refresh token
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/205">#205</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void refreshGrantTypeFailsWithInvalidRefreshToken() throws Exception {
         String refreshToken = "GARBAGE"
 
@@ -216,7 +215,28 @@ class Oauth2IT extends AbstractIT {
         .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
+            .body("size()", is(2))
             .body("message", not(isEmptyOrNullString()))
             .body("error", is("invalid_grant"))
+    }
+
+    /** Error responses include only error and message properties
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/12">#12</a>
+     * @throws Exception
+     */
+    public void oauthErrorsAreTransformedProperly() throws Exception {
+
+        given()
+            .param("grant_type", "password")
+            .param("username", "foobar")
+            .param("password", "nopenopenope!")
+        .when()
+            .post(OauthRoute)
+        .then()
+            .statusCode(400)
+            .contentType(ContentType.JSON)
+            .body("size()", is(2))
+            .body("message", not(isEmptyOrNullString()))
+            .body("error", not(isEmptyOrNullString()))
     }
 }

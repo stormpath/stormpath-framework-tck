@@ -80,7 +80,7 @@ class LoginIT extends AbstractIT {
     /** Only respond to GET and POST
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json", "html"])
     public void doNotHandlePut() throws Exception {
         put(LoginRoute)
             .then()
@@ -90,7 +90,7 @@ class LoginIT extends AbstractIT {
     /** Only respond to GET and POST
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json", "html"])
     public void doNotHandleDelete() throws Exception {
         delete(LoginRoute)
             .then()
@@ -102,7 +102,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/83">#83</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void servesLoginViewModel() throws Exception {
 
         given()
@@ -122,7 +122,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/89">#89</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void loginViewModelHasFields() throws Exception {
 
         given()
@@ -150,7 +150,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/93">#93</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void loginWithUsername() throws Exception {
 
         Map<String, Object>  credentials = new HashMap<>();
@@ -173,7 +173,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/93">#93</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void loginWithEmail() throws Exception {
 
         given()
@@ -193,7 +193,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/95">#95</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void missingLoginThrowsError() throws Exception {
 
         Map<String, Object> badCredentials = new HashMap<>();
@@ -215,7 +215,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/95">#95</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void missingPasswordThrowsError() throws Exception {
 
         Map<String, Object> badCredentials = new HashMap<>();
@@ -238,7 +238,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/100">#100</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void successfulAuthorization() throws Exception {
 
         given()
@@ -256,7 +256,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/101">#101</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void noLinkedResourcesPresent() throws Exception {
 
         given()
@@ -274,7 +274,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/108">#108</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void datetimePropertiesAreIso8601() throws Exception {
 
         Response response =
@@ -304,7 +304,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/45">#110</a>
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/28">#28</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void invalidLoginError() throws Exception {
 
         Map<String, Object> badCredentials = new HashMap<>();
@@ -328,7 +328,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/33">#33</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void setsCookiesOnJsonLogin() throws Exception {
 
         given()
@@ -346,7 +346,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/81">#81</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void servesLoginForm() throws Exception {
 
         Response response =
@@ -375,7 +375,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/94">#94</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void loginAndPasswordAreRequired() throws Exception {
 
         // todo: work with CSRF
@@ -394,7 +394,7 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "bad-login")
+        Node warning = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "bad-login")
         assertThat(warning.toString(), not(isEmptyOrNullString()))
     }
 
@@ -403,7 +403,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/33">#33</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void setsCookiesOnLogin() throws Exception {
 
         // todo: work with CSRF
@@ -423,7 +423,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/92">#92</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void loginValueCanBeEmail() throws Exception {
 
         // todo: work with CSRF
@@ -442,7 +442,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/92">#92</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void loginValueCanBeUsername() throws Exception {
 
         // todo: work with CSRF
@@ -461,7 +461,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/97">#97</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void redirectsToNextUriOnLogin() throws Exception {
 
         // todo: work with CSRF
@@ -481,7 +481,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/99">#99</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void redirectsToNextParameter() throws Exception {
 
         // todo: work with CSRF
@@ -502,7 +502,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/102">#102</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void rendersUnverifiedMessage() throws Exception {
 
         Response response =
@@ -519,7 +519,7 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
+        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
         assertThat(getNodeText(header, false), not(isEmptyOrNullString()))
     }
 
@@ -527,7 +527,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/103">#103</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void rendersVerifiedMessage() throws Exception {
 
         Response response =
@@ -544,7 +544,7 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
+        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
         assertThat(getNodeText(header, false), not(isEmptyOrNullString()))
     }
 
@@ -552,7 +552,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/104">#104</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void rendersCreatedMessage() throws Exception {
 
         Response response =
@@ -569,7 +569,7 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
+        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
         assertThat(getNodeText(header, false), not(isEmptyOrNullString()))
     }
 
@@ -577,7 +577,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/105">#105</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void rendersForgotMessage() throws Exception {
 
         Response response =
@@ -594,7 +594,7 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
+        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
         assertThat(getNodeText(header, false), not(isEmptyOrNullString()))
     }
 
@@ -602,7 +602,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/106">#106</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void rendersResetMessage() throws Exception {
 
         Response response =
@@ -619,7 +619,7 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node header = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
+        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
         assertThat(getNodeText(header, false), not(isEmptyOrNullString()))
     }
 
@@ -627,7 +627,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/107">#107</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void ignoreArbitraryStatus() throws Exception {
 
         Response response =
@@ -656,7 +656,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/44">#44</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void rerenderFormWithErrorIfLoginFails() throws Exception {
 
         // todo: work with CSRF
@@ -676,7 +676,7 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "bad-login")
+        Node warning = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "bad-login")
         assertThat(warning.toString(), not(isEmptyOrNullString()))
     }
 
@@ -684,7 +684,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/114">#114</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void formShouldContainFieldsOrderedByFieldOrder() throws Exception {
 
         // todo: better CSRF handling
@@ -717,7 +717,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/177">#177</a>
      * @throws Exception
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void loginFormPreservesValuesOnPostback() throws Exception {
 
         // todo: work with CSRF

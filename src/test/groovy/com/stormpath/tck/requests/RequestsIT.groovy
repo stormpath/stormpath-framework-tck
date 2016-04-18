@@ -20,6 +20,7 @@ import com.jayway.restassured.http.ContentType
 import com.stormpath.tck.AbstractIT
 import org.testng.annotations.Test
 
+import static org.hamcrest.Matchers.*
 import static com.jayway.restassured.RestAssured.given
 import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
 
@@ -30,7 +31,7 @@ class RequestsIT extends AbstractIT {
      * Null or empty Accept header is treated as * / *
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/72">#72</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void emptyAccept() {
 
         given()
@@ -47,7 +48,7 @@ class RequestsIT extends AbstractIT {
      * Null or empty Accept header is treated as * / *
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/72">#72</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void missingAccept() {
 
         given()
@@ -63,7 +64,7 @@ class RequestsIT extends AbstractIT {
      * Accept: * / * uses first value in web.produces as Content-Type
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/73">#73</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void acceptAny() {
 
         given()
@@ -80,7 +81,7 @@ class RequestsIT extends AbstractIT {
      * Specifying valid Accept Content-Type returns that Content-Type
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/75">#75</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "json"])
     public void acceptJson() {
 
         given()
@@ -96,7 +97,7 @@ class RequestsIT extends AbstractIT {
      * Specifying valid Accept Content-Type returns that Content-Type
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/75">#75</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void acceptHtml() {
 
         given()
@@ -112,7 +113,7 @@ class RequestsIT extends AbstractIT {
      * Unknown Accept header is not handled
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/76">#76</a>
      */
-    @Test(groups=["v100"])
+    @Test(groups=["v100", "html"])
     public void unknownAccept() {
 
         given()
