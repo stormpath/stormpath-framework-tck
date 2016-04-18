@@ -17,6 +17,7 @@
 package com.stormpath.tck.me
 
 import com.jayway.restassured.http.ContentType
+import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.util.*
 import com.stormpath.tck.responseSpecs.*
@@ -58,8 +59,8 @@ class MeIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/37">#37</a>
      * @throws Exception
      */
-    @Test(groups=["v100", "json", "html"])
-    public void unauthorizedRequestFails() throws Exception {
+    @Test(groups=["v100", "json"])
+    public void meFailsOnUnauthenticatedRequest() throws Exception {
         when()
             .get(MeRoute)
         .then()
@@ -74,7 +75,7 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void testThatMeWithCookieAuthReturnsJsonUser() throws Exception {
+    public void meWithCookieAuthReturnsJsonUser() throws Exception {
         given()
             .cookie("access_token", accessToken)
         .when()
@@ -91,9 +92,37 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void testThatMeWithBearerAuthReturnsJsonUser() throws Exception {
+    public void meWithBearerAuthReturnsJsonUser() throws Exception {
         given()
             .auth().oauth2(accessToken)
+        .when()
+            .get(MeRoute)
+        .then()
+            .spec(AccountResponseSpec.matchesAccount(account))
+    }
+
+    /**
+     * Me should take Basic auth with an account's API keys as well.
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/236
+     */
+    @Test(groups=["v100", "json"])
+    public void meWithBasicAuthReturnsJsonUser() throws Exception {
+        Response apiKeysResource = given()
+            .header("User-Agent", "stormpath-framework-tck")
+            .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
+            .port(443)
+        .when()
+            .post(account.href + "/apiKeys")
+        .then()
+            .statusCode(201)
+        .extract()
+            .response()
+
+        String apiKeyId = apiKeysResource.body().jsonPath().getString("id")
+        String apiKeySecret = apiKeysResource.body().jsonPath().getString("secret")
+
+        given()
+            .auth().preemptive().basic(apiKeyId, apiKeySecret)
         .when()
             .get(MeRoute)
         .then()
@@ -107,7 +136,7 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void testThatMeWithCookieAuthStripsLinkedResources() throws Exception {
+    public void meWithCookieAuthStripsLinkedResources() throws Exception {
         given()
             .cookie("access_token", accessToken)
         .when()
@@ -123,7 +152,7 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void testThatMeWithBearerAuthStripsLinkedResources() throws Exception {
+    public void meWithBearerAuthStripsLinkedResources() throws Exception {
         given()
             .auth().oauth2(accessToken)
         .when()
@@ -139,7 +168,7 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void testThatMeWithCookieAuthHasNoCacheHeaders() throws Exception {
+    public void meWithCookieAuthHasNoCacheHeaders() throws Exception {
         given()
             .cookie("access_token", accessToken)
         .when()
@@ -158,7 +187,7 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void testThatMeWithBearerAuthHasNoCacheHeaders() throws Exception {
+    public void meWithBearerAuthHasNoCacheHeaders() throws Exception {
         given()
             .auth().oauth2(accessToken)
         .when()
