@@ -57,7 +57,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void doNotHandlePut() throws Exception {
+    public void changeDoesNotHandlePut() throws Exception {
         put(ChangeRoute)
                 .then()
                 .assertThat().statusCode(allOf(not(200), not(500)))
@@ -68,7 +68,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void doNotHandleDelete() throws Exception {
+    public void changeDoesNotHandleDelete() throws Exception {
         delete(ChangeRoute)
                 .then()
                 .assertThat().statusCode(allOf(not(200), not(500)))
@@ -79,7 +79,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void respondWithJsonErrorForInvalidSptoken() throws Exception {
+    public void changeErrorsForInvalidSptokenJson() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -96,7 +96,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void respondWithJsonErrorForMissingSptoken() throws Exception {
+    public void changeErrorsForMissingSptokenJson() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -112,7 +112,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void respondWithJsonErrorForInvalidSptokenWhenPosting() throws Exception {
+    public void changeErrorsForInvalidSptokenWhenPostingJson() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -132,7 +132,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void redirectToErrorUriForInvalidSptoken() throws Exception {
+    public void changeRedirectsToErrorUriForInvalidSptoken() throws Exception {
 
         given()
             .accept(ContentType.HTML)
@@ -149,7 +149,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void redirectToForgotUriForMissingSptoken() throws Exception {
+    public void changeRediredctsToForgotUriForMissingSptoken() throws Exception {
 
         given()
             .accept(ContentType.HTML)
@@ -165,7 +165,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void redirectToErrorUriForInvalidSptokenWhenPosting() throws Exception {
+    public void changeRedirectsToErrorUriForInvalidSptokenWhenPosting() throws Exception {
 
         given()
             .accept(ContentType.HTML)
@@ -184,7 +184,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void renderFormForValidSptoken() throws Exception {
+    public void changeRendersFormForValidSptoken() throws Exception {
 
         // TODO: work with CSRF?
 
@@ -218,7 +218,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void returnsSuccessOnJsonPost() throws Exception {
+    public void changeEndpointChangesAccountPasswordWhenPostingJson() throws Exception {
         // TODO: work with CSRF?
 
         TestAccount account = new TestAccount()
