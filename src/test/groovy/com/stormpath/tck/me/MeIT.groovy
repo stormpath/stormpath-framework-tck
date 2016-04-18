@@ -55,6 +55,7 @@ class MeIT extends AbstractIT {
 
     /** Respond with 401 if no user is authorized
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/62">#62</a>
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/37">#37</a>
      * @throws Exception
      */
     @Test(groups=["v100"])

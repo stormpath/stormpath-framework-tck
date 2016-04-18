@@ -30,6 +30,7 @@ import static org.testng.Assert.*
 import static org.hamcrest.Matchers.*
 import static com.stormpath.tck.util.FrameworkConstants.LogoutRoute
 import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
+import static com.stormpath.tck.util.CookieUtils.isCookieDeleted
 
 @Test
 class LogoutIT extends AbstractIT {
@@ -63,13 +64,8 @@ class LogoutIT extends AbstractIT {
     }
 
     private void assertCookiesAreDeleted(Cookies cookies) throws Exception {
-        def now = new Date()
-
-        Cookie accessTokenCookie = cookies.get("access_token")
-        assertTrue(accessTokenCookie.expiryDate < now)
-
-        Cookie refreshTokenCookie = cookies.get("refresh_token")
-        assertTrue(refreshTokenCookie.expiryDate < now)
+        assertTrue(isCookieDeleted(cookies.get("access_token")))
+        assertTrue(isCookieDeleted(cookies.get("refresh_token")))
     }
 
     private void assertTokenIsRevoked(String tokenJwt, String resourceType) throws Exception {

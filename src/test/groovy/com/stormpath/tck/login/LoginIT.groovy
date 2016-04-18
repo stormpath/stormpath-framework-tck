@@ -323,6 +323,7 @@ class LoginIT extends AbstractIT {
     /**
      * JSON response should set OAuth 2.0 cookies on successful login
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/168">#168</a>
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/33">#33</a>
      * @throws Exception
      */
     @Test(groups=["v100"])
@@ -397,6 +398,7 @@ class LoginIT extends AbstractIT {
 
     /** Default HTML form should set OAuth 2.0 cookies on successful login
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/88">#88</a>
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/33">#33</a>
      * @throws Exception
      */
     @Test(groups=["v100"])
