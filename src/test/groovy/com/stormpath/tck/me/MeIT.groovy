@@ -22,6 +22,7 @@ import com.stormpath.tck.util.*
 import com.stormpath.tck.responseSpecs.*
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
+import io.jsonwebtoken.*
 
 import static com.jayway.restassured.RestAssured.*
 import static org.hamcrest.Matchers.*
@@ -168,5 +169,28 @@ class MeIT extends AbstractIT {
             .header("Cache-Control", containsString("no-cache"))
             .header("Cache-Control", containsString("no-store"))
             .header("Pragma", is("no-cache"))
+    }
+
+    /** We shouldn't be able to authenticate with a JWT that uses an algorithm of none.
+     * @see https://github.com/stormpath/stormpath-framework-tck/issues/231
+     */
+    @Test(groups=["v100", "json"])
+    public void unsignedAccessTokensShouldFail() throws Exception {
+        String unsignedAccessToken = changeJwtAlgorithmToNone(accessToken)
+
+        given()
+            .auth().oauth2(unsignedAccessToken)
+        .when()
+            .get(MeRoute)
+        .then()
+            .statusCode(401)
+    }
+
+    // Helper method that strips the signature & changes the signing algorithm to none for a jwt
+    private String changeJwtAlgorithmToNone(String jwt) {
+        String jwtWithoutSignature = jwt.substring(0, jwt.lastIndexOf('.')+1)
+        Jwt newJwt = Jwts.parser().parseClaimsJwt(jwtWithoutSignature)
+
+        return Jwts.builder().setHeader(newJwt.header).setClaims(newJwt.body).compact()
     }
 }
