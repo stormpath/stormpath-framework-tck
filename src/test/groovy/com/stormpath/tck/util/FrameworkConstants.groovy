@@ -23,4 +23,5 @@ class FrameworkConstants {
     static String MeRoute = "/me"
     static String VerifyRoute = "/verify"
     static String ForgotRoute = "/forgot"
+    static String ChangeRoute = "/change"
 }
