@@ -46,7 +46,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void doNotHandlePut() throws Exception {
+    public void forgotDoesNotHandlePut() throws Exception {
         put(ForgotRoute)
             .then()
                 .assertThat().statusCode(allOf(not(200), not(500)))
@@ -57,7 +57,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void doNotHandleDelete() throws Exception {
+    public void forgotDoesNotHandleDelete() throws Exception {
         delete(ForgotRoute)
             .then()
                 .assertThat().statusCode(allOf(not(200), not(500)))
@@ -68,7 +68,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void doNotHandleJsonGet() throws Exception {
+    public void forgotDoesNotHandleJsonGet() throws Exception {
         given()
             .accept(ContentType.JSON)
         .when()
@@ -82,7 +82,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void returnsSuccessForValidEmail() throws Exception {
+    public void forgotSucceedsWhenPostingValidEmailJson() throws Exception {
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
@@ -98,7 +98,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void returnsSuccessForInvalidEmail() throws Exception {
+    public void forgotSucceedsWhenPostingInvalidEmailJson() throws Exception {
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
@@ -114,7 +114,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void rendersForm() throws Exception {
+    public void forgotRendersForm() throws Exception {
 
         def response = given()
             .accept(ContentType.HTML)
@@ -137,7 +137,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void rendersFormWithInvalidSptokenWarning() throws Exception {
+    public void forgotRendersFormWithInvalidSptokenBanner() throws Exception {
 
         def response = given()
             .accept(ContentType.HTML)
@@ -161,7 +161,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void redirectsToNextUriForValidEmail() throws Exception {
+    public void forgotRedirectsToNextUriWhenPostingValidEmail() throws Exception {
         given()
             .accept(ContentType.HTML)
             .contentType(ContentType.URLENC)
@@ -178,7 +178,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100"])
-    public void redirectsToNextUriForInvalidEmail() throws Exception {
+    public void forgotRedirectsToNextUriWhenPostingInvalidEmail() throws Exception {
         given()
             .accept(ContentType.HTML)
             .contentType(ContentType.URLENC)
