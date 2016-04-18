@@ -189,6 +189,7 @@ class LoginIT extends AbstractIT {
     }
 
     /** Omitting login or password when posting JSON results in an error
+     * Errors rendered as JSON include only message and status properties
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/95">#95</a>
      * @throws Exception
      */
@@ -301,6 +302,7 @@ class LoginIT extends AbstractIT {
      * Return JSON error from API if JSON login is unsuccessful (#110)
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/45">#45</a>
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/45">#110</a>
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/28">#28</a>
      */
     @Test(groups=["v100"])
     public void invalidLoginError() throws Exception {
@@ -649,7 +651,9 @@ class LoginIT extends AbstractIT {
     }
 
     /** Rerender form with error UX if login is unsuccessful
+     * Errors rendered to an HTML view use the API message property
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/109">#109</a>
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/44">#44</a>
      * @throws Exception
      */
     @Test(groups=["v100"])
