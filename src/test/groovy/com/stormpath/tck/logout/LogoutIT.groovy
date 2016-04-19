@@ -78,7 +78,7 @@ class LogoutIT extends AbstractIT {
         .when()
             .get(EnvUtils.stormpathBaseUrl + '/' + resourceType + '/' + tokenId)
         .then()
-            .statusCode(allOf(not(200), not(500)))
+            .statusCode(404)
     }
 
     /** Only handle POST
