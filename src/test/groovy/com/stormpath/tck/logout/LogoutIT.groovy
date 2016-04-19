@@ -74,6 +74,7 @@ class LogoutIT extends AbstractIT {
         given()
             .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
             .header("User-Agent", "stormpath-framework-tck")
+            .port(443)
         .when()
             .get(EnvUtils.stormpathBaseUrl + '/' + resourceType + '/' + tokenId)
         .then()
