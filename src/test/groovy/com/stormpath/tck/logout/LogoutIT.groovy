@@ -78,37 +78,37 @@ class LogoutIT extends AbstractIT {
         .when()
             .get(EnvUtils.stormpathBaseUrl + '/' + resourceType + '/' + tokenId)
         .then()
-            .statusCode(404)
+            .statusCode(allOf(not(200), not(500)))
     }
 
     /** Only handle POST
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
      */
     @Test(groups=["v100", "json", "html"])
-    public void doNotHandleGet() throws Exception {
+    public void logoutDoesNotHandleGet() throws Exception {
         get(LogoutRoute)
             .then()
-                .assertThat().statusCode(404)
+                .statusCode(allOf(not(200), not(500)))
     }
 
     /** Only handle POST
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
      */
     @Test(groups=["v100", "json", "html"])
-    public void doNotHandlePut() throws Exception {
+    public void logoutDoesNotHandlePut() throws Exception {
         put(LogoutRoute)
             .then()
-                .assertThat().statusCode(404)
+                .assertThat().statusCode(allOf(not(200), not(500)))
     }
 
     /** Only handle POST
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
      */
     @Test(groups=["v100", "json", "html"])
-    public void doNotHandleDelete() throws Exception {
+    public void logoutDoesNotHandleDelete() throws Exception {
         delete(LogoutRoute)
             .then()
-                .assertThat().statusCode(404)
+                .assertThat().statusCode(allOf(not(200), not(500)))
     }
 
     /** Return 200 OK for unauthenticated JSON request
@@ -116,7 +116,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void returnOkForUnauthenticatedJsonRequest() throws Exception {
+    public void logoutSucceedsOnUnauthenticatedJsonRequest() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -131,7 +131,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void deletesCookiesOnJsonLogout() throws Exception {
+    public void logoutDeletesCookiesJson() throws Exception {
         def sessionCookies = createSession()
 
         Cookies detailedCookies =
@@ -152,7 +152,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void returnOkOnSuccessfulJsonLogout() throws Exception {
+    public void logoutReturns200OKOnSuccess() throws Exception {
         def sessionCookies = createSession()
 
         given()
@@ -169,7 +169,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void revokesTokensOnJsonLogout() throws Exception {
+    public void logoutRevokesTokensAfterSuccessJson() throws Exception {
         def sessionCookies = createSession()
 
         given()
@@ -186,7 +186,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void redirectForUnauthenticatedRequest() throws Exception {
+    public void logoutRedirectsToNextUriOnUnauthenticatedRequest() throws Exception {
 
         given()
             .accept(ContentType.HTML)
@@ -202,7 +202,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void redirectOnSuccessfulLogout() throws Exception {
+    public void logoutRedirectsToNextUriOnSuccess() throws Exception {
         def sessionCookies = createSession()
 
         given()
@@ -220,7 +220,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void deletesCookiesOnLogout() throws Exception {
+    public void logoutDeletesCookiesHtml() throws Exception {
         def sessionCookies = createSession()
 
         Cookies detailedCookies =
@@ -241,7 +241,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void revokesTokensOnLogout() throws Exception {
+    public void logoutRevokesTokensHtml() throws Exception {
         def sessionCookies = createSession()
 
         given()
