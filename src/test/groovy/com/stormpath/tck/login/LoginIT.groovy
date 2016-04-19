@@ -81,20 +81,20 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
      */
     @Test(groups=["v100", "json", "html"])
-    public void doNotHandlePut() throws Exception {
+    public void loginDoesNotHandlePut() throws Exception {
         put(LoginRoute)
             .then()
-                .assertThat().statusCode(404)
+                .assertThat().statusCode(allOf(not(200), not(500)))
     }
 
     /** Only respond to GET and POST
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
      */
     @Test(groups=["v100", "json", "html"])
-    public void doNotHandleDelete() throws Exception {
+    public void loginDoesNotHandleDelete() throws Exception {
         delete(LoginRoute)
             .then()
-                .assertThat().statusCode(404)
+                .assertThat().statusCode(allOf(not(200), not(500)))
     }
 
     /**
@@ -103,7 +103,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void servesLoginViewModel() throws Exception {
+    public void loginServesJsonViewModel() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -151,7 +151,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void loginWithUsername() throws Exception {
+    public void loginWithUsernameSucceeds() throws Exception {
 
         Map<String, Object>  credentials = new HashMap<>();
         credentials.put("login", account.username)
@@ -174,7 +174,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void loginWithEmail() throws Exception {
+    public void loginWithEmailSucceeds() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -194,7 +194,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void missingLoginThrowsError() throws Exception {
+    public void loginWithEmptyStringFails() throws Exception {
 
         Map<String, Object> badCredentials = new HashMap<>();
 
@@ -216,7 +216,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void missingPasswordThrowsError() throws Exception {
+    public void loginWithEmptyPasswordFails() throws Exception {
 
         Map<String, Object> badCredentials = new HashMap<>();
 
@@ -239,7 +239,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void successfulAuthorization() throws Exception {
+    public void loginSucceedsForJson() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -257,7 +257,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void noLinkedResourcesPresent() throws Exception {
+    public void loginJsonDoesNotHaveLinkedResources() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -275,7 +275,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void datetimePropertiesAreIso8601() throws Exception {
+    public void loginAccountDatetimePropertiesAreIso8601() throws Exception {
 
         Response response =
             given()
@@ -305,7 +305,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/28">#28</a>
      */
     @Test(groups=["v100", "json"])
-    public void invalidLoginError() throws Exception {
+    public void loginErrorsWithBadCredentialsJson() throws Exception {
 
         Map<String, Object> badCredentials = new HashMap<>();
 
@@ -329,7 +329,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void setsCookiesOnJsonLogin() throws Exception {
+    public void loginSetsCookiesJson() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -347,7 +347,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void servesLoginForm() throws Exception {
+    public void loginServesHtmlForm() throws Exception {
 
         Response response =
             given()
@@ -376,7 +376,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginAndPasswordAreRequired() throws Exception {
+    public void loginHtmlRendersErrorWithoutUsernameAndPassword() throws Exception {
 
         // todo: work with CSRF
 
@@ -404,7 +404,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void setsCookiesOnLogin() throws Exception {
+    public void loginSetsCookiesHtml() throws Exception {
 
         // todo: work with CSRF
 
@@ -424,7 +424,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginValueCanBeEmail() throws Exception {
+    public void loginWithEmailSucceedsHtml() throws Exception {
 
         // todo: work with CSRF
 
@@ -443,7 +443,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginValueCanBeUsername() throws Exception {
+    public void loginWithUsernameSucceedsHtml() throws Exception {
 
         // todo: work with CSRF
 
@@ -462,7 +462,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void redirectsToNextUriOnLogin() throws Exception {
+    public void loginRedirectsToNextUriOnSuccess() throws Exception {
 
         // todo: work with CSRF
 
@@ -482,7 +482,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void redirectsToNextParameter() throws Exception {
+    public void loginRedirectsToNextQueryParameter() throws Exception {
 
         // todo: work with CSRF
 
@@ -503,7 +503,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void rendersUnverifiedMessage() throws Exception {
+    public void loginRendersUnverifiedMessage() throws Exception {
 
         Response response =
             given()
@@ -528,7 +528,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void rendersVerifiedMessage() throws Exception {
+    public void loginRendersVerifiedMessage() throws Exception {
 
         Response response =
             given()
@@ -553,7 +553,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void rendersCreatedMessage() throws Exception {
+    public void loginRendersCreatedMessage() throws Exception {
 
         Response response =
                 given()
@@ -578,7 +578,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void rendersForgotMessage() throws Exception {
+    public void loginRendersForgotMessage() throws Exception {
 
         Response response =
                 given()
@@ -603,7 +603,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void rendersResetMessage() throws Exception {
+    public void loginRendersResetMessage() throws Exception {
 
         Response response =
                 given()
@@ -628,7 +628,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void ignoreArbitraryStatus() throws Exception {
+    public void loginDoesNotRenderWrongStatusParameter() throws Exception {
 
         Response response =
                 given()
@@ -657,7 +657,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void rerenderFormWithErrorIfLoginFails() throws Exception {
+    public void loginRendersErrorOnFailure() throws Exception {
 
         // todo: work with CSRF
 
@@ -685,7 +685,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void formShouldContainFieldsOrderedByFieldOrder() throws Exception {
+    public void loginFormShouldBeOrderedCorrectly() throws Exception {
 
         // todo: better CSRF handling
 

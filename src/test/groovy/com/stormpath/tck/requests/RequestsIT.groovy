@@ -32,7 +32,7 @@ class RequestsIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/72">#72</a>
      */
     @Test(groups=["v100", "json"])
-    public void emptyAccept() {
+    public void emptyAcceptHeaderShouldGetJson() {
 
         given()
             .header("Accept", "")
@@ -49,7 +49,7 @@ class RequestsIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/72">#72</a>
      */
     @Test(groups=["v100", "json"])
-    public void missingAccept() {
+    public void missingAcceptHeaderShouldGetJson() {
 
         given()
         .when()
@@ -65,7 +65,7 @@ class RequestsIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/73">#73</a>
      */
     @Test(groups=["v100", "json"])
-    public void acceptAny() {
+    public void anyAcceptHeaderShouldGetJson() {
 
         given()
             .accept(ContentType.ANY)
@@ -82,7 +82,7 @@ class RequestsIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/75">#75</a>
      */
     @Test(groups=["v100", "json"])
-    public void acceptJson() {
+    public void jsonAcceptHeaderShouldReturnJson() {
 
         given()
             .accept(ContentType.JSON)
@@ -98,7 +98,7 @@ class RequestsIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/75">#75</a>
      */
     @Test(groups=["v100", "html"])
-    public void acceptHtml() {
+    public void htmlAcceptHeaderShouldReturnHtml() {
 
         given()
             .accept(ContentType.HTML)
@@ -114,7 +114,7 @@ class RequestsIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/76">#76</a>
      */
     @Test(groups=["v100", "html"])
-    public void unknownAccept() {
+    public void unknownAcceptHeaderIsNotHandled() {
 
         given()
             .header("Accept", "foo/bar")

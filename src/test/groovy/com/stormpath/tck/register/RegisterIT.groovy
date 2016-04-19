@@ -76,7 +76,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void servesViewModel() throws Exception {
+    public void registerServesJsonViewModel() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -96,7 +96,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void returnsErrorIfPostIsEmpty() throws Exception {
+    public void registerErrorsOnEmptyPostJson() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -113,7 +113,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void returnsErrorIfPasswordIsMissing() throws Exception {
+    public void registerErrorsOnMissingPostBodyJson() throws Exception {
 
         def jsonMap = [email: testAccount.email,
                          password: ""]
@@ -134,7 +134,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void returnsErrorIfRequiredFieldIsMissing() throws Exception {
+    public void registerErrorsOnMissingField() throws Exception {
 
         def jsonMap = [email: testAccount.email,
                        password: testAccount.password,
@@ -157,7 +157,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void returnsErrorForUndefinedRootCustomField() throws Exception {
+    public void registerErrorsForUndefinedFields() throws Exception {
 
         def jsonMap = [email: testAccount.email,
                        password: testAccount.password,
@@ -182,7 +182,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void returnsErrorForUndefinedCustomField() throws Exception {
+    public void registerErrorsForUndefinedCustomFields() throws Exception {
 
         def jsonMap = [email: testAccount.email,
                        password: testAccount.password,
@@ -208,7 +208,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void returnsJsonErrorForServerError() throws Exception {
+    public void registerErrorsOnServerError() throws Exception {
 
         def jsonMap = [email: "foo@bar",
                        password: "1",
@@ -232,7 +232,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void returnsSanitizedAccountForSuccess() throws Exception {
+    public void registerReturnsSanitizedJsonAccount() throws Exception {
 
         def testAccount = new TestAccount()
 
@@ -257,7 +257,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void servesRegisterForm() throws Exception {
+    public void registerServesHtmlForm() throws Exception {
 
         Response response =
             given()
@@ -281,7 +281,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void formShouldContainFieldsOrderedByFieldOrder() throws Exception {
+    public void registerFormShouldBeOrdered() throws Exception {
 
         // Todo: CSRF support
 
@@ -323,7 +323,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void displaysErrorIfPostIsEmpty() throws Exception {
+    public void registerErrorsWithEmptyPostBody() throws Exception {
 
         // Todo: CSRF support
 
@@ -351,7 +351,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void displaysErrorIfPasswordIsMissing() throws Exception {
+    public void registerErrorsWithMissingPasswordHtml() throws Exception {
 
         // todo: work with CSRF
 
@@ -381,7 +381,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void displaysErrorIfRequiredFieldIsMissing() throws Exception {
+    public void registerErrorsWithMissingFormFieldsHtml() throws Exception {
 
         // todo: work with CSRF
 
@@ -413,7 +413,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void displaysErrorForUndefinedCustomField() throws Exception {
+    public void registerErrorsForUndefinedFieldsHtml() throws Exception {
 
         // todo: work with CSRF
 
@@ -446,7 +446,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void displaysErrorForServerError() throws Exception {
+    public void registerErrorsOnServerErrorHtml() throws Exception {
 
         Response response =
             given()
@@ -477,7 +477,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void redirectsToLoginOnSuccess() throws Exception {
+    public void registerRedirectToLoginOnSuccess() throws Exception {
 
         given()
             .accept(ContentType.HTML)
