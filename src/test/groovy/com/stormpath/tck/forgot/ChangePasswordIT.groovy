@@ -28,11 +28,12 @@ import static com.jayway.restassured.RestAssured.*
 import static org.testng.Assert.*
 import static org.hamcrest.Matchers.*
 import static com.stormpath.tck.util.FrameworkConstants.ChangeRoute
+import static org.hamcrest.MatcherAssert.assertThat
 
 class ChangePasswordIT extends AbstractIT {
 
     def getPasswordResetToken(TestAccount account) {
-        assertNotNull(EnvUtils.stormpathApplicationHref, "We need the Application HREF to perform this test.")
+        assertThat(EnvUtils.stormpathApplicationHref, not(isEmptyOrNullString()))
 
         String passwordResetHref = given()
             .header("User-Agent", "stormpath-framework-tck")
