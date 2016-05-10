@@ -37,6 +37,10 @@ Once your web app is running, you can run the TCK against this webapp:
 
 This will run all tests against the targeted webapp.
 
+To run a single suite, name it using the -Dtest flag:
+
+    mvn clean verify -Dtest=LogoutIT
+
 ## Using Maven Profiles to Customize TCK Behavior
 
 The TCK will attempt to interact with a web application accessible by default via `http://localhost:8080`.  You can
@@ -55,3 +59,11 @@ The currently supported profile names are:
 * `laravel`
 
 Additional profile names can be added if different language environments require custom settings.
+
+## Test output as HTML
+
+Besides viewing the output in the console, there's a nicer HTML format so you can view it through your browser:
+
+```shell
+open target/surefire-reports/index.html
+```
