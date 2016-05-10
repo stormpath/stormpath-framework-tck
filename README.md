@@ -55,3 +55,11 @@ The currently supported profile names are:
 * `laravel`
 
 Additional profile names can be added if different language environments require custom settings.
+
+## Test output as HTML
+
+Besides viewing the output in the console, there's a nicer HTML format so you can view it through your browser:
+
+```shell
+open target/surefire-reports/index.html
+```
