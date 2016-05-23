@@ -17,7 +17,10 @@ package com.stormpath.tck
 
 import com.jayway.restassured.RestAssured
 import com.jayway.restassured.config.RedirectConfig
+import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
+import com.jayway.restassured.path.xml.element.Node
+import com.jayway.restassured.path.xml.element.NodeChildren
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.util.RestUtils
 import org.slf4j.Logger
@@ -26,6 +29,7 @@ import org.testng.annotations.*
 
 import static com.jayway.restassured.RestAssured.*
 import static com.stormpath.tck.util.EnvUtils.getVal
+import static com.stormpath.tck.util.FrameworkConstants.RegisterRoute
 
 abstract class AbstractIT {
 
@@ -92,6 +96,59 @@ abstract class AbstractIT {
 
     protected static XmlPath getHtmlDoc(Response response) {
         return new XmlPath(XmlPath.CompatibilityMode.HTML, response.getBody().asString());
+    }
+
+    protected String getCsrfToken() {
+        //We can get the CSRF token from any endpoint if not found then don't send it
+        Response response =
+                given()
+                        .accept(ContentType.HTML)
+                        .when()
+                        .get(RegisterRoute)
+                        .then()
+                        .statusCode(200)
+                        .contentType(ContentType.HTML)
+                        .extract()
+                        .response()
+
+        XmlPath doc = getHtmlDoc(response)
+
+        Node csrfInput = findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "csrfToken")
+
+        return csrfInput == null ? null : csrfInput.getAttribute("value")
+    }
+
+    protected Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
+        for (Node node : children.list()) {
+            def actualTag = node.name()
+            def actualAttribute = node.attributes().get(attributeKey)
+
+            if (actualTag == tag && actualAttribute.contains(attributeValue)) {
+                return node
+            }
+            else {
+                Node foundNode = findTagWithAttribute(node.children(), tag, attributeKey, attributeValue)
+                if (foundNode != null) {
+                    return foundNode
+                }
+            }
+        }
+    }
+
+    protected List<Node> findTags(NodeChildren children, String tag) {
+        def results = new ArrayList<Node>()
+
+        for (Node node in children.list()) {
+            if (node.name() == tag) {
+                results.add(node)
+            }
+            else {
+                Collection<Node> innerResults = findTags(node.children(), tag)
+                results.addAll(innerResults)
+            }
+        }
+
+        return results
     }
 
     private void deleteResources(List<String> hrefs) {

@@ -19,56 +19,30 @@ package com.stormpath.tck.register
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.path.xml.element.Node
-import com.jayway.restassured.path.xml.element.NodeChildren
 import com.jayway.restassured.response.Response
+import com.jayway.restassured.specification.RequestSpecification
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.*
-import com.stormpath.tck.responseSpecs.*
+import com.stormpath.tck.responseSpecs.AccountResponseSpec
+import com.stormpath.tck.responseSpecs.JsonResponseSpec
+import com.stormpath.tck.util.FrameworkConstants
+import com.stormpath.tck.util.TestAccount
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.given
-import static org.hamcrest.MatcherAssert.assertThat
-import static org.hamcrest.Matchers.*
-import static org.testng.Assert.*
 import static com.stormpath.tck.util.FrameworkConstants.RegisterRoute
+import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.endsWith
+import static org.hamcrest.Matchers.hasKey
+import static org.hamcrest.Matchers.is
+import static org.hamcrest.Matchers.isEmptyOrNullString
+import static org.hamcrest.Matchers.not
+import static org.testng.Assert.assertEquals
+import static org.testng.Assert.assertFalse
 
 @Test
 class RegisterIT extends AbstractIT {
 
     private final testAccount = new TestAccount()
-
-    private Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
-        for (Node node : children.list()) {
-            def actualTag = node.name()
-            def actualAttribute = node.attributes().get(attributeKey)
-
-            if (actualTag == tag && actualAttribute.contains(attributeValue)) {
-                return node
-            }
-            else {
-                Node foundNode = findTagWithAttribute(node.children(), tag, attributeKey, attributeValue)
-                if (foundNode != null) {
-                    return foundNode
-                }
-            }
-        }
-    }
-
-    private List<Node> findTags(NodeChildren children, String tag) {
-        def results = new ArrayList<Node>()
-
-        for (Node node in children.list()) {
-            if (node.name() == tag) {
-                results.add(node)
-            }
-            else {
-                Collection<Node> innerResults = findTags(node.children(), tag)
-                results.addAll(innerResults)
-            }
-        }
-
-        return results
-    }
 
     /**
      * Serve the registration view model for request type application/json
@@ -352,15 +326,20 @@ class RegisterIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     public void registerErrorsWithMissingPasswordHtml() throws Exception {
+        String csrfToken = getCsrfToken()
 
-        // todo: work with CSRF
-
-        Response response =
-            given()
+        def requestSpecification = given()
                 .accept(ContentType.HTML)
                 .contentType(ContentType.URLENC)
                 .formParam("email", testAccount.email)
                 .formParam("password", "")
+
+        if(csrfToken != null) {
+            requestSpecification.formParam("csrfToken", csrfToken)
+        }
+
+        Response response =
+                requestSpecification
             .when()
                 .post(RegisterRoute)
             .then()
@@ -383,16 +362,21 @@ class RegisterIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     public void registerErrorsWithMissingFormFieldsHtml() throws Exception {
 
-        // todo: work with CSRF
+        String csrfToken = getCsrfToken()
 
-        Response response =
-            given()
+        def requestSpecification = given()
                 .accept(ContentType.HTML)
                 .contentType(ContentType.URLENC)
                 .formParam("email", testAccount.email)
                 .formParam("password", testAccount.password)
                 .formParam("surname", testAccount.surname)
-                // givenName is required per the default configuration
+
+        if(csrfToken != null) {
+            requestSpecification.formParam("csrfToken", csrfToken)
+        }
+
+        Response response =
+                requestSpecification
             .when()
                 .post(RegisterRoute)
             .then()
@@ -414,18 +398,23 @@ class RegisterIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     public void registerErrorsForUndefinedFieldsHtml() throws Exception {
+        String csrfToken = getCsrfToken()
 
-        // todo: work with CSRF
-
-        Response response =
-            given()
+        def requestSpecification = given()
                 .accept(ContentType.HTML)
                 .contentType(ContentType.URLENC)
                 .formParam("email", testAccount.email)
                 .formParam("password", testAccount.password)
                 .formParam("givenName", testAccount.givenName)
                 .formParam("surname", testAccount.surname)
-                .formParam("customValue", "foobar") // not defined in default configuration
+                .formParam("customValue", "foobar")
+
+        if(csrfToken != null) {
+            requestSpecification.formParam("csrfToken", csrfToken)
+        }
+
+        Response response =
+                requestSpecification // not defined in default configuration
             .when()
                 .post(RegisterRoute)
             .then()
@@ -478,19 +467,26 @@ class RegisterIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     public void registerRedirectToLoginOnSuccess() throws Exception {
+        String csrfToken = getCsrfToken()
 
-        given()
-            .accept(ContentType.HTML)
-            .contentType(ContentType.URLENC)
-            .formParam("email", testAccount.email)
-            .formParam("password", testAccount.password)
-            .formParam("givenName", testAccount.givenName)
-            .formParam("surname", testAccount.surname)
+        def requestSpecification = given()
+                .accept(ContentType.HTML)
+                .contentType(ContentType.URLENC)
+                .formParam("email", testAccount.email)
+                .formParam("password", testAccount.password)
+                .formParam("givenName", testAccount.givenName)
+                .formParam("surname", testAccount.surname)
+
+        if(csrfToken != null) {
+            requestSpecification.formParam("csrfToken", csrfToken)
+        }
+
+        requestSpecification
         .when()
             .post(RegisterRoute)
         .then()
             .statusCode(302)
-            .header("Location", is(FrameworkConstants.LoginRoute + "?status=created"))
+            .header("Location", endsWith(FrameworkConstants.LoginRoute + "?status=created"))
 
         // todo: need to be able to delete created accounts!
         // see https://github.com/stormpath/stormpath-framework-tck/issues/213
@@ -504,16 +500,22 @@ class RegisterIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     public void registerFormPreservesValuesOnPostback() throws Exception {
 
-        // todo: work with CSRF
+        String csrfToken = getCsrfToken()
 
-        Response response =
-            given()
+        def requestSpecification = given()
                 .accept(ContentType.HTML)
                 .contentType(ContentType.URLENC)
                 .formParam("email", testAccount.email)
                 .formParam("password", "1") // Too short, will fail validation
                 .formParam("givenName", testAccount.givenName)
                 .formParam("surname", testAccount.surname)
+
+        if(csrfToken != null) {
+            requestSpecification.formParam("csrfToken", csrfToken)
+        }
+
+        Response response =
+                requestSpecification
             .when()
                 .post(RegisterRoute)
             .then()
