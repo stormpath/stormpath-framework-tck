@@ -33,7 +33,7 @@ class JsonResponseSpec {
             .expectBody("expires_in", is(3600))
             .expectBody("refresh_token", not(isEmptyOrNullString()))
             .expectBody("token_type", equalToIgnoringCase("Bearer"))
-            .expectHeader("Cache-Control", is("no-store"))
+            .expectHeader("Cache-Control", containsString("no-store"))
             .expectHeader("Pragma", is("no-cache"))
 
         return builder.build()
