@@ -17,8 +17,10 @@ package com.stormpath.tck
 
 import com.jayway.restassured.RestAssured
 import com.jayway.restassured.config.RedirectConfig
+import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.response.Response
+import com.stormpath.tck.util.HtmlUtils
 import com.stormpath.tck.util.RestUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -92,6 +94,30 @@ abstract class AbstractIT {
 
     protected static XmlPath getHtmlDoc(Response response) {
         return new XmlPath(XmlPath.CompatibilityMode.HTML, response.getBody().asString());
+    }
+
+    protected Map<String, String> getHiddens(String endpoint) {
+        def resp =
+            given()
+                .accept(ContentType.HTML)
+            .when()
+                .get(endpoint)
+            .then()
+                .statusCode(200)
+            .extract()
+
+        def xmlPath = getHtmlDoc(resp)
+
+        def form = HtmlUtils.findTagWithAttribute(xmlPath.get("html.body"), "form", "method", "post")
+
+        def hiddens = HtmlUtils.findTagsWithAttribute(form.children(), "input", "type", "hidden")
+
+        def ret = [:]
+        hiddens.each {
+            ret.put(it.getAttribute("name"), it.getAttribute("value"))
+        }
+
+        return ret
     }
 
     private void deleteResources(List<String> hrefs) {

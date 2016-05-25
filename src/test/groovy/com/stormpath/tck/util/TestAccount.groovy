@@ -14,6 +14,9 @@ class TestAccount {
     final String middleName = null
     final String password = "P@sword123!"
     final String username = email
+
+    def hiddens = [:]
+
     String href
 
     public void registerOnServer() {
@@ -29,10 +32,22 @@ class TestAccount {
             .path("account.href")
     }
 
+    public void setHiddens(hiddens) {
+        this.hiddens = hiddens
+    }
+
     def getPropertiesMap() {
-        return [email: email,
+        def ret =  [email: email,
                 password: password,
                 givenName: givenName,
                 surname: surname]
+
+        if (!hiddens.isEmpty()) {
+            hiddens.each {
+                ret.put(it.key, it.value)
+            }
+        }
+
+        return ret
     }
 }

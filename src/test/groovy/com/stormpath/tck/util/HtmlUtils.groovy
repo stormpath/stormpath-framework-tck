@@ -38,6 +38,23 @@ class HtmlUtils {
         }
     }
 
+    public static List<Node> findTagsWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
+        def results = new ArrayList<Node>()
+
+        for (Node node in children.list()) {
+            if (node.name() == tag && node.attributes().get(attributeKey).contains(attributeValue)) {
+                results.add(node)
+            }
+            else {
+                Collection<Node> innerResults =
+                    findTagsWithAttribute(node.children(), tag, attributeKey, attributeValue)
+                results.addAll(innerResults)
+            }
+        }
+
+        return results
+    }
+
     public static List<Node> findTags(NodeChildren children, String tag) {
         def results = new ArrayList<Node>()
 

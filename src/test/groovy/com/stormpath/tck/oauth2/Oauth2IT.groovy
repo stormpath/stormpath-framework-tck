@@ -35,6 +35,7 @@ class Oauth2IT extends AbstractIT {
 
     @BeforeClass
     private void createTestAccount() throws Exception {
+        account.setHiddens(getHiddens(FrameworkConstants.RegisterRoute))
         account.registerOnServer()
         deleteOnClassTeardown(account.href)
     }
@@ -46,6 +47,7 @@ class Oauth2IT extends AbstractIT {
     public void oauthErrorsOnUnsupportedGrantTypes() throws Exception {
 
         given()
+            .header("Origin", webappBaseUrl)
             .param("grant_type", "foobar_grant")
         .when()
             .post(OauthRoute)
@@ -61,6 +63,7 @@ class Oauth2IT extends AbstractIT {
     @Test(groups=["v100", "json"])
     public void oauthErrorsOnMissingGrantType() throws Exception {
         given()
+            .header("Origin", webappBaseUrl)
             .param("grant_type", "")
         .when()
             .post(OauthRoute)
@@ -76,6 +79,7 @@ class Oauth2IT extends AbstractIT {
     @Test(groups=["v100", "json"])
     public void oauthErrorsOnJsonRequestBody() throws Exception {
         given()
+            .header("Origin", webappBaseUrl)
             .contentType(ContentType.JSON)
             .body([ "hello": "world" ])
         .when()
@@ -92,6 +96,7 @@ class Oauth2IT extends AbstractIT {
     @Test(groups=["v100", "json"])
     public void oauthErrorsOnEmptyRequestBody() throws Exception {
         given()
+            .header("Origin", webappBaseUrl)
             .body()
         .when()
             .post(OauthRoute)
@@ -119,6 +124,7 @@ class Oauth2IT extends AbstractIT {
 
         String accessToken =
             given()
+                .header("Origin", webappBaseUrl)
                 .param("grant_type", "password")
                 .param("username", account.username)
                 .param("password", account.password)
@@ -216,12 +222,14 @@ class Oauth2IT extends AbstractIT {
     public void oauthErrorsAreTransformedProperly() throws Exception {
 
         given()
+            .header("Origin", webappBaseUrl)
             .param("grant_type", "password")
             .param("username", "foobar")
             .param("password", "nopenopenope!")
         .when()
             .post(OauthRoute)
         .then()
+            .log().all()
             .statusCode(400)
             .contentType(ContentType.JSON)
             .header("Cache-Control", containsString("no-store"))
@@ -237,6 +245,7 @@ class Oauth2IT extends AbstractIT {
     @Test(groups=["v100", "json"])
     public void oauthClientCredentialsGrantSucceeds() throws Exception {
         TestAccount testAccount = new TestAccount()
+        testAccount.setHiddens(getHiddens(FrameworkConstants.RegisterRoute))
         testAccount.registerOnServer()
         deleteOnClassTeardown(testAccount.href)
 
@@ -259,6 +268,7 @@ class Oauth2IT extends AbstractIT {
         // Attempt to get tokens
 
         given()
+            .header("Origin", webappBaseUrl)
             .param("grant_type", "client_credentials")
             .auth()
                 .preemptive().basic(apiKeyId, apiKeySecret)
@@ -281,18 +291,15 @@ class Oauth2IT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     public void oauthClientCredentialsGrantFailsWithoutAPISecret() throws Exception {
-        TestAccount testAccount = new TestAccount()
-        testAccount.registerOnServer()
-        deleteOnClassTeardown(testAccount.href)
-
         // Get API keys so we can use it for client credentials
 
         Response apiKeysResource = given()
+            .header("Origin", webappBaseUrl)
             .header("User-Agent", "stormpath-framework-tck")
             .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
             .port(443)
         .when()
-            .post(testAccount.href + "/apiKeys")
+            .post(account.href + "/apiKeys")
         .then()
             .statusCode(201)
         .extract()
@@ -303,6 +310,7 @@ class Oauth2IT extends AbstractIT {
         // Attempt to get tokens
 
         given()
+            .header("Origin", webappBaseUrl)
             .param("grant_type", "client_credentials")
             .auth()
                 .preemptive().basic(apiKeyId, "NOT_A_VALID_API_SECRET")
