@@ -21,7 +21,6 @@ import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.util.*
 import com.stormpath.tck.responseSpecs.*
-import oracle.jrockit.jfr.events.ContentTypeImpl
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 

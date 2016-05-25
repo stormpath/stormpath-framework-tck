@@ -11,9 +11,9 @@ class TestAccount {
     final String email = "fooemail-" + randomUUID + "@stormpath.com"
     final String givenName = "GivenName-" + randomUUID
     final String surname = "Surname-" + randomUUID
-    final String middleName = "Foobar"
+    final String middleName = null
     final String password = "P@sword123!"
-    final String username = "foo-" + randomUUID
+    final String username = email
     String href
 
     public void registerOnServer() {
@@ -33,8 +33,6 @@ class TestAccount {
         return [email: email,
                 password: password,
                 givenName: givenName,
-                surname: surname,
-                middleName: middleName,
-                username: username]
+                surname: surname]
     }
 }

@@ -19,7 +19,7 @@ class AccountResponseSpec {
             .expectContentType(ContentType.JSON)
             .expectBody("size()", is(1))
             .expectBody("account.href", not(isEmptyOrNullString()))
-            .expectBody("account.username", is(account.username))
+            .expectBody("account.username", is(account.email))
             .expectBody("account.modifiedAt", not(isEmptyOrNullString()))
             .expectBody("account.status", equalToIgnoringCase("ENABLED"))
             .expectBody("account.createdAt", not(isEmptyOrNullString()))
@@ -27,7 +27,7 @@ class AccountResponseSpec {
             .expectBody("account.middleName", is(account.middleName))
             .expectBody("account.surname", is(account.surname))
             .expectBody("account.givenName", is(account.givenName))
-            .expectBody("account.fullName", is("$account.givenName $account.middleName $account.surname".toString()))
+            .expectBody("account.fullName", is("$account.givenName $account.surname".toString()))
 
         return builder.build()
     }

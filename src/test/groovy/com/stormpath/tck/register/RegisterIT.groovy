@@ -22,20 +22,34 @@ import com.jayway.restassured.path.xml.element.Node
 import com.jayway.restassured.path.xml.element.NodeChildren
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.*
-import com.stormpath.tck.responseSpecs.*
+import com.stormpath.tck.responseSpecs.AccountResponseSpec
+import com.stormpath.tck.responseSpecs.JsonResponseSpec
+import com.stormpath.tck.util.FrameworkConstants
+import com.stormpath.tck.util.TestAccount
+import org.testng.annotations.BeforeTest
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.given
-import static org.hamcrest.MatcherAssert.assertThat
-import static org.hamcrest.Matchers.*
-import static org.testng.Assert.*
 import static com.stormpath.tck.util.FrameworkConstants.RegisterRoute
+import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.hasKey
+import static org.hamcrest.Matchers.is
+import static org.hamcrest.Matchers.isEmptyOrNullString
+import static org.hamcrest.Matchers.not
+import static org.testng.Assert.assertEquals
+import static org.testng.Assert.assertFalse
 
 @Test
 class RegisterIT extends AbstractIT {
 
-    private final testAccount = new TestAccount()
+    private testAccount;
+
+    @BeforeTest
+    public void setUp() {
+        super.setUp();
+
+        testAccount = new TestAccount()
+    }
 
     private Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
         for (Node node : children.list()) {
@@ -165,6 +179,25 @@ class RegisterIT extends AbstractIT {
                        surname: testAccount.surname,
                        customValue: "foobar"]
         // field 'customValue' is not defined in the default configuration
+
+        given()
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .body(jsonMap)
+        .when()
+            .post(RegisterRoute)
+        .then()
+            .spec(JsonResponseSpec.isError(400))
+    }
+
+    @Test(groups=["v100", "json"])
+    public void registerErrorsForDisableDefaultFields() throws Exception {
+
+        def jsonMap = [email: testAccount.email,
+                       password: testAccount.password,
+                       givenName: testAccount.givenName,
+                       surname: testAccount.surname,
+                       middleName: "foobar"]
 
         given()
             .accept(ContentType.JSON)
