@@ -146,6 +146,7 @@ class Oauth2IT extends AbstractIT {
 
         String accessToken =
             given()
+                .header("Origin", webappBaseUrl)
                 .param("grant_type", "password")
                 .param("username", account.email)
                 .param("password", account.password)
@@ -166,6 +167,7 @@ class Oauth2IT extends AbstractIT {
     public void oauthRefreshGrantWorksWithValidToken() throws Exception {
         Response passwordGrantResponse =
             given()
+                .header("Origin", webappBaseUrl)
                 .param("grant_type", "password")
                 .param("username", account.email)
                 .param("password", account.password)
@@ -181,6 +183,7 @@ class Oauth2IT extends AbstractIT {
 
         String newAccessToken =
             given()
+                .header("Origin", webappBaseUrl)
                 .param("grant_type", "refresh_token")
                 .param("refresh_token", refreshToken)
             .when()
@@ -202,6 +205,7 @@ class Oauth2IT extends AbstractIT {
         String refreshToken = "GARBAGE"
 
         given()
+            .header("Origin", webappBaseUrl)
             .param("grant_type", "refresh_token")
             .param("refresh_token", refreshToken)
         .when()
@@ -229,7 +233,6 @@ class Oauth2IT extends AbstractIT {
         .when()
             .post(OauthRoute)
         .then()
-            .log().all()
             .statusCode(400)
             .contentType(ContentType.JSON)
             .header("Cache-Control", containsString("no-store"))
@@ -244,11 +247,6 @@ class Oauth2IT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     public void oauthClientCredentialsGrantSucceeds() throws Exception {
-        TestAccount testAccount = new TestAccount()
-        testAccount.setHiddens(getHiddens(FrameworkConstants.RegisterRoute))
-        testAccount.registerOnServer()
-        deleteOnClassTeardown(testAccount.href)
-
         // Get API keys so we can use it for client credentials
 
         Response apiKeysResource = given()
@@ -256,7 +254,7 @@ class Oauth2IT extends AbstractIT {
             .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
             .port(443)
         .when()
-            .post(testAccount.href + "/apiKeys")
+            .post(account.href + "/apiKeys")
         .then()
             .statusCode(201)
         .extract()
