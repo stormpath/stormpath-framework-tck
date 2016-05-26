@@ -4,6 +4,8 @@
 package com.stormpath.tck.util
 
 import com.jayway.restassured.http.ContentType
+import io.jsonwebtoken.lang.Strings
+
 import static com.jayway.restassured.RestAssured.*
 
 class TestAccount {
@@ -14,19 +16,41 @@ class TestAccount {
     final String middleName = null
     final String password = "P@sword123!"
     final String username = email
+
+    String csrf
+    Map<String, String> cookies
+
     String href
 
     public void registerOnServer() {
-        href = given()
+        def requestSpecification = given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
             .body(getPropertiesMap())
-        .when()
-            .post(FrameworkConstants.RegisterRoute)
-        .then()
-            .statusCode(200)
-        .extract()
-            .path("account.href")
+
+        if (Strings.hasText(csrf)) {
+            requestSpecification.header("X-CSRF-TOKEN", csrf)
+        }
+
+        if (cookies != null) {
+            requestSpecification.cookies(cookies)
+        }
+
+        href = requestSpecification
+            .when()
+                .post(FrameworkConstants.RegisterRoute)
+            .then()
+                .statusCode(200)
+            .extract()
+                .path("account.href")
+    }
+
+    public void setCSRF(String csrf) {
+        this.csrf = csrf
+    }
+
+    public void setCookies(Map<String, String> cookies) {
+        this.cookies = cookies
     }
 
     def getPropertiesMap() {

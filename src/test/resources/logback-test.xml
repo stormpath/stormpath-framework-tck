@@ -30,5 +30,8 @@
 
     <logger name="com.stormpath" level="INFO"/>
     <!-- <logger name="org.apache.http.wire" level="DEBUG"/> -->
+    <!--<logger name="org.apache.http" level="DEBUG"/>-->
+    <!--<logger name="org.apache.http.wire" level="TRACE"/>-->
+
 
 </configuration>

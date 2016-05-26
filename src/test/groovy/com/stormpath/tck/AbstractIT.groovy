@@ -17,8 +17,10 @@ package com.stormpath.tck
 
 import com.jayway.restassured.RestAssured
 import com.jayway.restassured.config.RedirectConfig
+import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.response.Response
+import com.stormpath.tck.util.HtmlUtils
 import com.stormpath.tck.util.RestUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -37,6 +39,9 @@ abstract class AbstractIT {
     static final private String webappUrlPortSuffix = toPortSuffix(webappUrlScheme, webappUrlPort)
     static final private String defaultWebappBaseUrl = "$webappUrlScheme://$webappUrlHost$webappUrlPortSuffix"
     static final String webappBaseUrl = getVal("STORMPATH_TCK_WEBAPP_URL", defaultWebappBaseUrl)
+
+    static final private List<String> possibleCSRFKeys = ['_csrf', 'csrfToken']
+
     static {
         setupRestAssured()
     }
@@ -44,6 +49,9 @@ abstract class AbstractIT {
     private final List<String> classResourcesToDelete = []
     private final List<String> methodResourcesToDelete = []
     private final List<String> methodAccountsToDelete = []
+
+    String csrf
+    Map<String, String> cookies
 
     private static String toPortSuffix(String scheme, int port) {
         if (("http".equalsIgnoreCase(scheme) && port == 80) || ("https".equalsIgnoreCase(scheme) && port == 443)) {
@@ -69,6 +77,8 @@ abstract class AbstractIT {
     @BeforeTest
     public void setUp() {
         methodResourcesToDelete.clear() //fresh list per test
+        csrf = null
+        cookies = null
     }
 
     @AfterTest
@@ -92,6 +102,36 @@ abstract class AbstractIT {
 
     protected static XmlPath getHtmlDoc(Response response) {
         return new XmlPath(XmlPath.CompatibilityMode.HTML, response.getBody().asString());
+    }
+
+    protected  saveCSRFAndCookies(String endpoint) {
+        def resp =
+            given()
+                .accept(ContentType.HTML)
+            .when()
+                .get(endpoint)
+            .then()
+                .statusCode(200)
+            .extract()
+
+        cookies = resp.cookies()
+
+        def xmlPath = getHtmlDoc(resp)
+
+        def form = HtmlUtils.findTagWithAttribute(xmlPath.get("html.body"), "form", "method", "post")
+
+        def hiddens = HtmlUtils.findTagsWithAttribute(form.children(), "input", "type", "hidden")
+
+        String ret = null
+        hiddens.each {
+            if (possibleCSRFKeys.contains(it.getAttribute("name"))) {
+                ret = it.getAttribute("value")
+                return true
+            }
+            return false
+        }
+
+        csrf = ret
     }
 
     private void deleteResources(List<String> hrefs) {
