@@ -35,7 +35,9 @@ class Oauth2IT extends AbstractIT {
 
     @BeforeClass
     private void createTestAccount() throws Exception {
-        account.setHiddens(getHiddens(FrameworkConstants.RegisterRoute))
+        saveCSRFAndCookies(FrameworkConstants.RegisterRoute)
+        account.setCSRF(csrf)
+        account.setCookies(cookies)
         account.registerOnServer()
         deleteOnClassTeardown(account.href)
     }

@@ -39,6 +39,9 @@ abstract class AbstractIT {
     static final private String webappUrlPortSuffix = toPortSuffix(webappUrlScheme, webappUrlPort)
     static final private String defaultWebappBaseUrl = "$webappUrlScheme://$webappUrlHost$webappUrlPortSuffix"
     static final String webappBaseUrl = getVal("STORMPATH_TCK_WEBAPP_URL", defaultWebappBaseUrl)
+
+    static final private List<String> possibleCSRFKeys = ['_csrf', 'csrfToken']
+
     static {
         setupRestAssured()
     }
@@ -46,6 +49,9 @@ abstract class AbstractIT {
     private final List<String> classResourcesToDelete = []
     private final List<String> methodResourcesToDelete = []
     private final List<String> methodAccountsToDelete = []
+
+    String csrf
+    Map<String, String> cookies
 
     private static String toPortSuffix(String scheme, int port) {
         if (("http".equalsIgnoreCase(scheme) && port == 80) || ("https".equalsIgnoreCase(scheme) && port == 443)) {
@@ -71,6 +77,8 @@ abstract class AbstractIT {
     @BeforeTest
     public void setUp() {
         methodResourcesToDelete.clear() //fresh list per test
+        csrf = null
+        cookies = null
     }
 
     @AfterTest
@@ -96,7 +104,7 @@ abstract class AbstractIT {
         return new XmlPath(XmlPath.CompatibilityMode.HTML, response.getBody().asString());
     }
 
-    protected Map<String, String> getHiddens(String endpoint) {
+    protected  saveCSRFAndCookies(String endpoint) {
         def resp =
             given()
                 .accept(ContentType.HTML)
@@ -106,18 +114,24 @@ abstract class AbstractIT {
                 .statusCode(200)
             .extract()
 
+        cookies = resp.cookies()
+
         def xmlPath = getHtmlDoc(resp)
 
         def form = HtmlUtils.findTagWithAttribute(xmlPath.get("html.body"), "form", "method", "post")
 
         def hiddens = HtmlUtils.findTagsWithAttribute(form.children(), "input", "type", "hidden")
 
-        def ret = [:]
+        String ret = null
         hiddens.each {
-            ret.put(it.getAttribute("name"), it.getAttribute("value"))
+            if (possibleCSRFKeys.contains(it.getAttribute("name"))) {
+                ret = it.getAttribute("value")
+                return true
+            }
+            return false
         }
 
-        return ret
+        csrf = ret
     }
 
     private void deleteResources(List<String> hrefs) {
