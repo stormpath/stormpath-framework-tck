@@ -26,6 +26,7 @@ import com.stormpath.tck.responseSpecs.AccountResponseSpec
 import com.stormpath.tck.responseSpecs.JsonResponseSpec
 import com.stormpath.tck.util.FrameworkConstants
 import com.stormpath.tck.util.TestAccount
+import org.testng.annotations.BeforeMethod
 import org.testng.annotations.BeforeTest
 import org.testng.annotations.Test
 
@@ -47,7 +48,10 @@ class RegisterIT extends AbstractIT {
     @BeforeTest
     public void setUp() {
         super.setUp();
+    }
 
+    @BeforeMethod
+    public void beforeEach() {
         testAccount = new TestAccount()
     }
 
