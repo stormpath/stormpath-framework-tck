@@ -245,7 +245,7 @@ class ChangePasswordIT extends AbstractIT {
         assertNotNull(EnvUtils.stormpathApplicationHref, "We need the Application HREF to perform this test.")
 
         // Pull account stores
-        List<String> accountStores = given()
+        given()
             .header("User-Agent", "stormpath-framework-tck")
             .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
             .port(443)
@@ -254,7 +254,7 @@ class ChangePasswordIT extends AbstractIT {
             .param("username", account.email)
             .param("password", newPassword)
         .when()
-            .get(EnvUtils.stormpathApplicationHref + "/oauth/token")
+            .post(EnvUtils.stormpathApplicationHref + "/oauth/token")
         .then()
             .statusCode(200)
             .body("access_token", not(isEmptyOrNullString()))
