@@ -111,6 +111,7 @@ class MeIT extends AbstractIT {
         Response apiKeysResource = given()
             .header("User-Agent", "stormpath-framework-tck")
             .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
+            .header("Content-Type", "application/json")
             .port(443)
         .when()
             .post(account.href + "/apiKeys")
