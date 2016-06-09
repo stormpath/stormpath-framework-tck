@@ -19,21 +19,30 @@ package com.stormpath.tck.login
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.path.xml.element.Node
-import com.jayway.restassured.path.xml.element.NodeChildren
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.*
-import com.stormpath.tck.responseSpecs.*
+import com.stormpath.tck.responseSpecs.AccountResponseSpec
+import com.stormpath.tck.responseSpecs.JsonResponseSpec
+import com.stormpath.tck.util.HtmlUtils
+import com.stormpath.tck.util.Iso8601Utils
+import com.stormpath.tck.util.TestAccount
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.delete
 import static com.jayway.restassured.RestAssured.given
 import static com.jayway.restassured.RestAssured.put
-import static org.hamcrest.Matchers.*
-import static org.testng.Assert.*
-import static org.hamcrest.MatcherAssert.assertThat
 import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
+import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.allOf
+import static org.hamcrest.Matchers.hasKey
+import static org.hamcrest.Matchers.is
+import static org.hamcrest.Matchers.isEmptyOrNullString
+import static org.hamcrest.Matchers.not
+import static org.testng.Assert.assertEquals
+import static org.testng.Assert.assertFalse
+import static org.testng.Assert.assertNull
+import static org.testng.Assert.assertTrue
 
 @Test
 class LoginIT extends AbstractIT {
@@ -394,7 +403,7 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node warning = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "bad-login")
+        Node warning = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "span", "id", "error")
         assertThat(warning.toString(), not(isEmptyOrNullString()))
     }
 
@@ -519,8 +528,8 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
-        assertThat(getNodeText(header, false), not(isEmptyOrNullString()))
+        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "span", "id", "status")
+        assertEquals(getNodeText(header, false), "Click HereYour account verification email has been sent! Before you can log into your account, you need to activate your account by clicking the link we sent to your inbox. Didn't get the email?")
     }
 
     /** Render verified status message
@@ -544,8 +553,8 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
-        assertThat(getNodeText(header, false), not(isEmptyOrNullString()))
+        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "span", "id", "status")
+        assertEquals(getNodeText(header, false), "Your Account Has Been Verified. You may now login.")
     }
 
     /** Render created status message
@@ -569,8 +578,8 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
-        assertThat(getNodeText(header, false), not(isEmptyOrNullString()))
+        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "span", "id", "status")
+        assertEquals(getNodeText(header, false), "Your Account Has Been Created. You may now login.")
     }
 
     /** Render forgot status message
@@ -594,8 +603,8 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
-        assertThat(getNodeText(header, false), not(isEmptyOrNullString()))
+        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "span", "id", "status")
+        assertEquals(getNodeText(header, false), "Password Reset Requested. If an account exists for the email provided, you will receive an email shortly.")
     }
 
     /** Render reset status message
@@ -619,8 +628,8 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
-        assertThat(getNodeText(header, false), not(isEmptyOrNullString()))
+        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "span", "id", "status")
+        assertEquals(getNodeText(header, false), "Password Reset Successfully. You can now login with your new password.")
     }
 
     /** Ignore bogus status query values
@@ -644,10 +653,9 @@ class LoginIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node header = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "header")
+        Node status = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "span", "id", "status")
 
-        // The only header div should be the one that contains the form header
-        assertThat(getNodeText(header, true), not(isEmptyOrNullString()))
+        assertNull(status, "no status message should be render")
     }
 
     /** Rerender form with error UX if login is unsuccessful

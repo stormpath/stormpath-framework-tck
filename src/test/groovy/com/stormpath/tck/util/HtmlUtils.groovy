@@ -21,15 +21,16 @@ import com.jayway.restassured.path.xml.element.NodeChildren
 
 class HtmlUtils {
 
-    public static Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
+    public
+    static Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
         for (Node node : children.list()) {
             def actualTag = node.name()
             def actualAttribute = node.attributes().get(attributeKey)
-
-            if (actualTag == tag && actualAttribute.contains(attributeValue)) {
-                return node
-            }
-            else {
+            if (actualAttribute != null) {
+                if (actualTag == tag && actualAttribute.contains(attributeValue)) {
+                    return node
+                }
+            } else {
                 Node foundNode = findTagWithAttribute(node.children(), tag, attributeKey, attributeValue)
                 if (foundNode != null) {
                     return foundNode
@@ -38,16 +39,16 @@ class HtmlUtils {
         }
     }
 
-    public static List<Node> findTagsWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
+    public
+    static List<Node> findTagsWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
         def results = new ArrayList<Node>()
 
         for (Node node in children.list()) {
             if (node.name() == tag && node.attributes().get(attributeKey).contains(attributeValue)) {
                 results.add(node)
-            }
-            else {
+            } else {
                 Collection<Node> innerResults =
-                    findTagsWithAttribute(node.children(), tag, attributeKey, attributeValue)
+                        findTagsWithAttribute(node.children(), tag, attributeKey, attributeValue)
                 results.addAll(innerResults)
             }
         }
@@ -61,8 +62,7 @@ class HtmlUtils {
         for (Node node in children.list()) {
             if (node.name() == tag) {
                 results.add(node)
-            }
-            else {
+            } else {
                 Collection<Node> innerResults = findTags(node.children(), tag)
                 results.addAll(innerResults)
             }
