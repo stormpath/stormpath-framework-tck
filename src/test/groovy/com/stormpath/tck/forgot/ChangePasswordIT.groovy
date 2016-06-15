@@ -33,7 +33,7 @@ import static org.hamcrest.MatcherAssert.assertThat
 class ChangePasswordIT extends AbstractIT {
 
     def getPasswordResetToken(TestAccount account) {
-        assertThat(EnvUtils.stormpathApplicationHref, not(isEmptyOrNullString()))
+        assertTrue((EnvUtils.stormpathApplicationHref?.trim()) as boolean, "We need the Application HREF to perform this test.")
 
         String passwordResetHref = given()
             .header("User-Agent", "stormpath-framework-tck")

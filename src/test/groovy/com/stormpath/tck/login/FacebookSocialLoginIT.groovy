@@ -44,7 +44,7 @@ class FacebookSocialLoginIT extends AbstractIT {
     }
 
     private void getSocialProviderIdsFromStormpath() {
-        assertNotNull(EnvUtils.stormpathApplicationHref, "We need the Application HREF to perform this test.")
+        assertTrue((EnvUtils.stormpathApplicationHref?.trim()) as boolean, "We need the Application HREF to perform this test.")
 
         // Pull account stores
         List<String> accountStores = given()
