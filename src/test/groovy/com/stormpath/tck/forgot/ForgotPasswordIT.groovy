@@ -29,6 +29,7 @@ import static org.testng.Assert.*
 import static org.hamcrest.Matchers.*
 import static org.hamcrest.MatcherAssert.assertThat
 import static com.stormpath.tck.util.FrameworkConstants.ForgotRoute
+import static com.stormpath.tck.util.Matchers.*
 
 @Test
 class ForgotPasswordIT extends AbstractIT {
@@ -170,7 +171,7 @@ class ForgotPasswordIT extends AbstractIT {
             .post(ForgotRoute)
         .then()
             .statusCode(302)
-            .header("Location", is("/login?status=forgot"))
+            .header("Location", urlMatchesPath("/login?status=forgot"))
     }
 
     /** POST requests preferring text/html should redirect to nextUri
@@ -187,6 +188,6 @@ class ForgotPasswordIT extends AbstractIT {
             .post(ForgotRoute)
         .then()
             .statusCode(302)
-            .header("Location", is("/login?status=forgot"))
+            .header("Location", urlMatchesPath("/login?status=forgot"))
     }
 }

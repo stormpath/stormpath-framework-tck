@@ -29,6 +29,7 @@ import static org.testng.Assert.*
 import static org.hamcrest.Matchers.*
 import static com.stormpath.tck.util.FrameworkConstants.ChangeRoute
 import static org.hamcrest.MatcherAssert.assertThat
+import static com.stormpath.tck.util.Matchers.*
 
 class ChangePasswordIT extends AbstractIT {
 
@@ -140,7 +141,7 @@ class ChangePasswordIT extends AbstractIT {
             .get(ChangeRoute)
         .then()
             .statusCode(302)
-            .header("Location", "/forgot?status=invalid_sptoken")
+            .header("Location", urlMatchesPath("/forgot?status=invalid_sptoken"))
     }
 
     /** https://github.com/stormpath/stormpath-framework-tck/issues/151
@@ -156,7 +157,7 @@ class ChangePasswordIT extends AbstractIT {
             .get(ChangeRoute)
         .then()
             .statusCode(302)
-            .header("Location", "/forgot")
+            .header("Location", urlMatchesPath("/forgot"))
     }
 
     /** Redirect to errorUri for invalid or expired token on POST
@@ -175,7 +176,7 @@ class ChangePasswordIT extends AbstractIT {
             .post(ChangeRoute)
         .then()
             .statusCode(302)
-            .header("Location", "/forgot?status=invalid_sptoken")
+            .header("Location", urlMatchesPath("/forgot?status=invalid_sptoken"))
     }
 
     /** Render a form to collect new password for valid sptoken

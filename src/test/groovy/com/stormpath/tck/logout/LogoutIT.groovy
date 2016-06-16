@@ -31,6 +31,7 @@ import static org.hamcrest.Matchers.*
 import static com.stormpath.tck.util.FrameworkConstants.LogoutRoute
 import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
 import static com.stormpath.tck.util.CookieUtils.isCookieDeleted
+import static com.stormpath.tck.util.Matchers.*
 
 @Test
 class LogoutIT extends AbstractIT {
@@ -194,7 +195,7 @@ class LogoutIT extends AbstractIT {
             .post(LogoutRoute)
         .then()
             .statusCode(302)
-            .header("Location", is("/"))
+            .header("Location", urlMatchesPath("/"))
     }
 
     /** Redirect to nextUri on successful logout
@@ -212,7 +213,7 @@ class LogoutIT extends AbstractIT {
             .post(LogoutRoute)
         .then()
             .statusCode(302)
-            .header("Location", is("/"))
+            .header("Location", urlMatchesPath("/"))
     }
 
     /** Delete cookies on logout

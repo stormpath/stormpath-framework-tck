@@ -28,6 +28,7 @@ import static org.testng.Assert.*
 import static com.stormpath.tck.util.FrameworkConstants.MeRoute
 import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
 import static com.stormpath.tck.util.CookieUtils.isCookieDeleted
+import static com.stormpath.tck.util.Matchers.*
 
 @Test
 class CookieIT extends AbstractIT {
@@ -108,7 +109,7 @@ class CookieIT extends AbstractIT {
             .get(MeRoute + "?foo=bar")
         .then()
             .statusCode(302)
-            .header("Location", is("/login?next=%2Fme%3Ffoo%3Dbar"))
+            .header("Location", urlMatchesPath("/login?next=%2Fme%3Ffoo%3Dbar"))
     }
 
     /** Cookie expires flag should be set to token TTL

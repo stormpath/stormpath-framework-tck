@@ -34,6 +34,7 @@ import static org.hamcrest.Matchers.*
 import static org.testng.Assert.*
 import static org.hamcrest.MatcherAssert.assertThat
 import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
+import static com.stormpath.tck.util.Matchers.*
 
 @Test
 class LoginIT extends AbstractIT {
@@ -474,7 +475,7 @@ class LoginIT extends AbstractIT {
             .post(LoginRoute)
         .then()
             .statusCode(302)
-            .header("Location", is("/"))
+            .header("Location", urlMatchesPath("/"))
     }
 
     /** Redirect to URI specified by next query parameter on successful authorization
@@ -495,7 +496,7 @@ class LoginIT extends AbstractIT {
             .post(LoginRoute)
         .then()
             .statusCode(302)
-            .header("Location", is("/foo"))
+            .header("Location", urlMatchesPath("/foo"))
     }
 
     /** Render unverified status message

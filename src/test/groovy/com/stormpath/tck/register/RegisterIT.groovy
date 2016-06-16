@@ -39,6 +39,7 @@ import static org.hamcrest.Matchers.isEmptyOrNullString
 import static org.hamcrest.Matchers.not
 import static org.testng.Assert.assertEquals
 import static org.testng.Assert.assertFalse
+import static com.stormpath.tck.util.Matchers.*
 
 @Test
 class RegisterIT extends AbstractIT {
@@ -527,7 +528,7 @@ class RegisterIT extends AbstractIT {
             .post(RegisterRoute)
         .then()
             .statusCode(302)
-            .header("Location", is(FrameworkConstants.LoginRoute + "?status=created"))
+            .header("Location", urlMatchesPath(FrameworkConstants.LoginRoute + "?status=created"))
 
         // todo: need to be able to delete created accounts!
         // see https://github.com/stormpath/stormpath-framework-tck/issues/213
