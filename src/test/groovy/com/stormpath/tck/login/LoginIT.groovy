@@ -479,27 +479,6 @@ class LoginIT extends AbstractIT {
             .header("Location", urlMatchesPath("/"))
     }
 
-    /** Redirect to URI specified by next query parameter on successful authorization
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/99">#99</a>
-     * @throws Exception
-     */
-    @Test(groups=["v100", "html"])
-    public void loginRedirectsToNextQueryParameter() throws Exception {
-
-        // todo: work with CSRF
-
-        given()
-            .accept(ContentType.HTML)
-            .formParam("login", account.email)
-            .formParam("password", account.password)
-            .queryParam("next", "/foo")
-        .when()
-            .post(LoginRoute)
-        .then()
-            .statusCode(302)
-            .header("Location", urlMatchesPath("/foo"))
-    }
-
     /** Render unverified status message
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/102">#102</a>
      * @throws Exception

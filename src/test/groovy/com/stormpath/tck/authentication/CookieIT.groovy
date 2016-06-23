@@ -109,7 +109,7 @@ class CookieIT extends AbstractIT {
             .get(MeRoute + "?foo=bar")
         .then()
             .statusCode(302)
-            .header("Location", urlMatchesPath("/login?next=%2Fme%3Ffoo%3Dbar"))
+            .header("Location", urlStartsWithPath("/login"))
     }
 
     /** Cookie expires flag should be set to token TTL
