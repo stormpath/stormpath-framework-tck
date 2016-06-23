@@ -40,7 +40,7 @@ abstract class AbstractIT {
     static final private String defaultWebappBaseUrl = "$webappUrlScheme://$webappUrlHost$webappUrlPortSuffix"
     static final String webappBaseUrl = getVal("STORMPATH_TCK_WEBAPP_URL", defaultWebappBaseUrl)
 
-    static final private List<String> possibleCSRFKeys = ['_csrf', 'csrfToken']
+    static final private List<String> possibleCSRFKeys = ['_csrf', 'csrfToken', 'authenticity_token']
 
     static {
         setupRestAssured()

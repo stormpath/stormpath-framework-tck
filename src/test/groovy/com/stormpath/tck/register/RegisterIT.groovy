@@ -40,6 +40,7 @@ import static org.hamcrest.Matchers.not
 import static org.testng.Assert.assertEquals
 import static org.testng.Assert.assertFalse
 import static com.stormpath.tck.util.Matchers.*
+import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
 
 @Test
 class RegisterIT extends AbstractIT {
@@ -320,6 +321,12 @@ class RegisterIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     public void registerFormShouldBeOrdered() throws Exception {
+        def requiredAttributesList = [
+                [name: "givenName", placeholder: "First Name", type: "text"],
+                [name: "surname", placeholder: "Last Name", type: "text"],
+                [name: "email", placeholder: "Email", type: "email"],
+                [name: "password", placeholder: "Password", type: "password"]
+        ]
 
         // Todo: CSRF support
 
@@ -337,22 +344,7 @@ class RegisterIT extends AbstractIT {
         XmlPath doc = getHtmlDoc(response)
         List<Node> fields = findTags(doc.getNodeChildren("html.body"), "input")
 
-        // From default configuration
-        assertEquals(fields.get(0).attributes().get("name"), "givenName")
-        assertEquals(fields.get(0).attributes().get("placeholder"), "First Name")
-        assertEquals(fields.get(0).attributes().get("type"), "text")
-
-        assertEquals(fields.get(1).attributes().get("name"), "surname")
-        assertEquals(fields.get(1).attributes().get("placeholder"), "Last Name")
-        assertEquals(fields.get(1).attributes().get("type"), "text")
-
-        assertEquals(fields.get(2).attributes().get("name"), "email")
-        assertEquals(fields.get(2).attributes().get("placeholder"), "Email")
-        assertEquals(fields.get(2).attributes().get("type"), "email")
-
-        assertEquals(fields.get(3).attributes().get("name"), "password")
-        assertEquals(fields.get(3).attributes().get("placeholder"), "Password")
-        assertEquals(fields.get(3).attributes().get("type"), "password")
+        assertAttributesEqual(fields, requiredAttributesList)
     }
 
     /**

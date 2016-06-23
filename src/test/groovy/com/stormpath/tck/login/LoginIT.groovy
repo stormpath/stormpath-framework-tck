@@ -35,6 +35,7 @@ import static org.testng.Assert.*
 import static org.hamcrest.MatcherAssert.assertThat
 import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
 import static com.stormpath.tck.util.Matchers.*
+import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
 
 @Test
 class LoginIT extends AbstractIT {
@@ -687,8 +688,10 @@ class LoginIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     public void loginFormShouldBeOrderedCorrectly() throws Exception {
-
-        // todo: better CSRF handling
+        def requiredAttributesList = [
+                [name: "login", placeholder: "Email", type: "text"],
+                [name: "password", placeholder: "Password", type: "password"]
+        ]
 
         Response response =
             given()
@@ -704,14 +707,7 @@ class LoginIT extends AbstractIT {
         XmlPath doc = getHtmlDoc(response)
         List<Node> fields = HtmlUtils.findTags(doc.getNodeChildren("html.body"), "input")
 
-        // From default configuration
-        assertEquals(fields.get(0).attributes().get("name"), "login")
-        assertEquals(fields.get(0).attributes().get("placeholder"), "Username or Email")
-        assertEquals(fields.get(0).attributes().get("type"), "text")
-
-        assertEquals(fields.get(1).attributes().get("name"), "password")
-        assertEquals(fields.get(1).attributes().get("placeholder"), "Password")
-        assertEquals(fields.get(1).attributes().get("type"), "password")
+        assertAttributesEqual(fields, requiredAttributesList)
     }
 
     /** Preserve value in login field on unsuccessful attempt

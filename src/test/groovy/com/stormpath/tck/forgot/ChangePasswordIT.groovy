@@ -30,6 +30,7 @@ import static org.hamcrest.Matchers.*
 import static com.stormpath.tck.util.FrameworkConstants.ChangeRoute
 import static org.hamcrest.MatcherAssert.assertThat
 import static com.stormpath.tck.util.Matchers.*
+import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
 
 class ChangePasswordIT extends AbstractIT {
 
@@ -185,6 +186,10 @@ class ChangePasswordIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     public void changeRendersFormForValidSptoken() throws Exception {
+        def requiredAttributesList = [
+                [name: "password", type: "password"],
+                [type: "password"]
+        ]
 
         // TODO: work with CSRF?
         def account = new TestAccount()
@@ -207,13 +212,10 @@ class ChangePasswordIT extends AbstractIT {
         XmlPath doc = getHtmlDoc(response)
         List<Node> fields = HtmlUtils.findTags(doc.getNodeChildren("html.body"), "input")
 
-        // From default configuration
-        assertEquals(fields.get(0).attributes().get("name"), "password")
-        assertEquals(fields.get(0).attributes().get("type"), "password")
+        assertAttributesEqual(fields, requiredAttributesList)
 
         // Todo: asserting the name of the second field is 1.1
         //assertEquals(fields.get(1).attributes().get("name"), "confirmPassword")
-        assertEquals(fields.get(1).attributes().get("type"), "password")
     }
 
     /** Return 200 OK and empty body for application/json POST

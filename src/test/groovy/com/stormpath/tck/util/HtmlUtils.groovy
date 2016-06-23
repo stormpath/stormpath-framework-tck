@@ -19,6 +19,10 @@ package com.stormpath.tck.util
 import com.jayway.restassured.path.xml.element.Node
 import com.jayway.restassured.path.xml.element.NodeChildren
 
+import static org.testng.Assert.assertEquals
+import static org.testng.Assert.assertEquals
+import static org.testng.Assert.assertEquals
+
 class HtmlUtils {
 
     public static Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
@@ -69,5 +73,37 @@ class HtmlUtils {
         }
 
         return results
+    }
+
+    /**
+     * Takes an array like:
+     *         def requiredAttributesList = [
+     [name: "givenName", placeholder: "First Name", type: "text"],
+     [name: "surname", placeholder: "Last Name", type: "text"],
+     [name: "email", placeholder: "Email", type: "email"],
+     [name: "password", placeholder: "Password", type: "password"]
+     ]
+
+     And checks that the Nodes' elements equal those
+     * @param htmlTags
+     * @param requiredAttributesList
+     */
+    public static void assertAttributesEqual(List<Node> htmlTags, List<Map<String, String>> requiredAttributesList) {
+        Iterator<Node> htmlTagsIterator = htmlTags.iterator()
+        Iterator<LinkedHashMap<String, String>> requiredAttributesIterator = requiredAttributesList.iterator()
+
+        while(htmlTagsIterator.hasNext() && requiredAttributesIterator.hasNext()) {
+            Map<String, String> attributes = htmlTagsIterator.next().attributes()
+
+            if(attributes.get("type", "").equalsIgnoreCase("hidden")) {
+                continue
+            }
+            Map<String, String> requiredAttributes = requiredAttributesIterator.next()
+
+            for(requiredAttribute in requiredAttributes) {
+                String attribute = attributes[requiredAttribute.key]
+                assertEquals(requiredAttribute.value, attribute)
+            }
+        }
     }
 }
