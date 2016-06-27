@@ -13,4 +13,8 @@ class Matchers {
     public static Matcher urlMatchesPath(String path) {
         return new UrlMatchesPath(path);
     }
+    @Factory
+    public static Matcher urlStartsWithPath(String path) {
+        return new UrlStartsWithPath(path);
+    }
 }
