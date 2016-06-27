@@ -102,7 +102,7 @@ class HtmlUtils {
 
             for(requiredAttribute in requiredAttributes) {
                 String attribute = attributes[requiredAttribute.key]
-                assertEquals(requiredAttribute.value, attribute)
+                assertEquals(attribute, requiredAttribute.value)
             }
         }
     }

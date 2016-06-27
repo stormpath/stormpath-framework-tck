@@ -689,7 +689,7 @@ class LoginIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     public void loginFormShouldBeOrderedCorrectly() throws Exception {
         def requiredAttributesList = [
-                [name: "login", placeholder: "Email", type: "text"],
+                [name: "login", placeholder: "Username or Email", type: "text"],
                 [name: "password", placeholder: "Password", type: "password"]
         ]
 
