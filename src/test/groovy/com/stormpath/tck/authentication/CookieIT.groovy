@@ -80,6 +80,7 @@ class CookieIT extends AbstractIT {
     @Test(groups=["v100", "json", "html"])
     public void serverDeletesCookiesWhenRefreshingWithInvalidToken() throws Exception {
         def response = given()
+            .cookie("access_token",  "not_a_valid_access_token_at_all")
             .cookie("refresh_token", "not_a_valid_refresh_token_at_all")
         .when()
             .get(MeRoute)
