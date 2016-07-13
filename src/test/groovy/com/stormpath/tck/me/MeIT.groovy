@@ -19,16 +19,22 @@ package com.stormpath.tck.me
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.*
-import com.stormpath.tck.responseSpecs.*
+import com.stormpath.tck.responseSpecs.AccountResponseSpec
+import com.stormpath.tck.util.RestUtils
+import com.stormpath.tck.util.TestAccount
+import io.jsonwebtoken.Jwt
+import io.jsonwebtoken.Jwts
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
-import io.jsonwebtoken.*
 
-import static com.jayway.restassured.RestAssured.*
-import static org.hamcrest.Matchers.*
+import static com.jayway.restassured.RestAssured.given
+import static com.jayway.restassured.RestAssured.when
 import static com.stormpath.tck.util.FrameworkConstants.MeRoute
 import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
+import static org.hamcrest.Matchers.containsString
+import static org.hamcrest.Matchers.is
+import static org.hamcrest.Matchers.isEmptyOrNullString
+import static org.hamcrest.Matchers.not
 
 @Test
 class MeIT extends AbstractIT {
@@ -77,12 +83,15 @@ class MeIT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     public void meWithCookieAuthReturnsJsonUser() throws Exception {
-        given()
-            .cookie("access_token", accessToken)
-        .when()
-            .get(MeRoute)
-        .then()
-            .spec(AccountResponseSpec.matchesAccount(account))
+        ["text/html", "application/json", "*/*", ""].each { contentType ->
+            given()
+                .header("Accept", contentType)
+                .cookie("access_token", accessToken)
+            .when()
+                .get(MeRoute)
+            .then()
+                .spec(AccountResponseSpec.matchesAccount(account))
+        }
     }
 
     /**
