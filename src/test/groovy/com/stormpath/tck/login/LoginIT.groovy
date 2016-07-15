@@ -19,7 +19,6 @@ package com.stormpath.tck.login
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.path.xml.element.Node
-import com.jayway.restassured.path.xml.element.NodeChildren
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.util.*
@@ -30,6 +29,7 @@ import org.testng.annotations.Test
 import static com.jayway.restassured.RestAssured.delete
 import static com.jayway.restassured.RestAssured.given
 import static com.jayway.restassured.RestAssured.put
+import static com.stormpath.tck.util.FrameworkConstants.MeRoute
 import static org.hamcrest.Matchers.*
 import static org.testng.Assert.*
 import static org.hamcrest.MatcherAssert.assertThat
@@ -718,5 +718,66 @@ class LoginIT extends AbstractIT {
 
         Node passwordField = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "password")
         assertFalse((passwordField.attributes().get("value")?.trim() as boolean), "The 'password' field should NOT preserve value")
+    }
+
+    /**
+     * When trying to access an endpoint that requires authentication then the login page should kick in and
+     * the user should be redirected back to that original endpoint after a successful login.
+     * <p>
+     * {@link #loginRedirectsToNextUriOnSuccess()} is already checking that. However, in our Java SDK
+     * we had <a href="https://github.com/stormpath/stormpath-sdk-java/issues/718">this issue<a> where Spring Security
+     * was always redirecting the user to the very first intercepted URI (clarification: "intercepted" as in user is redirected to
+     * login when trying to access an URI that requires authenticated access and the user is not logged in).
+     * </p>
+     * <p>
+     * Although this issues existed only in JSDK the behaviour tested here is standard for every SDK and it will help
+     * detect an eventual similar issue in other SDKs.
+     * </p>
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/274">#274</a>
+     * @throws Exception
+     */
+    @Test(groups=["v100", "html"])
+    public void testNoRedirectionStickinessHtml() throws Exception {
+
+        def response = given()
+            .accept(ContentType.HTML)
+        .when()
+            .get("/")
+        .then()
+            .statusCode(200)
+        .extract()
+
+        def cookies = response.cookies() //Let's get the JSESSIONID (this is what we need for Spring Security, other SDK might have other relevant cookie)
+
+        //Trying to access the "/me" endpoint without authentication; we must be redirected to login
+        given()
+            .accept(ContentType.HTML)
+            .cookies(cookies)
+        .when()
+            .get(MeRoute)
+        .then()
+            .statusCode(302)
+            .header("location", urlMatchesPath("/login")) //we must be redirected to login
+
+        //Let's not login for now. The web-app must "forget" about the intercepted URI now.
+        given()
+            .cookies(cookies)
+            .accept(ContentType.HTML)
+        .when()
+            .get("/")
+        .then()
+            .statusCode(200)
+
+        //Let's login, we should be redirect to "/" rather than to "/me"
+        given()
+            .cookies(cookies)
+            .accept(ContentType.HTML)
+            .formParam("login", account.email)
+            .formParam("password", account.password)
+        .when()
+            .post(LoginRoute)
+        .then()
+            .statusCode(302)
+            .header("Location", not(urlMatchesPath(MeRoute)))
     }
 }
