@@ -20,17 +20,25 @@ import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.path.xml.element.Node
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.*
-import com.stormpath.tck.responseSpecs.*
+import com.stormpath.tck.responseSpecs.JsonResponseSpec
+import com.stormpath.tck.util.EnvUtils
+import com.stormpath.tck.util.HtmlUtils
+import com.stormpath.tck.util.RestUtils
+import com.stormpath.tck.util.TestAccount
 import org.testng.annotations.Test
 
-import static com.jayway.restassured.RestAssured.*
-import static org.testng.Assert.*
-import static org.hamcrest.Matchers.*
+import static com.jayway.restassured.RestAssured.delete
+import static com.jayway.restassured.RestAssured.given
+import static com.jayway.restassured.RestAssured.put
 import static com.stormpath.tck.util.FrameworkConstants.ChangeRoute
-import static org.hamcrest.MatcherAssert.assertThat
-import static com.stormpath.tck.util.Matchers.*
+import static com.stormpath.tck.util.FrameworkConstants.ForgotRoute
 import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
+import static com.stormpath.tck.util.Matchers.urlMatchesPath
+import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.allOf
+import static org.hamcrest.Matchers.isEmptyOrNullString
+import static org.hamcrest.Matchers.not
+import static org.testng.Assert.assertNotNull
 
 class ChangePasswordIT extends AbstractIT {
 
@@ -168,12 +176,17 @@ class ChangePasswordIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     public void changeRedirectsToErrorUriForInvalidSptokenWhenPosting() throws Exception {
 
-        given()
+        saveCSRFAndCookies(ForgotRoute)
+
+        def req = given()
             .accept(ContentType.HTML)
             .contentType(ContentType.URLENC)
             .queryParam("sptoken", "NOTEVENCLOSETOVALID")
             .param("password", "foobar123!")
-        .when()
+
+        setCSRFAndCookies(req, ContentType.HTML)
+
+        req.when()
             .post(ChangeRoute)
         .then()
             .statusCode(302)

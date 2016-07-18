@@ -32,20 +32,22 @@ import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.given
 import static com.stormpath.tck.util.FrameworkConstants.RegisterRoute
+import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
+import static com.stormpath.tck.util.Matchers.urlMatchesPath
 import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.both
+import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.hasKey
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.isEmptyOrNullString
 import static org.hamcrest.Matchers.not
 import static org.testng.Assert.assertEquals
 import static org.testng.Assert.assertFalse
-import static com.stormpath.tck.util.Matchers.*
-import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
 
 @Test
 class RegisterIT extends AbstractIT {
 
-    private testAccount;
+    private testAccount
 
     @BeforeTest
     public void setUp() {
@@ -116,59 +118,31 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void registerErrorsOnEmptyPostJson() throws Exception {
-
-        given()
-            .accept(ContentType.JSON)
-            .contentType(ContentType.JSON)
-        .when()
-            .post(RegisterRoute)
-        .then()
-            .spec(JsonResponseSpec.isError(400))
-    }
-
-    /**
-     * Return JSON error if required fields are missing
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/189">#189</a>
-     * @throws Exception
-     */
-    @Test(groups=["v100", "json"])
-    public void registerErrorsOnMissingPostBodyJson() throws Exception {
-
-        def jsonMap = [email: testAccount.email,
-                         password: ""]
-
-        given()
-            .accept(ContentType.JSON)
-            .contentType(ContentType.JSON)
-            .body(jsonMap)
-        .when()
-            .post(RegisterRoute)
-        .then()
-            .spec(JsonResponseSpec.isError(400))
-    }
-
-    /**
-     * Return JSON error if required fields are missing
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/189">#189</a>
-     * @throws Exception
-     */
-    @Test(groups=["v100", "json"])
-    public void registerErrorsOnMissingField() throws Exception {
-
-        def jsonMap = [email: testAccount.email,
-                       password: testAccount.password,
-                       surname: testAccount.surname]
-        // givenName is required per the default configuration
-
-        given()
-            .accept(ContentType.JSON)
-            .contentType(ContentType.JSON)
-            .body(jsonMap)
-        .when()
-            .post(RegisterRoute)
-        .then()
-            .spec(JsonResponseSpec.isError(400))
+    public void registerErrorsOnMissingRequiredFields() throws Exception {
+        [
+                //No surname
+                [params: [email: testAccount.email, password: testAccount.password, givenName: testAccount.givenName], errorMsg: "Last Name is required."],
+                //No givenName
+                [params: [email: testAccount.email, password: testAccount.password, surname: testAccount.surname], errorMsg: "First Name is required."],
+                //No email
+                [params: [password: testAccount.password, givenName: testAccount.givenName, surname: testAccount.surname], errorMsg: "Email is required."],
+                //No password
+                [params: [email: testAccount.email, surname: testAccount.surname, givenName: testAccount.givenName], errorMsg: "Password is required."],
+                //Empty body
+                [params: [:], errorMsg: "required"/*The message only has the word required cause we don't know the order of the validation in each SDK*/]
+        ].each { testCase ->
+            // @formatter:off
+            given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(testCase.params)
+            .when()
+                .post(RegisterRoute)
+            .then()
+                .body("message", containsString(testCase.errorMsg))
+                .spec(JsonResponseSpec.isError(400))
+            // @formatter:on
+        }
     }
 
     /**
@@ -381,60 +355,42 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void registerErrorsWithMissingPasswordHtml() throws Exception {
+    public void registerErrorsWithMissingRequiredFormFieldsHtml() throws Exception {
+        [
+                //No surname
+                [params: [email: testAccount.email, password: testAccount.password, givenName: testAccount.givenName], errorMsg: "Last Name is required."],
+                //No givenName
+                [params: [email: testAccount.email, password: testAccount.password, surname: testAccount.surname], errorMsg: "First Name is required."],
+                //No email
+                [params: [password: testAccount.password, givenName: testAccount.givenName, surname: testAccount.surname], errorMsg: "Email is required."],
+                //No password
+                [params: [email: testAccount.email, surname: testAccount.surname, givenName: testAccount.givenName], errorMsg: "Password is required."],
+                //No body
+                [params: [:], errorMsg: "required"/*The message only has the word required cause we don't know the order of the validation in each SDK*/]
+        ].each { testCase ->
+            saveCSRFAndCookies(RegisterRoute)
 
-        // todo: work with CSRF
+            // @formatter:off
+            Response response =
+                given()
+                    .accept(ContentType.HTML)
+                    .contentType(ContentType.URLENC)
+                    .formParameters(testCase.params)
+                    .formParam(csrfKey, csrf)
+                .when()
+                    .post(RegisterRoute)
+                .then()
+                    .statusCode(200)
+                    .contentType(ContentType.HTML)
+                .extract()
+                    .response()
+            // @formatter:on
 
-        Response response =
-            given()
-                .accept(ContentType.HTML)
-                .contentType(ContentType.URLENC)
-                .formParam("email", testAccount.email)
-                .formParam("password", "")
-            .when()
-                .post(RegisterRoute)
-            .then()
-                .statusCode(200)
-                .contentType(ContentType.HTML)
-            .extract()
-                .response()
+            XmlPath doc = getHtmlDoc(response)
 
-        XmlPath doc = getHtmlDoc(response)
-
-        Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "alert-danger")
-        assertThat(warning.toString(), not(isEmptyOrNullString()))
-    }
-
-    /**
-     * Re-render form with error if required fields are missing
-     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/188">#188</a>
-     * @throws Exception
-     */
-    @Test(groups=["v100", "html"])
-    public void registerErrorsWithMissingFormFieldsHtml() throws Exception {
-
-        // todo: work with CSRF
-
-        Response response =
-            given()
-                .accept(ContentType.HTML)
-                .contentType(ContentType.URLENC)
-                .formParam("email", testAccount.email)
-                .formParam("password", testAccount.password)
-                .formParam("surname", testAccount.surname)
-                // givenName is required per the default configuration
-            .when()
-                .post(RegisterRoute)
-            .then()
-                .statusCode(200)
-                .contentType(ContentType.HTML)
-            .extract()
-                .response()
-
-        XmlPath doc = getHtmlDoc(response)
-
-        Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "alert-danger")
-        assertThat(warning.toString(), not(isEmptyOrNullString()))
+            Node warning = findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "alert-danger")
+            assertThat(warning.toString(), containsString(testCase.errorMsg))
+        }
     }
 
     /**
@@ -509,22 +465,27 @@ class RegisterIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     public void registerRedirectToLoginOnSuccess() throws Exception {
 
-        given()
+        saveCSRFAndCookies(RegisterRoute)
+
+        def req = given()
             .accept(ContentType.HTML)
             .contentType(ContentType.URLENC)
             .formParam("email", testAccount.email)
             .formParam("password", testAccount.password)
             .formParam("givenName", testAccount.givenName)
             .formParam("surname", testAccount.surname)
-        .when()
-            .post(RegisterRoute)
-        .then()
-            .statusCode(302)
-            .header("Location", urlMatchesPath(FrameworkConstants.LoginRoute + "?status=created"))
 
-        // todo: need to be able to delete created accounts!
-        // see https://github.com/stormpath/stormpath-framework-tck/issues/213
-        //deleteAccountOnTeardown(accountEmail)
+
+        setCSRFAndCookies(req, ContentType.HTML)
+
+        req
+            .when()
+                .post(RegisterRoute)
+            .then()
+                .statusCode(302)
+                .header("Location", urlMatchesPath(FrameworkConstants.LoginRoute + "?status=created"))
+
+        deleteOnTeardown(testAccount.href)
     }
 
     /** Preserve values in form fields on unsuccessful attempt

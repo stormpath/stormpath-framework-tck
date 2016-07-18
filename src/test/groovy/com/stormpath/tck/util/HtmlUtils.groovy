@@ -20,8 +20,6 @@ import com.jayway.restassured.path.xml.element.Node
 import com.jayway.restassured.path.xml.element.NodeChildren
 
 import static org.testng.Assert.assertEquals
-import static org.testng.Assert.assertEquals
-import static org.testng.Assert.assertEquals
 
 class HtmlUtils {
 

@@ -22,12 +22,22 @@ import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.util.HtmlUtils
 import com.stormpath.tck.util.RestUtils
+import com.stormpath.tck.util.TestAccount
+import io.jsonwebtoken.lang.Strings
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.testng.annotations.*
+import org.testng.annotations.AfterSuite
+import org.testng.annotations.AfterTest
+import org.testng.annotations.BeforeSuite
+import org.testng.annotations.BeforeTest
 
-import static com.jayway.restassured.RestAssured.*
+import static com.jayway.restassured.RestAssured.config
+import static com.jayway.restassured.RestAssured.given
 import static com.stormpath.tck.util.EnvUtils.getVal
+import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
+import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
+import static org.hamcrest.Matchers.isEmptyOrNullString
+import static org.hamcrest.Matchers.not
 
 abstract class AbstractIT {
 
@@ -51,6 +61,7 @@ abstract class AbstractIT {
     private final List<String> methodAccountsToDelete = []
 
     String csrf
+    String csrfKey
     Map<String, String> cookies
 
     private static String toPortSuffix(String scheme, int port) {
@@ -104,7 +115,7 @@ abstract class AbstractIT {
         return new XmlPath(XmlPath.CompatibilityMode.HTML, response.getBody().asString());
     }
 
-    protected  saveCSRFAndCookies(String endpoint) {
+    protected void saveCSRFAndCookies(String endpoint) {
         def resp =
             given()
                 .accept(ContentType.HTML)
@@ -125,6 +136,7 @@ abstract class AbstractIT {
         String ret = null
         hiddens.each {
             if (possibleCSRFKeys.contains(it.getAttribute("name"))) {
+                csrfKey = it.getAttribute("name")
                 ret = it.getAttribute("value")
                 return true
             }
@@ -132,6 +144,43 @@ abstract class AbstractIT {
         }
 
         csrf = ret
+    }
+
+    protected void setCSRFAndCookies(requestSpecification, contentType) {
+
+        if (Strings.hasText(csrf) && ContentType.JSON.equals(contentType)) {
+            requestSpecification.header("X-CSRF-TOKEN", csrf)
+        }
+
+        if (Strings.hasText(csrfKey) && Strings.hasText(csrf) && !ContentType.JSON.equals(contentType)) {
+            requestSpecification.formParam(csrfKey, csrf);
+        }
+
+        if (cookies != null) {
+            requestSpecification.cookies(cookies)
+        }
+    }
+
+    protected Tuple2 createTestAccountTokens() {
+        def account = new TestAccount()
+        account.registerOnServer()
+
+        def response =
+                given()
+                    .param("grant_type", "password")
+                    .param("username", account.username)
+                    .param("password", account.password)
+                .when()
+                    .post(OauthRoute)
+                .then()
+                    .statusCode(200)
+                    .contentType(ContentType.JSON)
+                    .body("access_token", not(isEmptyOrNullString()))
+                .extract()
+                    .response()
+        deleteOnClassTeardown(account.href)
+
+        return new Tuple2(response.path("access_token"), response.path("refresh_token"))
     }
 
     private void deleteResources(List<String> hrefs) {

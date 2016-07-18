@@ -19,15 +19,25 @@ package com.stormpath.tck.oauth2
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.*
-import com.stormpath.tck.responseSpecs.*
+import com.stormpath.tck.responseSpecs.JsonResponseSpec
+import com.stormpath.tck.util.FrameworkConstants
+import com.stormpath.tck.util.JwtUtils
+import com.stormpath.tck.util.RestUtils
+import com.stormpath.tck.util.TestAccount
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
-import static com.jayway.restassured.RestAssured.*
-import static org.hamcrest.Matchers.*
-import static org.testng.Assert.*
+import static com.jayway.restassured.RestAssured.get
+import static com.jayway.restassured.RestAssured.given
 import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
+import static org.hamcrest.Matchers.containsString
+import static org.hamcrest.Matchers.equalToIgnoringCase
+import static org.hamcrest.Matchers.is
+import static org.hamcrest.Matchers.isEmptyOrNullString
+import static org.hamcrest.Matchers.not
+import static org.hamcrest.Matchers.nullValue
+import static org.testng.Assert.assertNotEquals
+import static org.testng.Assert.assertTrue
 
 @Test
 class Oauth2IT extends AbstractIT {
@@ -35,9 +45,6 @@ class Oauth2IT extends AbstractIT {
 
     @BeforeClass
     private void createTestAccount() throws Exception {
-        saveCSRFAndCookies(FrameworkConstants.RegisterRoute)
-        account.setCSRF(csrf)
-        account.setCookies(cookies)
         account.registerOnServer()
         deleteOnClassTeardown(account.href)
     }
@@ -49,7 +56,6 @@ class Oauth2IT extends AbstractIT {
     public void oauthErrorsOnUnsupportedGrantTypes() throws Exception {
 
         given()
-            .header("Origin", webappBaseUrl)
             .param("grant_type", "foobar_grant")
         .when()
             .post(OauthRoute)
@@ -65,7 +71,6 @@ class Oauth2IT extends AbstractIT {
     @Test(groups=["v100", "json"])
     public void oauthErrorsOnMissingGrantType() throws Exception {
         given()
-            .header("Origin", webappBaseUrl)
             .param("grant_type", "")
         .when()
             .post(OauthRoute)
@@ -81,7 +86,6 @@ class Oauth2IT extends AbstractIT {
     @Test(groups=["v100", "json"])
     public void oauthErrorsOnJsonRequestBody() throws Exception {
         given()
-            .header("Origin", webappBaseUrl)
             .contentType(ContentType.JSON)
             .body([ "hello": "world" ])
         .when()
@@ -98,7 +102,6 @@ class Oauth2IT extends AbstractIT {
     @Test(groups=["v100", "json"])
     public void oauthErrorsOnEmptyRequestBody() throws Exception {
         given()
-            .header("Origin", webappBaseUrl)
             .body()
         .when()
             .post(OauthRoute)
@@ -126,7 +129,6 @@ class Oauth2IT extends AbstractIT {
 
         String accessToken =
             given()
-                .header("Origin", webappBaseUrl)
                 .param("grant_type", "password")
                 .param("username", account.username)
                 .param("password", account.password)
@@ -148,7 +150,6 @@ class Oauth2IT extends AbstractIT {
 
         String accessToken =
             given()
-                .header("Origin", webappBaseUrl)
                 .param("grant_type", "password")
                 .param("username", account.email)
                 .param("password", account.password)
@@ -169,7 +170,6 @@ class Oauth2IT extends AbstractIT {
     public void oauthRefreshGrantWorksWithValidToken() throws Exception {
         Response passwordGrantResponse =
             given()
-                .header("Origin", webappBaseUrl)
                 .param("grant_type", "password")
                 .param("username", account.email)
                 .param("password", account.password)
@@ -185,7 +185,6 @@ class Oauth2IT extends AbstractIT {
 
         String newAccessToken =
             given()
-                .header("Origin", webappBaseUrl)
                 .param("grant_type", "refresh_token")
                 .param("refresh_token", refreshToken)
             .when()
@@ -207,7 +206,6 @@ class Oauth2IT extends AbstractIT {
         String refreshToken = "GARBAGE"
 
         given()
-            .header("Origin", webappBaseUrl)
             .param("grant_type", "refresh_token")
             .param("refresh_token", refreshToken)
         .when()
@@ -228,7 +226,6 @@ class Oauth2IT extends AbstractIT {
     public void oauthErrorsAreTransformedProperly() throws Exception {
 
         given()
-            .header("Origin", webappBaseUrl)
             .param("grant_type", "password")
             .param("username", "foobar")
             .param("password", "nopenopenope!")
@@ -269,7 +266,6 @@ class Oauth2IT extends AbstractIT {
         // Attempt to get tokens
 
         given()
-            .header("Origin", webappBaseUrl)
             .param("grant_type", "client_credentials")
             .auth()
                 .preemptive().basic(apiKeyId, apiKeySecret)
@@ -295,7 +291,6 @@ class Oauth2IT extends AbstractIT {
         // Get API keys so we can use it for client credentials
 
         Response apiKeysResource = given()
-            .header("Origin", webappBaseUrl)
             .header("User-Agent", "stormpath-framework-tck")
             .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
             .header("Content-Type", "application/json")
@@ -312,7 +307,6 @@ class Oauth2IT extends AbstractIT {
         // Attempt to get tokens
 
         given()
-            .header("Origin", webappBaseUrl)
             .param("grant_type", "client_credentials")
             .auth()
                 .preemptive().basic(apiKeyId, "NOT_A_VALID_API_SECRET")

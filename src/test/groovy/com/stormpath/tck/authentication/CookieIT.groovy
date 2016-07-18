@@ -18,42 +18,22 @@ package com.stormpath.tck.authentication
 
 import com.jayway.restassured.http.ContentType
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.*
+import com.stormpath.tck.util.FrameworkConstants
+import com.stormpath.tck.util.JwtUtils
+import com.stormpath.tck.util.TestAccount
 import org.testng.annotations.Test
 
-import static com.jayway.restassured.RestAssured.*
-import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
-import static org.hamcrest.Matchers.*
-import static org.testng.Assert.*
-import static com.stormpath.tck.util.FrameworkConstants.MeRoute
-import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
+import static com.jayway.restassured.RestAssured.given
 import static com.stormpath.tck.util.CookieUtils.isCookieDeleted
-import static com.stormpath.tck.util.Matchers.*
+import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
+import static com.stormpath.tck.util.FrameworkConstants.MeRoute
+import static org.hamcrest.Matchers.is
+import static org.hamcrest.Matchers.not
+import static org.testng.Assert.assertEquals
+import static org.testng.Assert.assertTrue
 
 @Test
 class CookieIT extends AbstractIT {
-
-    def createTestAccountTokens() {
-        def account = new TestAccount()
-        account.registerOnServer()
-
-        def response =
-                given()
-                    .param("grant_type", "password")
-                    .param("username", account.username)
-                    .param("password", account.password)
-                .when()
-                    .post(OauthRoute)
-                .then()
-                    .statusCode(200)
-                    .contentType(ContentType.JSON)
-                    .body("access_token", not(isEmptyOrNullString()))
-                .extract()
-                    .response()
-        deleteOnClassTeardown(account.href)
-
-        return new Tuple2(response.path("access_token"), response.path("refresh_token"))
-    }
 
     /** If access token is invalid, use refresh token to get new access token
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/34">#34</a>
@@ -123,24 +103,31 @@ class CookieIT extends AbstractIT {
         account.registerOnServer()
         deleteOnClassTeardown(account.href)
 
-        def response = given()
+        saveCSRFAndCookies(FrameworkConstants.LoginRoute)
+
+        def requestSpecification = given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
             .body([ "login": account.email, "password": account.password ])
-        .when()
-            .post(LoginRoute)
-        .then()
-            .statusCode(200)
-        .extract()
-            .response()
+
+        setCSRFAndCookies(requestSpecification, ContentType.JSON);
+
+        def response = requestSpecification
+            .when()
+                .post(LoginRoute)
+            .then()
+                .statusCode(200)
+            .extract()
+                .response()
 
         def accessTokenCookie = response.detailedCookies.get("access_token")
         def accessTokenTtl = JwtUtils.extractJwtClaim(accessTokenCookie.value, "exp") as long
-        assertEquals(accessTokenCookie.expiryDate, new Date(accessTokenTtl * 1000L))
+        assertEquals accessTokenCookie.expiryDate, new Date(accessTokenTtl * 1000L)
+
 
         def refreshTokenCookie = response.detailedCookies.get("refresh_token")
         def refreshTokenTtl = JwtUtils.extractJwtClaim(refreshTokenCookie.value, "exp") as long
-        assertEquals(refreshTokenCookie.expiryDate, new Date(refreshTokenTtl * 1000L))
+        assertEquals refreshTokenCookie.expiryDate, new Date(refreshTokenTtl * 1000L)
     }
 
     /** Passing refresh token as access token should fail

@@ -2,12 +2,13 @@
  * Created by edjiang on 6/8/16.
  */
 
-import org.hamcrest.Description;
-import org.hamcrest.Factory;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
+package com.stormpath.tck.util.matchers
+
+import org.hamcrest.Description
+import org.hamcrest.TypeSafeMatcher
+
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 class UrlMatchesPath extends TypeSafeMatcher {
     String path;

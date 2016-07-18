@@ -17,15 +17,16 @@ package com.stormpath.tck.login
 
 import com.jayway.restassured.http.ContentType
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.*
-import com.stormpath.tck.responseSpecs.*
+import com.stormpath.tck.responseSpecs.JsonResponseSpec
+import com.stormpath.tck.util.EnvUtils
+import com.stormpath.tck.util.RestUtils
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.given
-import static org.hamcrest.Matchers.*
-import static org.testng.Assert.*
 import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
+import static org.hamcrest.Matchers.is
+import static org.testng.Assert.assertNotNull
 
 @Test
 class FacebookSocialLoginIT extends AbstractIT {

@@ -21,21 +21,28 @@ import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.path.xml.element.Node
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.*
-import com.stormpath.tck.responseSpecs.*
+import com.stormpath.tck.responseSpecs.AccountResponseSpec
+import com.stormpath.tck.responseSpecs.JsonResponseSpec
+import com.stormpath.tck.util.FrameworkConstants
+import com.stormpath.tck.util.HtmlUtils
+import com.stormpath.tck.util.Iso8601Utils
+import com.stormpath.tck.util.TestAccount
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.delete
 import static com.jayway.restassured.RestAssured.given
 import static com.jayway.restassured.RestAssured.put
-import static com.stormpath.tck.util.FrameworkConstants.MeRoute
-import static org.hamcrest.Matchers.*
-import static org.testng.Assert.*
-import static org.hamcrest.MatcherAssert.assertThat
 import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
-import static com.stormpath.tck.util.Matchers.*
-import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
+import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.allOf
+import static org.hamcrest.Matchers.hasKey
+import static org.hamcrest.Matchers.is
+import static org.hamcrest.Matchers.isEmptyOrNullString
+import static org.hamcrest.Matchers.not
+import static org.testng.Assert.assertEquals
+import static org.testng.Assert.assertFalse
+import static org.testng.Assert.assertTrue
 
 @Test
 class LoginIT extends AbstractIT {
@@ -70,6 +77,7 @@ class LoginIT extends AbstractIT {
 
         credentials.put("login", account.email)
         credentials.put("password", account.password)
+
         return credentials
     }
 
@@ -278,12 +286,17 @@ class LoginIT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     public void loginAccountDatetimePropertiesAreIso8601() throws Exception {
+        saveCSRFAndCookies(LoginRoute)
 
-        Response response =
+        def req =
             given()
                 .accept(ContentType.JSON)
                 .contentType(ContentType.JSON)
                 .body(getJsonCredentials())
+
+        setCSRFAndCookies(req, ContentType.JSON)
+
+        Response response = req
             .when()
                 .post(LoginRoute)
             .then()
@@ -380,12 +393,16 @@ class LoginIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     public void loginHtmlRendersErrorWithoutUsernameAndPassword() throws Exception {
 
-        // todo: work with CSRF
+        saveCSRFAndCookies(LoginRoute)
 
-        Response response =
+        def req =
             given()
                 .accept(ContentType.HTML)
                 .formParam("foo", "bar")
+
+        setCSRFAndCookies(req, ContentType.HTML)
+
+        Response response = req
             .when()
                 .post(LoginRoute)
             .then()
@@ -408,17 +425,21 @@ class LoginIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     public void loginSetsCookiesHtml() throws Exception {
 
-        // todo: work with CSRF
+        saveCSRFAndCookies(LoginRoute)
 
-        given()
+        def req = given()
             .accept(ContentType.HTML)
             .formParam("login", account.email)
             .formParam("password", account.password)
-        .when()
-            .post(LoginRoute)
-        .then()
-            .cookie("access_token", not(isEmptyOrNullString()))
-            .cookie("refresh_token", not(isEmptyOrNullString()))
+
+        setCSRFAndCookies(req, ContentType.HTML)
+
+        req
+            .when()
+                .post(LoginRoute)
+            .then()
+                .cookie("access_token", not(isEmptyOrNullString()))
+                .cookie("refresh_token", not(isEmptyOrNullString()))
     }
 
     /** Login value can either be username or email
@@ -427,17 +448,20 @@ class LoginIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     public void loginWithEmailSucceedsHtml() throws Exception {
+        saveCSRFAndCookies(LoginRoute)
 
-        // todo: work with CSRF
-
-        given()
+        def req = given()
             .accept(ContentType.HTML)
             .formParam("login", account.email)
             .formParam("password", account.password)
-        .when()
-            .post(LoginRoute)
-        .then()
-            .statusCode(302)
+
+        setCSRFAndCookies(req, ContentType.HTML)
+
+        req
+            .when()
+                .post(LoginRoute)
+            .then()
+                .statusCode(302)
     }
 
     /** Login value can either be username or email
@@ -446,17 +470,20 @@ class LoginIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     public void loginWithUsernameSucceedsHtml() throws Exception {
+        saveCSRFAndCookies(LoginRoute)
 
-        // todo: work with CSRF
-
-        given()
+        def req = given()
             .accept(ContentType.HTML)
             .formParam("login", account.username)
             .formParam("password", account.password)
-        .when()
-            .post(LoginRoute)
-        .then()
-            .statusCode(302)
+
+        setCSRFAndCookies(req, ContentType.HTML)
+
+        req
+            .when()
+                .post(LoginRoute)
+            .then()
+                .statusCode(302)
     }
 
     /** Redirect to nextUri on successful authorization
@@ -466,17 +493,21 @@ class LoginIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     public void loginRedirectsToNextUriOnSuccess() throws Exception {
 
-        // todo: work with CSRF
+        saveCSRFAndCookies(LoginRoute)
 
-        given()
+        def req = given()
             .accept(ContentType.HTML)
             .formParam("login", account.email)
             .formParam("password", account.password)
-        .when()
-            .post(LoginRoute)
-        .then()
-            .statusCode(302)
-            .header("Location", urlMatchesPath("/"))
+
+        setCSRFAndCookies(req, ContentType.HTML)
+
+        req
+            .when()
+                .post(LoginRoute)
+            .then()
+                .statusCode(302)
+                .header("Location", containsString("/"))
     }
 
     /** Render unverified status message
@@ -696,13 +727,17 @@ class LoginIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     public void loginFormPreservesValuesOnPostback() throws Exception {
 
-        // todo: work with CSRF
+        saveCSRFAndCookies(LoginRoute)
 
-        Response response =
+        def req =
             given()
                 .accept(ContentType.HTML)
                 .formParam("login", "blah")
                 .formParam("password", "1")
+
+        setCSRFAndCookies(req, ContentType.HTML)
+
+        Response response = req
             .when()
                 .post(LoginRoute)
             .then()

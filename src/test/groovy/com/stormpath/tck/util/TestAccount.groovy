@@ -6,7 +6,7 @@ package com.stormpath.tck.util
 import com.jayway.restassured.http.ContentType
 import io.jsonwebtoken.lang.Strings
 
-import static com.jayway.restassured.RestAssured.*
+import static com.jayway.restassured.RestAssured.given
 
 class TestAccount {
     final String randomUUID = UUID.randomUUID().toString()
@@ -23,26 +23,19 @@ class TestAccount {
     String href
 
     public void registerOnServer() {
-        def requestSpecification = given()
+        href = given()
+            .port(443)
             .accept(ContentType.JSON)
+            .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
+            .header("User-Agent", "stormpath-framework-tck")
             .contentType(ContentType.JSON)
             .body(getPropertiesMap())
-
-        if (Strings.hasText(csrf)) {
-            requestSpecification.header("X-CSRF-TOKEN", csrf)
-        }
-
-        if (cookies != null) {
-            requestSpecification.cookies(cookies)
-        }
-
-        href = requestSpecification
             .when()
-                .post(FrameworkConstants.RegisterRoute)
+                .post(EnvUtils.stormpathApplicationHref + "/accounts")
             .then()
-                .statusCode(200)
+                .statusCode(201)
             .extract()
-                .path("account.href")
+                .path("href")
     }
 
     public void setCSRF(String csrf) {

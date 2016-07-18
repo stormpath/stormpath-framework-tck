@@ -17,21 +17,26 @@
 package com.stormpath.tck.logout
 
 import com.jayway.restassured.http.ContentType
-import com.jayway.restassured.response.Cookie
 import com.jayway.restassured.response.Cookies
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.*
-import com.stormpath.tck.responseSpecs.*
+import com.stormpath.tck.util.EnvUtils
+import com.stormpath.tck.util.JwtUtils
+import com.stormpath.tck.util.RestUtils
+import com.stormpath.tck.util.TestAccount
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
-import static com.jayway.restassured.RestAssured.*
-import static org.testng.Assert.*
-import static org.hamcrest.Matchers.*
-import static com.stormpath.tck.util.FrameworkConstants.LogoutRoute
-import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
+import static com.jayway.restassured.RestAssured.delete
+import static com.jayway.restassured.RestAssured.get
+import static com.jayway.restassured.RestAssured.given
+import static com.jayway.restassured.RestAssured.put
 import static com.stormpath.tck.util.CookieUtils.isCookieDeleted
-import static com.stormpath.tck.util.Matchers.*
+import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
+import static com.stormpath.tck.util.FrameworkConstants.LogoutRoute
+import static com.stormpath.tck.util.Matchers.urlMatchesPath
+import static org.hamcrest.Matchers.allOf
+import static org.hamcrest.Matchers.not
+import static org.testng.Assert.assertTrue
 
 @Test
 class LogoutIT extends AbstractIT {

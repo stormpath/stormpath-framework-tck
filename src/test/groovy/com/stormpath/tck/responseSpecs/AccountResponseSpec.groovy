@@ -4,12 +4,16 @@
 
 package com.stormpath.tck.responseSpecs
 
-import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.builder.ResponseSpecBuilder
+import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.specification.ResponseSpecification
-import com.stormpath.tck.util.*
+import com.stormpath.tck.util.TestAccount
 
-import static org.hamcrest.Matchers.*
+import static org.hamcrest.Matchers.equalToIgnoringCase
+import static org.hamcrest.Matchers.is
+import static org.hamcrest.Matchers.isEmptyOrNullString
+import static org.hamcrest.Matchers.not
+import static org.hamcrest.Matchers.nullValue
 
 class AccountResponseSpec {
     static ResponseSpecification matchesAccount(TestAccount account) {

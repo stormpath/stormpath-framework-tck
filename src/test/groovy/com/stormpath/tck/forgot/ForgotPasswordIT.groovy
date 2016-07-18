@@ -20,16 +20,21 @@ import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.path.xml.element.Node
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.*
+import com.stormpath.tck.util.HtmlUtils
+import com.stormpath.tck.util.TestAccount
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
-import static com.jayway.restassured.RestAssured.*
-import static org.testng.Assert.*
-import static org.hamcrest.Matchers.*
-import static org.hamcrest.MatcherAssert.assertThat
+import static com.jayway.restassured.RestAssured.delete
+import static com.jayway.restassured.RestAssured.given
+import static com.jayway.restassured.RestAssured.put
 import static com.stormpath.tck.util.FrameworkConstants.ForgotRoute
-import static com.stormpath.tck.util.Matchers.*
+import static com.stormpath.tck.util.Matchers.urlMatchesPath
+import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.allOf
+import static org.hamcrest.Matchers.isEmptyOrNullString
+import static org.hamcrest.Matchers.not
+import static org.testng.Assert.assertEquals
 
 @Test
 class ForgotPasswordIT extends AbstractIT {
