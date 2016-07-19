@@ -24,4 +24,5 @@ class FrameworkConstants {
     static String VerifyRoute = "/verify"
     static String ForgotRoute = "/forgot"
     static String ChangeRoute = "/change"
+    static String MissingRoute = "/missing" // should 404
 }
