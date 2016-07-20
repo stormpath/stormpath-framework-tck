@@ -14,63 +14,31 @@
  * limitations under the License.
  */
 
-package com.stormpath.tck.errors;
+package com.stormpath.tck.errors
 
-import com.jayway.restassured.http.ContentType;
-import com.stormpath.tck.AbstractIT;
-import org.testng.annotations.Test;
+import com.jayway.restassured.http.ContentType
+import com.stormpath.tck.AbstractIT
+import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.given
-import static com.stormpath.tck.util.FrameworkConstants.MeRoute;
+import static com.stormpath.tck.util.FrameworkConstants.MeRoute
 import static com.stormpath.tck.util.FrameworkConstants.MissingRoute
-import static org.hamcrest.CoreMatchers.containsString;
 
 @Test
 class ErrorsIT extends AbstractIT {
 
     /**
-     * A missing endpoint should return HTML when Accept header is text/html
+     * A missing endpoint should return a 404
      * @see <a href="https://github.com/stormpath/stormpath-sdk-java/issues/706">#706</a>
      */
     @Test(groups=["v100", "html"])
-    public void missingEndpointShouldReturn404AsHTML() {
+    public void missingEndpointShouldReturn404() {
         given()
             .header("Accept", ContentType.HTML)
         .when()
             .get(MissingRoute)
         .then()
             .statusCode(404)
-            .header("Content-Type", containsString(ContentType.HTML.toString()))
-    }
-
-    /**
-     * A missing endpoint should return JSON when Accept header is application/json
-     * @see <a href="https://github.com/stormpath/stormpath-sdk-java/issues/706">#706</a>
-     */
-    @Test(groups=["v100", "json"])
-    public void missingEndpointShouldReturn404AsJSON() {
-        given()
-            .header("Accept", ContentType.JSON)
-        .when()
-            .get(MissingRoute)
-        .then()
-            .statusCode(404)
-            .contentType(ContentType.JSON)
-    }
-
-    /**
-     * A restricted endpoint should return a redirect to login when Accept header is text/html
-     * @see <a href="https://github.com/stormpath/stormpath-sdk-java/issues/706">#706</a>
-     */
-    @Test(groups=["v100", "html"])
-    public void restrictedEndpointShouldReturn302ToLogin() {
-        given()
-            .header("Accept", ContentType.HTML)
-        .when()
-            .get(MeRoute)
-        .then()
-            .statusCode(302)
-            .header("Location", "http://localhost:8080/login?next=%2Fme")
     }
 
     /**
@@ -78,7 +46,7 @@ class ErrorsIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-sdk-java/issues/706">#706</a>
      */
     @Test(groups=["v100", "json"])
-    public void restrictedEndpointShouldReturn401AsJSON() {
+    public void restrictedEndpointShouldReturn401AndWWWAuthenticateHeader() {
         given()
             .header("Accept", ContentType.JSON)
         .when()
