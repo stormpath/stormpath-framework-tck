@@ -29,22 +29,29 @@ class ApiKey {
     public static final String DEFAULT_API_KEY_PROPERTIES_FILE_LOCATION =
             System.getProperty("user.home") + File.separatorChar + ".stormpath" + File.separatorChar + "apiKey.properties";
 
-    private final static String apiKeyIdPropertyName     = "apiKey.id"
-    private final static String apiKeySecretPropertyName = "apiKey.secret"
+    private final static String API_KEY_ID_PROPERTY_NAME = "apiKey.id"
+    private final static String API_KEY_SECRET_PROPERTY_NAME = "apiKey.secret"
 
-    private final static String[] apiKeyIdEnvironmentVariableNames = ["STORMPATH_API_KEY_ID", "STORMPATH_CLIENT_APIKEY_ID"]
-    private final static String[] apiKeySecretEnvironmentVariableNames = ["STORMPATH_API_KEY_SECRET", "STORMPATH_CLIENT_APIKEY_SECRET"]
+    private final static String API_KEY_FILE_ENV_NAME = "STORMPATH_API_KEY_FILE";
+
+    private final static String[] API_KEY_ID_ENVIRONMENT_VARIABLE_NAMES = ["STORMPATH_API_KEY_ID", "STORMPATH_CLIENT_APIKEY_ID"]
+    private final static String[] API_KEY_SECRET_ENVIRONMENT_VARIABLE_NAMES = ["STORMPATH_API_KEY_SECRET", "STORMPATH_CLIENT_APIKEY_SECRET"]
 
    static {
         //1. Try to load the default api key properties file.  All other config options have higher priority than this:
         Properties properties = getDefaultApiKeyFileProperties()
-        apiKeyID = properties.get(apiKeyIdPropertyName)
-        apiKeySecret = properties.get(apiKeySecretPropertyName)
+        apiKeyID = properties.get(API_KEY_ID_PROPERTY_NAME)
+        apiKeySecret = properties.get(API_KEY_SECRET_PROPERTY_NAME)
 
-        //2. Try environment variables:
+        //2. Try api key properties file environment variable
+       properties = getApiKeyFilePropertiesByEnv();
+       apiKeyID = properties.get(API_KEY_ID_PROPERTY_NAME)
+       apiKeySecret = properties.get(API_KEY_SECRET_PROPERTY_NAME)
+
+        //3. Try environment variables:
         properties = getEnvironmentVariableProperties();
-        apiKeyID = properties.get(apiKeyIdPropertyName) != null ? properties.get(apiKeyIdPropertyName) : apiKeyID
-        apiKeySecret = properties.get(apiKeySecretPropertyName) != null ? properties.get(apiKeySecretPropertyName) : apiKeySecret
+        apiKeyID = properties.get(API_KEY_ID_PROPERTY_NAME) != null ? properties.get(API_KEY_ID_PROPERTY_NAME) : apiKeyID
+        apiKeySecret = properties.get(API_KEY_SECRET_PROPERTY_NAME) != null ? properties.get(API_KEY_SECRET_PROPERTY_NAME) : apiKeySecret
     }
 
     static String getId() {
@@ -56,15 +63,23 @@ class ApiKey {
     }
 
     protected static Properties getDefaultApiKeyFileProperties() {
+        return getApiKeyFileProperties(DEFAULT_API_KEY_PROPERTIES_FILE_LOCATION);
+    }
+
+    protected static Properties getApiKeyFilePropertiesByEnv() {
+        return getApiKeyFileProperties(System.getenv(API_KEY_FILE_ENV_NAME));
+    }
+
+    protected static getApiKeyFileProperties(String fileName) {
         Properties properties = new Properties();
         InputStream input = null;
         try {
-            input = new FileInputStream(DEFAULT_API_KEY_PROPERTIES_FILE_LOCATION);
+            input = new FileInputStream(fileName);
             // load a properties file
             properties.load(input);
         } catch (IOException ex) {
             log.debug("Unable to find or load default api key properties file [" +
-                    DEFAULT_API_KEY_PROPERTIES_FILE_LOCATION + "].  This can be safely ignored as this is a " +
+                    fileName + "].  This can be safely ignored as this is a " +
                     "fallback location - other more specific locations will be checked.");
         } finally {
             if (input != null) {
@@ -82,21 +97,21 @@ class ApiKey {
         Properties props = new Properties();
 
         String value = null
-        for (int i = 0; i < apiKeyIdEnvironmentVariableNames.length; i++) {
-            value = System.getenv(apiKeyIdEnvironmentVariableNames[i])
+        for (int i = 0; i < API_KEY_ID_ENVIRONMENT_VARIABLE_NAMES.length; i++) {
+            value = System.getenv(API_KEY_ID_ENVIRONMENT_VARIABLE_NAMES[i])
             if (Strings.hasText(value)) { break }
         }
         if (Strings.hasText(value)) {
-            props.put(apiKeyIdPropertyName, value)
+            props.put(API_KEY_ID_PROPERTY_NAME, value)
         }
 
         value = null
-        for (int i = 0; i < apiKeySecretEnvironmentVariableNames.length; i++) {
-            value = System.getenv(apiKeySecretEnvironmentVariableNames[i])
+        for (int i = 0; i < API_KEY_SECRET_ENVIRONMENT_VARIABLE_NAMES.length; i++) {
+            value = System.getenv(API_KEY_SECRET_ENVIRONMENT_VARIABLE_NAMES[i])
             if (Strings.hasText(value)) { break }
         }
         if (Strings.hasText(value)) {
-            props.put(apiKeySecretPropertyName, value);
+            props.put(API_KEY_SECRET_PROPERTY_NAME, value);
         }
 
         return props;
