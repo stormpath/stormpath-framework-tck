@@ -90,6 +90,7 @@ class MeIT extends AbstractIT {
             .when()
                 .get(MeRoute)
             .then()
+                .statusCode(200)
                 .spec(AccountResponseSpec.matchesAccount(account))
         }
     }
@@ -108,6 +109,7 @@ class MeIT extends AbstractIT {
         .when()
             .get(MeRoute)
         .then()
+            .statusCode(200)
             .spec(AccountResponseSpec.matchesAccount(account))
     }
 
@@ -137,6 +139,7 @@ class MeIT extends AbstractIT {
         .when()
             .get(MeRoute)
         .then()
+            .statusCode(200)
             .spec(AccountResponseSpec.matchesAccount(account))
     }
 
