@@ -27,6 +27,7 @@ import static com.jayway.restassured.RestAssured.given
 import static com.stormpath.tck.util.CookieUtils.isCookieDeleted
 import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
 import static com.stormpath.tck.util.FrameworkConstants.MeRoute
+import static com.stormpath.tck.util.Matchers.urlStartsWithPath
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.not
 import static org.testng.Assert.assertEquals

@@ -34,6 +34,9 @@ import static com.jayway.restassured.RestAssured.delete
 import static com.jayway.restassured.RestAssured.given
 import static com.jayway.restassured.RestAssured.put
 import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
+import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
+import static com.stormpath.tck.util.Matchers.urlMatchesPath
+import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.allOf
 import static org.hamcrest.Matchers.hasKey
@@ -671,13 +674,17 @@ class LoginIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     public void loginRendersErrorOnFailure() throws Exception {
 
-        // todo: work with CSRF
+        saveCSRFAndCookies(LoginRoute)
 
-        Response response =
+        def requestSpecification =
             given()
                 .accept(ContentType.HTML)
                 .formParam("login", "blah")
                 .formParam("password", "foobar!")
+
+        setCSRFAndCookies(requestSpecification, ContentType.HTML)
+
+        def response = requestSpecification
             .when()
                 .post(LoginRoute)
             .then()
@@ -789,7 +796,7 @@ class LoginIT extends AbstractIT {
             .accept(ContentType.HTML)
             .cookies(cookies)
         .when()
-            .get(MeRoute)
+            .get(FrameworkConstants.MeRoute)
         .then()
             .statusCode(302)
             .header("location", urlMatchesPath("/login")) //we must be redirected to login

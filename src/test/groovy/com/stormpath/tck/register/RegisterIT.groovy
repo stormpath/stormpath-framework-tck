@@ -31,7 +31,9 @@ import org.testng.annotations.BeforeTest
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.given
+import static com.jayway.restassured.RestAssured.requestSpecification
 import static com.stormpath.tck.util.FrameworkConstants.RegisterRoute
+import static com.stormpath.tck.util.FrameworkConstants.getForgotRoute
 import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
 import static com.stormpath.tck.util.Matchers.urlMatchesPath
 import static org.hamcrest.MatcherAssert.assertThat
@@ -329,12 +331,16 @@ class RegisterIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     public void registerErrorsWithEmptyPostBody() throws Exception {
 
-        // Todo: CSRF support
+        saveCSRFAndCookies(RegisterRoute)
 
-        Response response =
+        def requestSpecification =
             given()
                 .accept(ContentType.HTML)
                 .contentType(ContentType.URLENC)
+
+        setCSRFAndCookies(requestSpecification, ContentType.HTML);
+
+        def response = requestSpecification
             .when()
                 .post(RegisterRoute)
             .then()
@@ -371,12 +377,15 @@ class RegisterIT extends AbstractIT {
             saveCSRFAndCookies(RegisterRoute)
 
             // @formatter:off
-            Response response =
+            def requestSpecification =
                 given()
                     .accept(ContentType.HTML)
                     .contentType(ContentType.URLENC)
                     .formParameters(testCase.params)
-                    .formParam(csrfKey, csrf)
+
+            setCSRFAndCookies(requestSpecification, ContentType.HTML)
+
+            def response = requestSpecification
                 .when()
                     .post(RegisterRoute)
                 .then()
@@ -401,9 +410,9 @@ class RegisterIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     public void registerErrorsForUndefinedFieldsHtml() throws Exception {
 
-        // todo: work with CSRF
+        saveCSRFAndCookies(RegisterRoute);
 
-        Response response =
+        def requestSpecification =
             given()
                 .accept(ContentType.HTML)
                 .contentType(ContentType.URLENC)
@@ -412,6 +421,10 @@ class RegisterIT extends AbstractIT {
                 .formParam("givenName", testAccount.givenName)
                 .formParam("surname", testAccount.surname)
                 .formParam("customValue", "foobar") // not defined in default configuration
+
+        setCSRFAndCookies(requestSpecification, ContentType.JSON);
+
+        def response = requestSpecification
             .when()
                 .post(RegisterRoute)
             .then()
@@ -434,7 +447,9 @@ class RegisterIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     public void registerErrorsOnServerErrorHtml() throws Exception {
 
-        Response response =
+        saveCSRFAndCookies(RegisterRoute);
+
+        def requestSpecification =
             given()
                 .accept(ContentType.HTML)
                 .contentType(ContentType.URLENC)
@@ -443,6 +458,10 @@ class RegisterIT extends AbstractIT {
                 .formParam("givenName", testAccount.givenName)
                 .formParam("surname", testAccount.surname)
                 // Email and password will not pass Stormpath API validation and will error
+
+        setCSRFAndCookies(requestSpecification, ContentType.HTML)
+
+        def response = requestSpecification
             .when()
                 .post(RegisterRoute)
             .then()
@@ -495,9 +514,9 @@ class RegisterIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     public void registerFormPreservesValuesOnPostback() throws Exception {
 
-        // todo: work with CSRF
+        saveCSRFAndCookies(RegisterRoute)
 
-        Response response =
+        def requestSpecification =
             given()
                 .accept(ContentType.HTML)
                 .contentType(ContentType.URLENC)
@@ -505,6 +524,10 @@ class RegisterIT extends AbstractIT {
                 .formParam("password", "1") // Too short, will fail validation
                 .formParam("givenName", testAccount.givenName)
                 .formParam("surname", testAccount.surname)
+
+        setCSRFAndCookies(requestSpecification, ContentType.HTML)
+
+        def response = requestSpecification
             .when()
                 .post(RegisterRoute)
             .then()
