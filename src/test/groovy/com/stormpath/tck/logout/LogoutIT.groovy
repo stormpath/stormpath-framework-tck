@@ -31,7 +31,6 @@ import static com.jayway.restassured.RestAssured.get
 import static com.jayway.restassured.RestAssured.given
 import static com.jayway.restassured.RestAssured.put
 import static com.stormpath.tck.util.CookieUtils.isCookieDeleted
-import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
 import static com.stormpath.tck.util.FrameworkConstants.LogoutRoute
 import static com.stormpath.tck.util.Matchers.urlMatchesPath
 import static org.hamcrest.Matchers.allOf
@@ -46,27 +45,6 @@ class LogoutIT extends AbstractIT {
     public void createTestUser() throws Exception {
         account.registerOnServer()
         deleteOnClassTeardown(account.href)
-    }
-
-    private Map<String, String> createSession() throws Exception {
-
-        Map<String, Object>  credentials = new HashMap<>();
-        credentials.put("login", account.email)
-        credentials.put("password", account.password)
-
-        Map<String, String> cookies =
-            given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .body(credentials)
-            .when()
-                .post(LoginRoute)
-            .then()
-                .statusCode(200)
-            .extract()
-                .cookies()
-
-        return cookies
     }
 
     private void assertCookiesAreDeleted(Cookies cookies) throws Exception {
@@ -138,7 +116,7 @@ class LogoutIT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     public void logoutDeletesCookiesJson() throws Exception {
-        def sessionCookies = createSession()
+        def sessionCookies = createSession(account)
 
         Cookies detailedCookies =
             given()
@@ -159,7 +137,7 @@ class LogoutIT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     public void logoutReturns200OKOnSuccess() throws Exception {
-        def sessionCookies = createSession()
+        def sessionCookies = createSession(account)
 
         given()
             .accept(ContentType.JSON)
@@ -176,7 +154,7 @@ class LogoutIT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     public void logoutRevokesTokensAfterSuccessJson() throws Exception {
-        def sessionCookies = createSession()
+        def sessionCookies = createSession(account)
 
         given()
             .accept(ContentType.JSON)
@@ -209,7 +187,7 @@ class LogoutIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     public void logoutRedirectsToNextUriOnSuccess() throws Exception {
-        def sessionCookies = createSession()
+        def sessionCookies = createSession(account)
 
         given()
             .accept(ContentType.HTML)
@@ -227,7 +205,7 @@ class LogoutIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     public void logoutDeletesCookiesHtml() throws Exception {
-        def sessionCookies = createSession()
+        def sessionCookies = createSession(account)
 
         Cookies detailedCookies =
                 given()
@@ -248,7 +226,7 @@ class LogoutIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     public void logoutRevokesTokensHtml() throws Exception {
-        def sessionCookies = createSession()
+        def sessionCookies = createSession(account)
 
         given()
             .accept(ContentType.HTML)

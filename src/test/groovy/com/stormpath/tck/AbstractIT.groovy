@@ -205,6 +205,27 @@ abstract class AbstractIT {
         // todo
     }
 
+    protected Map<String, String> createSession(TestAccount account) throws Exception {
+
+        Map<String, Object>  credentials = new HashMap<>();
+        credentials.put("login", account.email)
+        credentials.put("password", account.password)
+
+        Map<String, String> cookies =
+                given()
+                        .accept(ContentType.JSON)
+                        .contentType(ContentType.JSON)
+                        .body(credentials)
+                        .when()
+                        .post(LoginRoute)
+                        .then()
+                        .statusCode(200)
+                        .extract()
+                        .cookies()
+
+        return cookies
+    }
+
     @SuppressWarnings("GroovyUnusedDeclaration")
     protected void deleteOnTeardown(String resourceHref) {
         if (resourceHref) {

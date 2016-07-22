@@ -20,7 +20,6 @@ import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.responseSpecs.JsonResponseSpec
-import com.stormpath.tck.util.FrameworkConstants
 import com.stormpath.tck.util.JwtUtils
 import com.stormpath.tck.util.RestUtils
 import com.stormpath.tck.util.TestAccount
@@ -139,6 +138,32 @@ class Oauth2IT extends AbstractIT {
             .extract()
                 .path("access_token")
 
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.account.href)
+    }
+
+    /** Password grant flow with username/password and access_token cookie present
+     *
+     * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/11">#11</a>
+     * @see <a href="https://github.com/stormpath/stormpath-sdk-java/issues/612">#612</a>
+     */
+    @Test(groups=["v100", "json"])
+    public void oauthPasswordGrantWithUsernameSucceedsAndCookiePresent() throws Exception {
+        def cookies = createSession(account)
+
+        // @formatter:off
+        String accessToken =
+                given()
+                    .cookies(cookies)
+                    .param("grant_type", "password")
+                    .param("username", account.username)
+                    .param("password", account.password)
+                .when()
+                     .post(OauthRoute)
+                .then()
+                     .spec(JsonResponseSpec.validAccessAndRefreshTokens())
+                     .extract()
+                     .path("access_token")
+        // @formatter:on
         assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.account.href)
     }
 
