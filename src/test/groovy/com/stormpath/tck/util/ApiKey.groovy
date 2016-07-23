@@ -16,6 +16,7 @@
 package com.stormpath.tck.util
 
 import io.jsonwebtoken.lang.Strings
+import org.codehaus.groovy.control.ConfigurationException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -38,20 +39,36 @@ class ApiKey {
     private final static String[] API_KEY_SECRET_ENVIRONMENT_VARIABLE_NAMES = ["STORMPATH_API_KEY_SECRET", "STORMPATH_CLIENT_APIKEY_SECRET"]
 
    static {
-        //1. Try to load the default api key properties file.  All other config options have higher priority than this:
-        Properties properties = getDefaultApiKeyFileProperties()
-        apiKeyID = properties.get(API_KEY_ID_PROPERTY_NAME)
-        apiKeySecret = properties.get(API_KEY_SECRET_PROPERTY_NAME)
+       //1. Try to load the default api key properties file.  All other config options have higher priority than this:
+       Properties properties = getDefaultApiKeyFileProperties()
+       if (properties.size() > 0) {
+           apiKeyID = properties.get(API_KEY_ID_PROPERTY_NAME)
+           apiKeySecret = properties.get(API_KEY_SECRET_PROPERTY_NAME)
+       }
 
-        //2. Try api key properties file environment variable
+       //2. Try api key properties file environment variable
        properties = getApiKeyFilePropertiesByEnv();
-       apiKeyID = properties.get(API_KEY_ID_PROPERTY_NAME)
-       apiKeySecret = properties.get(API_KEY_SECRET_PROPERTY_NAME)
+       if (properties.size() > 0) {
+           apiKeyID = properties.get(API_KEY_ID_PROPERTY_NAME)
+           apiKeySecret = properties.get(API_KEY_SECRET_PROPERTY_NAME)
+       }
 
-        //3. Try environment variables:
-        properties = getEnvironmentVariableProperties();
-        apiKeyID = properties.get(API_KEY_ID_PROPERTY_NAME) != null ? properties.get(API_KEY_ID_PROPERTY_NAME) : apiKeyID
-        apiKeySecret = properties.get(API_KEY_SECRET_PROPERTY_NAME) != null ? properties.get(API_KEY_SECRET_PROPERTY_NAME) : apiKeySecret
+       //3. Try environment variables:
+       properties = getEnvironmentVariableProperties();
+       if (properties.size() > 0) {
+           apiKeyID = properties.get(API_KEY_ID_PROPERTY_NAME) != null ?: apiKeyID
+           apiKeySecret = properties.get(API_KEY_SECRET_PROPERTY_NAME) != null ?: apiKeySecret
+       }
+
+       if (apiKeyID == null || apiKeySecret == null) {
+           throw new ConfigurationException(
+               "apiKeyID and apiKeySecret must be set by one of the following: \n" +
+               "\t~/.stormpath/apiKey.properties file OR \n" +
+               "\tSTORMPATH_API_KEY_FILE env variable OR \n" +
+               "\tSTORMPATH_API_KEY_ID and STORMPATH_API_KEY_SECRET env variables \n" +
+               "\tSTORMPATH_CLIENT_APIKEY_ID and STORMPATH_CLIENT_APIKEY_SECRET env variables."
+           )
+       }
     }
 
     static String getId() {
