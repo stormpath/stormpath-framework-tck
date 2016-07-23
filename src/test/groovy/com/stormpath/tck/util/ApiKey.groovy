@@ -70,14 +70,14 @@ class ApiKey {
         return getApiKeyFileProperties(System.getenv(API_KEY_FILE_ENV_NAME));
     }
 
-    protected static getApiKeyFileProperties(String fileName) {
+    protected static Properties getApiKeyFileProperties(String fileName) {
         Properties properties = new Properties();
         InputStream input = null;
         try {
-            input = new FileInputStream(fileName);
+            input = new FileInputStream((String)fileName);
             // load a properties file
             properties.load(input);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             log.debug("Unable to find or load default api key properties file [" +
                     fileName + "].  This can be safely ignored as this is a " +
                     "fallback location - other more specific locations will be checked.");
