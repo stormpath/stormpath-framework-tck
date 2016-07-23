@@ -159,7 +159,10 @@ class LogoutIT extends AbstractIT {
         given()
             .accept(ContentType.JSON)
             .cookies(sessionCookies)
-        .post(LogoutRoute)
+        .when()
+            .post(LogoutRoute)
+        .then()
+            .statusCode(200)
 
         assertTokenIsRevoked(sessionCookies.get("access_token"), "accessTokens")
         assertTokenIsRevoked(sessionCookies.get("refresh_token"), "refreshTokens")

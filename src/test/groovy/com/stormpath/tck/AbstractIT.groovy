@@ -212,16 +212,16 @@ abstract class AbstractIT {
         credentials.put("password", account.password)
 
         Map<String, String> cookies =
-                given()
-                        .accept(ContentType.JSON)
-                        .contentType(ContentType.JSON)
-                        .body(credentials)
-                        .when()
-                        .post(LoginRoute)
-                        .then()
-                        .statusCode(200)
-                        .extract()
-                        .cookies()
+            given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(credentials)
+            .when()
+                .post(LoginRoute)
+            .then()
+                .statusCode(200)
+                .extract()
+                .cookies()
 
         return cookies
     }
