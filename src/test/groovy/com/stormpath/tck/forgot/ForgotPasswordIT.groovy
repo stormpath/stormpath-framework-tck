@@ -158,7 +158,7 @@ class ForgotPasswordIT extends AbstractIT {
 
         XmlPath doc = getHtmlDoc(response)
 
-        Node warningBanner = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "alert-warning")
+        Node warningBanner = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "div", "class", "alert")
         assertThat(warningBanner.toString(), not(isEmptyOrNullString()))
     }
 
@@ -168,15 +168,22 @@ class ForgotPasswordIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     public void forgotRedirectsToNextUriWhenPostingValidEmail() throws Exception {
-        given()
+
+        saveCSRFAndCookies(ForgotRoute)
+
+        def req = given()
             .accept(ContentType.HTML)
             .contentType(ContentType.URLENC)
             .param("email", account.email)
-        .when()
-            .post(ForgotRoute)
-        .then()
-            .statusCode(302)
-            .header("Location", urlMatchesPath("/login?status=forgot"))
+
+        setCSRFAndCookies(req, ContentType.HTML)
+
+        req
+            .when()
+                .post(ForgotRoute)
+            .then()
+                .statusCode(302)
+                .header("Location", urlMatchesPath("/login?status=forgot"))
     }
 
     /** POST requests preferring text/html should redirect to nextUri
@@ -185,14 +192,21 @@ class ForgotPasswordIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     public void forgotRedirectsToNextUriWhenPostingInvalidEmail() throws Exception {
-        given()
+
+        saveCSRFAndCookies(ForgotRoute)
+
+        def req = given()
             .accept(ContentType.HTML)
             .contentType(ContentType.URLENC)
             .param("email", invalidEmail)
-        .when()
-            .post(ForgotRoute)
-        .then()
-            .statusCode(302)
-            .header("Location", urlMatchesPath("/login?status=forgot"))
+
+        setCSRFAndCookies(req, ContentType.HTML)
+
+        req
+            .when()
+                .post(ForgotRoute)
+            .then()
+                .statusCode(302)
+                .header("Location", urlMatchesPath("/login?status=forgot"))
     }
 }

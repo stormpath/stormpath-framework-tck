@@ -781,45 +781,50 @@ class LoginIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     public void testNoRedirectionStickinessHtml() throws Exception {
 
-        def response = given()
-            .accept(ContentType.HTML)
-        .when()
-            .get("/")
-        .then()
-            .statusCode(200)
-        .extract()
-
-        def cookies = response.cookies() //Let's get the JSESSIONID (this is what we need for Spring Security, other SDK might have other relevant cookie)
+        saveCSRFAndCookies("/")
 
         //Trying to access the "/me" endpoint without authentication; we must be redirected to login
-        given()
+        def req = given()
             .accept(ContentType.HTML)
-            .cookies(cookies)
-        .when()
-            .get(FrameworkConstants.MeRoute)
-        .then()
-            .statusCode(302)
-            .header("location", urlMatchesPath("/login")) //we must be redirected to login
+
+        setCSRFAndCookies(req, ContentType.HTML)
+
+        req
+            .when()
+                .get(FrameworkConstants.MeRoute)
+            .then()
+                .statusCode(302)
+                .header("Location", urlMatchesPath("/login?next=%2Fme")) //we must be redirected to login
 
         //Let's not login for now. The web-app must "forget" about the intercepted URI now.
-        given()
-            .cookies(cookies)
+        req = given()
             .accept(ContentType.HTML)
-        .when()
-            .get("/")
-        .then()
-            .statusCode(200)
+
+        setCSRFAndCookies(req, ContentType.HTML)
+
+        req
+            .when()
+                .get("/")
+            .then()
+                .statusCode(200)
 
         //Let's login, we should be redirect to "/" rather than to "/me"
-        given()
+
+        saveCSRFAndCookies(LoginRoute)
+
+        req = given()
             .cookies(cookies)
             .accept(ContentType.HTML)
             .formParam("login", account.email)
             .formParam("password", account.password)
-        .when()
-            .post(LoginRoute)
-        .then()
-            .statusCode(302)
-            .header("Location", not(urlMatchesPath(MeRoute)))
+
+        setCSRFAndCookies(req, ContentType.HTML)
+
+        req
+            .when()
+                .post(LoginRoute)
+            .then()
+                .statusCode(302)
+                .header("Location", not(urlMatchesPath(FrameworkConstants.MeRoute)))
     }
 }
