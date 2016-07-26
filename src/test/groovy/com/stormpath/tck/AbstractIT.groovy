@@ -131,16 +131,18 @@ abstract class AbstractIT {
 
         def form = HtmlUtils.findTagWithAttribute(xmlPath.get("html.body"), "form", "method", "post")
 
-        def hiddens = HtmlUtils.findTagsWithAttribute(form.children(), "input", "type", "hidden")
-
         String ret = null
-        hiddens.each {
-            if (possibleCSRFKeys.contains(it.getAttribute("name"))) {
-                csrfKey = it.getAttribute("name")
-                ret = it.getAttribute("value")
-                return true
+        if (form != null) {
+            def hiddens = HtmlUtils.findTagsWithAttribute(form.children(), "input", "type", "hidden")
+
+            hiddens.each {
+                if (possibleCSRFKeys.contains(it.getAttribute("name"))) {
+                    csrfKey = it.getAttribute("name")
+                    ret = it.getAttribute("value")
+                    return true
+                }
+                return false
             }
-            return false
         }
 
         csrf = ret
