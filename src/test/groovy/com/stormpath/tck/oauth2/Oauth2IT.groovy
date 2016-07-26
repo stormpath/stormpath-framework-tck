@@ -29,6 +29,7 @@ import org.testng.annotations.Test
 import static com.jayway.restassured.RestAssured.get
 import static com.jayway.restassured.RestAssured.given
 import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
+import static org.hamcrest.Matchers.contains
 import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.equalToIgnoringCase
 import static org.hamcrest.Matchers.is
@@ -304,7 +305,7 @@ class Oauth2IT extends AbstractIT {
             .body("token_type", equalToIgnoringCase("Bearer"))
             .body("expires_in", is(3600))
             .body("refresh_token", nullValue())
-            .header("Cache-Control", is("no-store"))
+            .header("Cache-Control", contains("no-store"))
             .header("Pragma", is("no-cache"))
     }
 
