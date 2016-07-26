@@ -122,13 +122,11 @@ class CookieIT extends AbstractIT {
                 .response()
 
         def accessTokenCookie = response.detailedCookies.get("access_token")
-        def accessTokenTtl = JwtUtils.extractJwtClaim(accessTokenCookie.value, "exp") as long
-        assertEquals accessTokenCookie.expiryDate, new Date(accessTokenTtl * 1000L)
+        assertEquals accessTokenCookie.expiryDate, JwtUtils.parseJwt(accessTokenCookie.value).getBody().getExpiration()
 
 
         def refreshTokenCookie = response.detailedCookies.get("refresh_token")
-        def refreshTokenTtl = JwtUtils.extractJwtClaim(refreshTokenCookie.value, "exp") as long
-        assertEquals refreshTokenCookie.expiryDate, new Date(refreshTokenTtl * 1000L)
+        assertEquals refreshTokenCookie.expiryDate, JwtUtils.parseJwt(refreshTokenCookie.value).getBody().getExpiration()
     }
 
     /** Passing refresh token as access token should fail
