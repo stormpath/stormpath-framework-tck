@@ -135,7 +135,7 @@ class ForgotPasswordIT extends AbstractIT {
         XmlPath doc = getHtmlDoc(response)
 
         Node emailField = HtmlUtils.findTagWithAttribute(doc.getNodeChildren("html.body"), "input", "name", "email")
-        assertEquals(emailField.attributes().get("type"), "text")
+        assertEquals(emailField.attributes().get("type"), "email")
     }
 
     /** If query string contains invalid_sptoken, render message above form
