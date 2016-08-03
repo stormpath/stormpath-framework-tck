@@ -757,7 +757,7 @@ class LoginIT extends AbstractIT {
             .get(MeRoute)
         .then()
             .statusCode(302)
-            .header("location", urlMatchesPath("/login")) //we must be redirected to login
+            .header("location", urlStartsWithPath("/login")) //we must be redirected to login
 
         //Let's not login for now. The web-app must "forget" about the intercepted URI now.
         given()
