@@ -83,13 +83,13 @@ class VerifyEmailIT extends AbstractIT {
     public void verifyEmailErrorsForInvalidSptokenJson() throws Exception {
 
         given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .queryParam("sptoken", "NOTEVENCLOSETOVALID")
-                .when()
-                .get(VerifyRoute)
-                .then()
-                .spec(JsonResponseSpec.isError(404))
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .queryParam("sptoken", "NOTEVENCLOSETOVALID")
+        .when()
+            .get(VerifyRoute)
+        .then()
+            .spec(JsonResponseSpec.isError(404))
     }
 
     /**
@@ -101,14 +101,14 @@ class VerifyEmailIT extends AbstractIT {
 
         Response response =
                 given()
-                        .accept(ContentType.HTML)
-                        .when()
-                        .get(VerifyRoute)
-                        .then()
-                        .statusCode(200)
-                        .contentType(ContentType.HTML)
-                        .extract()
-                        .response()
+                    .accept(ContentType.HTML)
+                .when()
+                    .get(VerifyRoute)
+                .then()
+                    .statusCode(200)
+                    .contentType(ContentType.HTML)
+                    .extract()
+                    .response()
 
         XmlPath doc = getHtmlDoc(response)
 
@@ -126,15 +126,15 @@ class VerifyEmailIT extends AbstractIT {
 
         Response response =
                 given()
-                        .accept(ContentType.HTML)
-                        .queryParam("sptoken", "NOTEVENCLOSETOVALID")
-                        .when()
-                        .get(VerifyRoute)
-                        .then()
-                        .statusCode(200)
-                        .contentType(ContentType.HTML)
-                        .extract()
-                        .response()
+                    .accept(ContentType.HTML)
+                    .queryParam("sptoken", "NOTEVENCLOSETOVALID")
+                .when()
+                    .get(VerifyRoute)
+                .then()
+                    .statusCode(200)
+                    .contentType(ContentType.HTML)
+                    .extract()
+                    .response()
 
         XmlPath doc = getHtmlDoc(response)
 
@@ -149,12 +149,12 @@ class VerifyEmailIT extends AbstractIT {
     public void verifyEmailErrorsForMissingSptokenJson() throws Exception {
 
         given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .when()
-                .get(VerifyRoute)
-                .then()
-                .spec(JsonResponseSpec.isError(400))
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+        .when()
+            .get(VerifyRoute)
+        .then()
+            .spec(JsonResponseSpec.isError(400))
     }
 
     /** Respond with 200 OK and empty body for a JSON POST with any valid or invalid email address
@@ -164,16 +164,14 @@ class VerifyEmailIT extends AbstractIT {
     public void verifyEmailForAnyEmailWhenPostingJson() throws Exception {
 
         given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .body([
-                "email": "ANYEMAIL@ANYDOMAIN.COM"
-        ])
-                .when()
-                .post(VerifyRoute)
-                .then()
-                .statusCode(200)
-                .body(isEmptyOrNullString())
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+            .body(["email": "ANYEMAIL@ANYDOMAIN.COM"])
+        .when()
+            .post(VerifyRoute)
+        .then()
+            .statusCode(200)
+            .body(isEmptyOrNullString())
     }
 
     /** Respond with error when POSTing JSON without the email parameter
@@ -183,12 +181,12 @@ class VerifyEmailIT extends AbstractIT {
     public void verifyEmailEmailRequiredWhenPostingJson() throws Exception {
 
         given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .when()
-                .post(VerifyRoute)
-                .then()
-                .spec(JsonResponseSpec.isError(400))
+            .accept(ContentType.JSON)
+            .contentType(ContentType.JSON)
+        .when()
+            .post(VerifyRoute)
+        .then()
+            .spec(JsonResponseSpec.isError(400))
     }
 
     /**
@@ -211,7 +209,7 @@ class VerifyEmailIT extends AbstractIT {
 
         req.when()
                 .post(VerifyRoute)
-                .then()
+            .then()
                 .statusCode(302)
                 .header("Location", urlMatchesPath("/login?status=unverified"))
     }
@@ -233,12 +231,12 @@ class VerifyEmailIT extends AbstractIT {
         setCSRFAndCookies(req, ContentType.HTML)
 
         Response response = req.when()
-                .post(VerifyRoute)
-                .then()
-                .statusCode(200)
-                .contentType(ContentType.HTML)
-                .extract()
-                .response()
+                                    .post(VerifyRoute)
+                                .then()
+                                    .statusCode(200)
+                                    .contentType(ContentType.HTML)
+                                    .extract()
+                                    .response()
 
         XmlPath doc = getHtmlDoc(response)
 
