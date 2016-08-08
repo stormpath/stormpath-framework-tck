@@ -159,8 +159,8 @@
                 <version>2.19.1</version>
                 <configuration>
                     <systemProperties>
-                        <stormpath.tck.webapp.port>${stormpath.tck.webapp.scheme}</stormpath.tck.webapp.port>
-                        <stormpath.tck.webapp.port>${stormpath.tck.webapp.host}</stormpath.tck.webapp.port>
+                        <stormpath.tck.webapp.scheme>${stormpath.tck.webapp.scheme}</stormpath.tck.webapp.scheme>
+                        <stormpath.tck.webapp.host>${stormpath.tck.webapp.host}</stormpath.tck.webapp.host>
                         <stormpath.tck.webapp.port>${stormpath.tck.webapp.port}</stormpath.tck.webapp.port>
                     </systemProperties>
                 </configuration>

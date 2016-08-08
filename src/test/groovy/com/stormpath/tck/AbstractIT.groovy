@@ -20,6 +20,7 @@ import com.jayway.restassured.config.RedirectConfig
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.response.Response
+import com.stormpath.tck.util.EnvUtils
 import com.stormpath.tck.util.HtmlUtils
 import com.stormpath.tck.util.RestUtils
 import com.stormpath.tck.util.TestAccount
@@ -116,6 +117,8 @@ abstract class AbstractIT {
     }
 
     protected void saveCSRFAndCookies(String endpoint) {
+        if ("false".equals(EnvUtils.stormpathHtmlEnabled)) { return }
+        
         def resp =
             given()
                 .accept(ContentType.HTML)
@@ -149,6 +152,7 @@ abstract class AbstractIT {
     }
 
     protected void setCSRFAndCookies(requestSpecification, contentType) {
+        if ("false".equals(EnvUtils.stormpathHtmlEnabled)) { return }
 
         if (Strings.hasText(csrf) && ContentType.JSON.equals(contentType)) {
             requestSpecification.header("X-CSRF-TOKEN", csrf)

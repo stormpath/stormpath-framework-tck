@@ -56,8 +56,8 @@ class ApiKey {
        //3. Try environment variables:
        properties = getEnvironmentVariableProperties();
        if (properties.size() > 0) {
-           apiKeyID = properties.get(API_KEY_ID_PROPERTY_NAME) != null ?: apiKeyID
-           apiKeySecret = properties.get(API_KEY_SECRET_PROPERTY_NAME) != null ?: apiKeySecret
+           apiKeyID = properties.get(API_KEY_ID_PROPERTY_NAME) != null ? properties.get(API_KEY_ID_PROPERTY_NAME) : apiKeyID
+           apiKeySecret = properties.get(API_KEY_SECRET_PROPERTY_NAME) != null ? properties.get(API_KEY_SECRET_PROPERTY_NAME) : apiKeySecret
        }
 
        if (apiKeyID == null || apiKeySecret == null) {
