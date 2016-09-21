@@ -63,20 +63,22 @@ class FacebookSocialLoginIT extends AbstractIT {
 
         // Find the FB account store, then put its client id in the class
         accountStores.each { accountStore ->
-            Map<String> provider = given()
-                .header("User-Agent", "stormpath-framework-tck")
-                .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
-                .port(443)
-            .when()
-                .get(accountStore + "?expand=provider")
-            .then()
-                .statusCode(200)
-            .extract().path("provider")
+            if (accountStore.contains("/directories/")) {
+                Map<String> provider = given()
+                        .header("User-Agent", "stormpath-framework-tck")
+                        .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
+                        .port(443)
+                        .when()
+                        .get(accountStore + "?expand=provider")
+                        .then()
+                        .statusCode(200)
+                        .extract().path("provider")
 
-            if (provider.get("providerId") == "facebook") {
-                this.facebookClientID = provider.get("clientId")
-                this.facebookClientSecret = provider.get("clientSecret")
-                return
+                if (provider.get("providerId") == "facebook") {
+                    this.facebookClientID = provider.get("clientId")
+                    this.facebookClientSecret = provider.get("clientSecret")
+                    return
+                }
             }
         }
     }
