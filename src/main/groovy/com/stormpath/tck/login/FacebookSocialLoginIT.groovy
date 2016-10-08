@@ -25,7 +25,10 @@ import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.given
 import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
+import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
 import static org.hamcrest.Matchers.is
+import static org.hamcrest.Matchers.isEmptyOrNullString
+import static org.hamcrest.Matchers.not
 import static org.testng.Assert.assertNotNull
 
 @Test
@@ -79,7 +82,7 @@ class FacebookSocialLoginIT extends AbstractIT {
     }
 
     private void getFacebookAccessToken() {
-        // We create a FB test user, and get its access token. We don't clean it up but oh well, TODO? 
+        // We create a FB test user, and get its access token. We don't clean it up but oh well, TODO?
         def fbTestUser = given()
             .port(443)
             .param("permissions", "email")
@@ -119,7 +122,7 @@ class FacebookSocialLoginIT extends AbstractIT {
     }
 
     /**
-     * Attempts to login with an invalid access token, and should fail. 
+     * Attempts to login with an invalid access token, and should fail.
      * @throws Exception
      */
     @Test(groups = ["v100", "json"])
@@ -137,5 +140,26 @@ class FacebookSocialLoginIT extends AbstractIT {
             .post(LoginRoute)
         .then()
             .spec(JsonResponseSpec.isError(400))
+    }
+
+    /**
+     * Attempts to use grant_type=stormpath_social with the Facebook Access Token, and expects an access_token back.
+     * @throws Exception
+     */
+    @Test(groups = ["v100", "json"])
+    public void loginWithGrantTypeStormpathSocialSucceeds() throws Exception {
+
+        given()
+            .accept(ContentType.JSON)
+            .contentType(ContentType.URLENC)
+            .param("grant_type", "stormpath_social")
+            .param("providerId", "facebook")
+            .param("accessToken", facebookTestUserAccessToken)
+        .when()
+            .post(OauthRoute)
+        .then()
+            .statusCode(200)
+            .body("access_token", not(isEmptyOrNullString()))
+        .extract().response()
     }
 }
