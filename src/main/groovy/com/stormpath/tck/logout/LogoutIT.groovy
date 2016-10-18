@@ -41,7 +41,7 @@ import static org.testng.Assert.assertTrue
 class LogoutIT extends AbstractIT {
     private TestAccount account = new TestAccount()
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void createTestUser() throws Exception {
         account.registerOnServer()
         deleteOnClassTeardown(account.href)

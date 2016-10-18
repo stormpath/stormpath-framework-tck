@@ -41,7 +41,7 @@ class MeIT extends AbstractIT {
     private TestAccount account = new TestAccount()
     private String accessToken
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     private void getTestAccountAccessToken() throws Exception {
         account.registerOnServer()
 

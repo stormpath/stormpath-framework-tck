@@ -84,7 +84,7 @@ class LoginIT extends AbstractIT {
         return credentials
     }
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     private void createTestAccount() throws Exception {
         account.registerOnServer()
         deleteOnClassTeardown(account.href)

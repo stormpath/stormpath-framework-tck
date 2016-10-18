@@ -42,7 +42,7 @@ import static org.testng.Assert.assertTrue
 class Oauth2IT extends AbstractIT {
     private TestAccount account = new TestAccount()
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     private void createTestAccount() throws Exception {
         account.registerOnServer()
         deleteOnClassTeardown(account.href)
