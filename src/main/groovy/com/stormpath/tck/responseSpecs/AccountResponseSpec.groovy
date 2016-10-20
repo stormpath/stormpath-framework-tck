@@ -40,7 +40,6 @@ class AccountResponseSpec {
         ResponseSpecBuilder builder = new ResponseSpecBuilder()
         builder.expectStatusCode(200)
                 .expectContentType(ContentType.JSON)
-                .expectBody("account.size()", is(10))
                 .expectBody("account.emailVerificationToken", is(nullValue()))
                 .expectBody("account.customData", is(nullValue()))
                 .expectBody("account.providerData", is(nullValue()))
