@@ -41,7 +41,7 @@ class FacebookSocialLoginIT extends AbstractIT {
     private String facebookTestUserAccessToken
     private String facebookTestUserEmail
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     private void getSocialProviderTokens() throws Exception {
         getSocialProviderIdsFromStormpath()
         getFacebookAccessToken()

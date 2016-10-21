@@ -78,6 +78,7 @@
         <stormpath.tck.webapp.scheme>http</stormpath.tck.webapp.scheme>
         <stormpath.tck.webapp.host>localhost</stormpath.tck.webapp.host>
         <stormpath.tck.webapp.port>8080</stormpath.tck.webapp.port>
+        <failsafe.groups>v100,json,html</failsafe.groups>
         
     </properties>
 
@@ -189,6 +190,7 @@
                                 <stormpath.tck.webapp.host>${stormpath.tck.webapp.host}</stormpath.tck.webapp.host>
                                 <stormpath.tck.webapp.port>${stormpath.tck.webapp.port}</stormpath.tck.webapp.port>
                             </systemProperties>
+                            <groups>${failsafe.groups}</groups>
                         </configuration>
                         <executions>
                             <execution>

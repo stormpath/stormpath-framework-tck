@@ -60,13 +60,21 @@ class ApiKey {
            apiKeySecret = properties.get(API_KEY_SECRET_PROPERTY_NAME) != null ? properties.get(API_KEY_SECRET_PROPERTY_NAME) : apiKeySecret
        }
 
+       //4. Try system properties:
+       properties = getSystemProperties();
+       if (properties.size() > 0) {
+           apiKeyID = properties.get(API_KEY_ID_PROPERTY_NAME) != null ? properties.get(API_KEY_ID_PROPERTY_NAME) : apiKeyID
+           apiKeySecret = properties.get(API_KEY_SECRET_PROPERTY_NAME) != null ? properties.get(API_KEY_SECRET_PROPERTY_NAME) : apiKeySecret
+       }
+
        if (apiKeyID == null || apiKeySecret == null) {
            throw new ConfigurationException(
                "apiKeyID and apiKeySecret must be set by one of the following: \n" +
                "\t~/.stormpath/apiKey.properties file OR \n" +
                "\tSTORMPATH_API_KEY_FILE env variable OR \n" +
                "\tSTORMPATH_API_KEY_ID and STORMPATH_API_KEY_SECRET env variables \n" +
-               "\tSTORMPATH_CLIENT_APIKEY_ID and STORMPATH_CLIENT_APIKEY_SECRET env variables."
+               "\tSTORMPATH_CLIENT_APIKEY_ID and STORMPATH_CLIENT_APIKEY_SECRET env variables OR \n" +
+               "\t" + API_KEY_ID_PROPERTY_NAME + " and " + API_KEY_SECRET_PROPERTY_NAME + " system properties."
            )
        }
     }
@@ -132,6 +140,22 @@ class ApiKey {
         }
 
         return props;
+    }
+
+    private static Properties getSystemProperties(){
+        Properties properties = new Properties();
+
+        String value = System.getProperty(API_KEY_ID_PROPERTY_NAME);
+        if (Strings.hasText(value)) {
+            properties.put(API_KEY_ID_PROPERTY_NAME, value)
+        }
+
+        value = System.getProperty(API_KEY_SECRET_PROPERTY_NAME)
+        if (Strings.hasText(value)) {
+            properties.put(API_KEY_SECRET_PROPERTY_NAME, value);
+        }
+
+        return properties
     }
 
 }

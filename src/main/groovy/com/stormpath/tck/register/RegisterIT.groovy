@@ -31,13 +31,10 @@ import org.testng.annotations.BeforeTest
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.given
-import static com.jayway.restassured.RestAssured.requestSpecification
 import static com.stormpath.tck.util.FrameworkConstants.RegisterRoute
-import static com.stormpath.tck.util.FrameworkConstants.getForgotRoute
 import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
 import static com.stormpath.tck.util.Matchers.urlStartsWithPath
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.hamcrest.Matchers.both
 import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.hasKey
 import static org.hamcrest.Matchers.is
@@ -51,12 +48,12 @@ class RegisterIT extends AbstractIT {
 
     private testAccount
 
-    @BeforeTest
+    @BeforeTest(alwaysRun = true)
     public void setUp() {
         super.setUp();
     }
 
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void beforeEach() {
         testAccount = new TestAccount()
     }
