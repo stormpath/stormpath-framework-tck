@@ -10,7 +10,7 @@ import static com.jayway.restassured.RestAssured.given
 
 class TestAccount {
     final String randomUUID = UUID.randomUUID().toString()
-    final String email = "fooemail-" + randomUUID + "@stormpath.com"
+    final String email = "fooemail-" + randomUUID + "@testmail.stormpath.com"
     final String givenName = "GivenName-" + randomUUID
     final String surname = "Surname-" + randomUUID
     final String middleName = null
