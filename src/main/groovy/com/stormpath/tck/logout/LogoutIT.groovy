@@ -153,7 +153,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void logoutRevokesTokensAfterSuccessJson() throws Exception {
+    public void logoutRevokesTokensInCookiesAfterSuccessJson() throws Exception {
         def sessionCookies = createSession(account)
 
         given()
@@ -166,6 +166,22 @@ class LogoutIT extends AbstractIT {
 
         assertTokenIsRevoked(sessionCookies.get("access_token"), "accessTokens")
         assertTokenIsRevoked(sessionCookies.get("refresh_token"), "refreshTokens")
+    }
+
+    @Test(groups=["v100", "json"])
+    public void logoutRevokesTokensInHeadersAfterSuccessJson() throws Exception {
+        Tuple2 tokens = createTestAccountTokens()
+
+        given()
+            .accept(ContentType.JSON)
+            .header("Authorization", "Bearer " + tokens.first.toString())
+        .when()
+            .post(LogoutRoute)
+        .then()
+            .statusCode(200)
+
+        assertTokenIsRevoked(tokens.first.toString(), "accessTokens")
+        assertTokenIsRevoked(tokens.second.toString(), "refreshTokens")
     }
 
     /** Redirect to nextUri for unauthenticated request
