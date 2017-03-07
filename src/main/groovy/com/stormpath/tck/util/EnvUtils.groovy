@@ -18,11 +18,9 @@ package com.stormpath.tck.util
 
 class EnvUtils {
 
-    public static final String stormpathBaseUrl = getVal("STORMPATH_CLIENT_BASEURL", "https://api.stormpath.com/v1")
-    public static final String stormpathApplicationHref = getVal("STORMPATH_APPLICATION_HREF", "")
     public static final String stormpathHtmlEnabled = getVal("STORMPATH_TCK_HTML_ENABLED", "true")
 
-    public static String getVal(String name, String defaultVal) {
+    static String getVal(String name, String defaultVal) {
 
         //convert to system property format and try that first (they have precedence over environment variables):
         String sysPropName = name.toLowerCase().replace('_', '.')

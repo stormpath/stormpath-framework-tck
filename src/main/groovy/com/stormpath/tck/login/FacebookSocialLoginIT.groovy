@@ -19,7 +19,6 @@ import com.jayway.restassured.http.ContentType
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.responseSpecs.JsonResponseSpec
 import com.stormpath.tck.util.EnvUtils
-import com.stormpath.tck.util.RestUtils
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 

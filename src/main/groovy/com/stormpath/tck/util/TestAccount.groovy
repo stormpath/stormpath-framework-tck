@@ -1,12 +1,22 @@
-/**
- * Created by edjiang on 3/30/16.
+/*
+ * Copyright 2016 Stormpath, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.stormpath.tck.util
 
-import com.jayway.restassured.http.ContentType
-import io.jsonwebtoken.lang.Strings
-
 import static com.jayway.restassured.RestAssured.given
+import static com.stormpath.tck.util.FrameworkConstants.RegisterRoute
 
 class TestAccount {
     final String randomUUID = UUID.randomUUID().toString()
@@ -22,27 +32,23 @@ class TestAccount {
 
     String href
 
-    public void registerOnServer() {
-        href = given()
-            .port(443)
-            .accept(ContentType.JSON)
-            .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
-            .header("User-Agent", "stormpath-framework-tck")
-            .contentType(ContentType.JSON)
-            .body(getPropertiesMap())
+    void registerOnServer() {
+        href =
+            given()
+                .body(getPropertiesMap())
             .when()
-                .post(EnvUtils.stormpathApplicationHref + "/accounts")
+                .post(RegisterRoute)
             .then()
-                .statusCode(201)
+                .statusCode(200)
             .extract()
-                .path("href")
+                .path("account.href")
     }
 
-    public void setCSRF(String csrf) {
+    void setCSRF(String csrf) {
         this.csrf = csrf
     }
 
-    public void setCookies(Map<String, String> cookies) {
+    void setCookies(Map<String, String> cookies) {
         this.cookies = cookies
     }
 

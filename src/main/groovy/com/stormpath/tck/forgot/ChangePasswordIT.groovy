@@ -23,7 +23,6 @@ import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.responseSpecs.JsonResponseSpec
 import com.stormpath.tck.util.EnvUtils
 import com.stormpath.tck.util.HtmlUtils
-import com.stormpath.tck.util.RestUtils
 import com.stormpath.tck.util.TestAccount
 import org.testng.annotations.Test
 
@@ -236,7 +235,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void changeEndpointChangesAccountPasswordWhenPostingJson() throws Exception {
+    void changeEndpointChangesAccountPasswordWhenPostingJson() throws Exception {
         // TODO: work with CSRF?
 
         def account = new TestAccount()

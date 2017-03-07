@@ -20,7 +20,6 @@ import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.responseSpecs.AccountResponseSpec
-import com.stormpath.tck.util.RestUtils
 import com.stormpath.tck.util.TestAccount
 import io.jsonwebtoken.Jwt
 import io.jsonwebtoken.Jwts

@@ -22,7 +22,6 @@ import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.util.EnvUtils
 import com.stormpath.tck.util.HtmlUtils
-import com.stormpath.tck.util.RestUtils
 import com.stormpath.tck.util.TestAccount
 import io.jsonwebtoken.lang.Strings
 import org.slf4j.Logger
