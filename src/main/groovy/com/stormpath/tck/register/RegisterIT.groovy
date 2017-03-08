@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.stormpath.tck.register
 
 import com.jayway.restassured.http.ContentType
@@ -37,24 +36,22 @@ import static com.stormpath.tck.util.Matchers.urlStartsWithPath
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.hasKey
-import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.isEmptyOrNullString
 import static org.hamcrest.Matchers.not
 import static org.testng.Assert.assertEquals
 import static org.testng.Assert.assertFalse
 
-@Test
 class RegisterIT extends AbstractIT {
 
     private testAccount
 
     @BeforeTest(alwaysRun = true)
-    public void setUp() {
+    void setUp() {
         super.setUp();
     }
 
     @BeforeMethod(alwaysRun = true)
-    public void beforeEach() {
+    void beforeEach() {
         testAccount = new TestAccount()
     }
 
@@ -97,7 +94,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void registerServesJsonViewModel() throws Exception {
+    void registerServesJsonViewModel() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -116,7 +113,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void registerErrorsOnMissingRequiredFields() throws Exception {
+    void registerErrorsOnMissingRequiredFields() throws Exception {
         [
                 //No surname
                 [params: [email: testAccount.email, password: testAccount.password, givenName: testAccount.givenName], errorMsg: "Last Name is required."],
@@ -149,7 +146,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void registerErrorsForUndefinedFields() throws Exception {
+    void registerErrorsForUndefinedFields() throws Exception {
 
         def jsonMap = [email: testAccount.email,
                        password: testAccount.password,
@@ -169,7 +166,7 @@ class RegisterIT extends AbstractIT {
     }
 
     @Test(groups=["v100", "json"])
-    public void registerErrorsForDisableDefaultFields() throws Exception {
+    void registerErrorsForDisableDefaultFields() throws Exception {
 
         def jsonMap = [email: testAccount.email,
                        password: testAccount.password,
@@ -193,7 +190,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void registerErrorsForUndefinedCustomFields() throws Exception {
+    void registerErrorsForUndefinedCustomFields() throws Exception {
 
         def jsonMap = [email: testAccount.email,
                        password: testAccount.password,
@@ -219,7 +216,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void registerErrorsOnServerError() throws Exception {
+    void registerErrorsOnServerError() throws Exception {
 
         def jsonMap = [email: "foo@bar",
                        password: "1",
@@ -243,7 +240,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void registerReturnsSanitizedJsonAccount() throws Exception {
+    void registerReturnsSanitizedJsonAccount() throws Exception {
 
         def testAccount = new TestAccount()
 
@@ -268,7 +265,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void registerServesHtmlForm() throws Exception {
+    void registerServesHtmlForm() throws Exception {
 
         Response response =
             given()
@@ -292,7 +289,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void registerFormShouldBeOrdered() throws Exception {
+    void registerFormShouldBeOrdered() throws Exception {
         def requiredAttributesList = [
                 [name: "givenName", placeholder: "First Name", type: "text"],
                 [name: "surname", placeholder: "Last Name", type: "text"],
@@ -325,7 +322,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void registerErrorsWithEmptyPostBody() throws Exception {
+    void registerErrorsWithEmptyPostBody() throws Exception {
 
         saveCSRFAndCookies(RegisterRoute)
 
@@ -357,7 +354,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void registerErrorsWithMissingRequiredFormFieldsHtml() throws Exception {
+    void registerErrorsWithMissingRequiredFormFieldsHtml() throws Exception {
         [
                 //No surname
                 [params: [email: testAccount.email, password: testAccount.password, givenName: testAccount.givenName], errorMsg: "Last Name is required."],
@@ -404,7 +401,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void registerErrorsForUndefinedFieldsHtml() throws Exception {
+    void registerErrorsForUndefinedFieldsHtml() throws Exception {
 
         saveCSRFAndCookies(RegisterRoute);
 
@@ -441,7 +438,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void registerErrorsOnServerErrorHtml() throws Exception {
+    void registerErrorsOnServerErrorHtml() throws Exception {
 
         saveCSRFAndCookies(RegisterRoute);
 
@@ -478,7 +475,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void registerRedirectToLoginOnSuccess() throws Exception {
+    void registerRedirectToLoginOnSuccess() throws Exception {
 
         saveCSRFAndCookies(RegisterRoute)
 
@@ -508,7 +505,7 @@ class RegisterIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void registerFormPreservesValuesOnPostback() throws Exception {
+    void registerFormPreservesValuesOnPostback() throws Exception {
 
         saveCSRFAndCookies(RegisterRoute)
 

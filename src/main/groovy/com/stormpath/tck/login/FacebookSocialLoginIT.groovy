@@ -30,7 +30,6 @@ import static org.hamcrest.Matchers.isEmptyOrNullString
 import static org.hamcrest.Matchers.not
 import static org.testng.Assert.assertNotNull
 
-@Test
 class FacebookSocialLoginIT extends AbstractIT {
     // We are really only going to try testing LoginWithFacebook for now, so might have some things hardcoded.
 
@@ -100,7 +99,7 @@ class FacebookSocialLoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups = ["v100", "json"])
-    public void loginWithValidFacebookAccessTokenSucceeds() throws Exception {
+    void loginWithValidFacebookAccessTokenSucceeds() throws Exception {
         def loginJSON = ["providerData": [
                 "providerId": "facebook",
                 "accessToken": facebookTestUserAccessToken
@@ -125,7 +124,7 @@ class FacebookSocialLoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups = ["v100", "json"])
-    public void loginWithInvalidFacebookAccessTokenFails() throws Exception {
+    void loginWithInvalidFacebookAccessTokenFails() throws Exception {
         def loginJSON = ["providerData": [
                 "providerId": "facebook",
                 "accessToken": "garbageToken"
@@ -146,7 +145,7 @@ class FacebookSocialLoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups = ["v100", "json"])
-    public void loginWithGrantTypeStormpathSocialSucceeds() throws Exception {
+    void loginWithGrantTypeStormpathSocialSucceeds() throws Exception {
 
         given()
             .accept(ContentType.JSON)

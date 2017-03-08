@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.stormpath.tck.me
 
 import com.jayway.restassured.http.ContentType
@@ -35,7 +34,6 @@ import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.isEmptyOrNullString
 import static org.hamcrest.Matchers.not
 
-@Test
 class MeIT extends AbstractIT {
     private TestAccount account = new TestAccount()
     private String accessToken
@@ -66,7 +64,7 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void meFailsOnUnauthenticatedRequest() throws Exception {
+    void meFailsOnUnauthenticatedRequest() throws Exception {
         when()
             .get(MeRoute)
         .then()
@@ -81,7 +79,7 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void meWithCookieAuthReturnsJsonUser() throws Exception {
+    void meWithCookieAuthReturnsJsonUser() throws Exception {
         ["text/html", "application/json", "*/*", ""].each { contentType ->
             given()
                 .header("Accept", contentType)
@@ -101,7 +99,7 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void meWithBearerAuthReturnsJsonUser() throws Exception {
+    void meWithBearerAuthReturnsJsonUser() throws Exception {
         given()
             .auth().oauth2(accessToken)
         .when()
@@ -113,9 +111,11 @@ class MeIT extends AbstractIT {
     /**
      * Me should take Basic auth with an account's API keys as well.
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/236
+     *
+     * TODO - disabling test to remove Stormpath specific behavior
      */
-    @Test(groups=["v100", "json"])
-    public void meWithBasicAuthReturnsJsonUser() throws Exception {
+    @Test(groups=["v100", "json"], enabled=false)
+    void meWithBasicAuthReturnsJsonUser() throws Exception {
         Response apiKeysResource = given()
             .header("User-Agent", "stormpath-framework-tck")
             .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
@@ -146,7 +146,7 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void meWithCookieAuthStripsLinkedResources() throws Exception {
+    void meWithCookieAuthStripsLinkedResources() throws Exception {
         given()
             .cookie("access_token", accessToken)
         .when()
@@ -162,7 +162,7 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void meWithBearerAuthStripsLinkedResources() throws Exception {
+    void meWithBearerAuthStripsLinkedResources() throws Exception {
         given()
             .auth().oauth2(accessToken)
         .when()
@@ -178,7 +178,7 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void meWithCookieAuthHasNoCacheHeaders() throws Exception {
+    void meWithCookieAuthHasNoCacheHeaders() throws Exception {
         given()
             .cookie("access_token", accessToken)
         .when()
@@ -197,7 +197,7 @@ class MeIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void meWithBearerAuthHasNoCacheHeaders() throws Exception {
+    void meWithBearerAuthHasNoCacheHeaders() throws Exception {
         given()
             .auth().oauth2(accessToken)
         .when()
@@ -213,7 +213,7 @@ class MeIT extends AbstractIT {
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/231
      */
     @Test(groups=["v100", "json"])
-    public void unsignedAccessTokensShouldFail() throws Exception {
+    void unsignedAccessTokensShouldFail() throws Exception {
         String unsignedAccessToken = changeJwtAlgorithmToNone(accessToken)
 
         given()

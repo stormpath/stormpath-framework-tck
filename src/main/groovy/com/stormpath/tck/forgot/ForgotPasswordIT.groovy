@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.stormpath.tck.forgot
 
 import com.jayway.restassured.http.ContentType
@@ -36,8 +35,8 @@ import static org.hamcrest.Matchers.isEmptyOrNullString
 import static org.hamcrest.Matchers.not
 import static org.testng.Assert.assertEquals
 
-@Test
 class ForgotPasswordIT extends AbstractIT {
+
     private TestAccount account = new TestAccount()
     private static final invalidEmail = "foo+notarealemail@bar.baz"
 
@@ -52,7 +51,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json", "html"])
-    public void forgotDoesNotHandlePut() throws Exception {
+    void forgotDoesNotHandlePut() throws Exception {
         put(ForgotRoute)
             .then()
                 .assertThat().statusCode(allOf(not(200), not(500)))
@@ -63,7 +62,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json", "html"])
-    public void forgotDoesNotHandleDelete() throws Exception {
+    void forgotDoesNotHandleDelete() throws Exception {
         delete(ForgotRoute)
             .then()
                 .assertThat().statusCode(allOf(not(200), not(500)))
@@ -74,7 +73,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void forgotDoesNotHandleJsonGet() throws Exception {
+    void forgotDoesNotHandleJsonGet() throws Exception {
         given()
             .accept(ContentType.JSON)
         .when()
@@ -88,7 +87,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void forgotSucceedsWhenPostingValidEmailJson() throws Exception {
+    void forgotSucceedsWhenPostingValidEmailJson() throws Exception {
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
@@ -104,7 +103,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void forgotSucceedsWhenPostingInvalidEmailJson() throws Exception {
+    void forgotSucceedsWhenPostingInvalidEmailJson() throws Exception {
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
@@ -120,7 +119,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void forgotRendersForm() throws Exception {
+    void forgotRendersForm() throws Exception {
 
         def response = given()
             .accept(ContentType.HTML)
@@ -143,7 +142,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void forgotRendersFormWithInvalidSptokenBanner() throws Exception {
+    void forgotRendersFormWithInvalidSptokenBanner() throws Exception {
 
         def response = given()
             .accept(ContentType.HTML)
@@ -167,7 +166,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void forgotRedirectsToNextUriWhenPostingValidEmail() throws Exception {
+    void forgotRedirectsToNextUriWhenPostingValidEmail() throws Exception {
 
         saveCSRFAndCookies(ForgotRoute)
 
@@ -191,7 +190,7 @@ class ForgotPasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void forgotRedirectsToNextUriWhenPostingInvalidEmail() throws Exception {
+    void forgotRedirectsToNextUriWhenPostingInvalidEmail() throws Exception {
 
         saveCSRFAndCookies(ForgotRoute)
 

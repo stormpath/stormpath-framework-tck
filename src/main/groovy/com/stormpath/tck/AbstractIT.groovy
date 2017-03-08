@@ -72,7 +72,7 @@ abstract class AbstractIT {
     }
 
     @BeforeSuite
-    public void setUpClass() {
+    void setUpClass() {
         setupRestAssured()
     }
 
@@ -86,20 +86,20 @@ abstract class AbstractIT {
     }
 
     @BeforeTest
-    public void setUp() {
+    void setUp() {
         methodResourcesToDelete.clear() //fresh list per test
         csrf = null
         cookies = null
     }
 
     @AfterTest
-    public void tearDown() {
+    void tearDown() {
         deleteResources(methodResourcesToDelete)
         deleteAccounts(methodAccountsToDelete)
     }
 
     @AfterSuite
-    public void tearDownClass() {
+    void tearDownClass() {
         deleteResources(classResourcesToDelete)
     }
 
@@ -171,24 +171,26 @@ abstract class AbstractIT {
         account.registerOnServer()
 
         def response =
-                given()
-                    .param("grant_type", "password")
-                    .param("username", account.username)
-                    .param("password", account.password)
-                .when()
-                    .post(OauthRoute)
-                .then()
-                    .statusCode(200)
-                    .contentType(ContentType.JSON)
-                    .body("access_token", not(isEmptyOrNullString()))
-                .extract()
-                    .response()
+            given()
+                .param("grant_type", "password")
+                .param("username", account.username)
+                .param("password", account.password)
+            .when()
+                .post(OauthRoute)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("access_token", not(isEmptyOrNullString()))
+            .extract()
+                .response()
         deleteOnClassTeardown(account.href)
 
         return new Tuple2(response.path("access_token"), response.path("refresh_token"))
     }
 
     private void deleteResources(List<String> hrefs) {
+        /*
+        // TODO - no way to delete resources interacting with frameworks exclusively
         //delete in opposite order - it's cleaner; children are deleted before parents
         hrefs.reverse().each { href ->
             try {
@@ -204,6 +206,7 @@ abstract class AbstractIT {
                 log.error("Unable to delete specified resource: $href", t)
             }
         }
+        */
     }
 
     private void deleteAccounts(List<String> emails) {

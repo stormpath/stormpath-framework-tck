@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.stormpath.tck.logout
 
 import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Cookies
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.EnvUtils
-import com.stormpath.tck.util.JwtUtils
 import com.stormpath.tck.util.TestAccount
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
@@ -36,7 +33,6 @@ import static org.hamcrest.Matchers.allOf
 import static org.hamcrest.Matchers.not
 import static org.testng.Assert.assertTrue
 
-@Test
 class LogoutIT extends AbstractIT {
     private TestAccount account = new TestAccount()
 
@@ -51,6 +47,9 @@ class LogoutIT extends AbstractIT {
         assertTrue(isCookieDeleted(cookies.get("refresh_token")))
     }
 
+    // TODO - this is stormpath specific and as such is commented out for now
+    // An agnostic approach here might be to login with the access token and confirm that it fails
+    // and try to use the refresh token and confirm that it fails
     private void assertTokenIsRevoked(String tokenJwt, String resourceType) throws Exception {
 //        String tokenId = JwtUtils.extractJwtClaim(tokenJwt, "jti")
 //
@@ -68,7 +67,7 @@ class LogoutIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
      */
     @Test(groups=["v100", "json", "html"])
-    public void logoutDoesNotHandleGet() throws Exception {
+    void logoutDoesNotHandleGet() throws Exception {
         get(LogoutRoute)
             .then()
                 .statusCode(allOf(not(200), not(500)))
@@ -78,7 +77,7 @@ class LogoutIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
      */
     @Test(groups=["v100", "json", "html"])
-    public void logoutDoesNotHandlePut() throws Exception {
+    void logoutDoesNotHandlePut() throws Exception {
         put(LogoutRoute)
             .then()
                 .assertThat().statusCode(allOf(not(200), not(500)))
@@ -88,7 +87,7 @@ class LogoutIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/54">#54</a>
      */
     @Test(groups=["v100", "json", "html"])
-    public void logoutDoesNotHandleDelete() throws Exception {
+    void logoutDoesNotHandleDelete() throws Exception {
         delete(LogoutRoute)
             .then()
                 .assertThat().statusCode(allOf(not(200), not(500)))
@@ -99,7 +98,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void logoutSucceedsOnUnauthenticatedJsonRequest() throws Exception {
+    void logoutSucceedsOnUnauthenticatedJsonRequest() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -114,7 +113,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void logoutDeletesCookiesJson() throws Exception {
+    void logoutDeletesCookiesJson() throws Exception {
         def sessionCookies = createSession(account)
 
         Cookies detailedCookies =
@@ -135,7 +134,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void logoutReturns200OKOnSuccess() throws Exception {
+    void logoutReturns200OKOnSuccess() throws Exception {
         def sessionCookies = createSession(account)
 
         given()
@@ -152,7 +151,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void logoutRevokesTokensInCookiesAfterSuccessJson() throws Exception {
+    void logoutRevokesTokensInCookiesAfterSuccessJson() throws Exception {
         def sessionCookies = createSession(account)
 
         given()
@@ -168,7 +167,7 @@ class LogoutIT extends AbstractIT {
     }
 
     @Test(groups=["v100", "json"])
-    public void logoutRevokesTokensInHeadersAfterSuccessJson() throws Exception {
+    void logoutRevokesTokensInHeadersAfterSuccessJson() throws Exception {
         Tuple2 tokens = createTestAccountTokens()
 
         given()
@@ -188,7 +187,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void logoutRedirectsToNextUriOnUnauthenticatedRequest() throws Exception {
+    void logoutRedirectsToNextUriOnUnauthenticatedRequest() throws Exception {
 
         given()
             .accept(ContentType.HTML)
@@ -204,7 +203,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void logoutRedirectsToNextUriOnSuccess() throws Exception {
+    void logoutRedirectsToNextUriOnSuccess() throws Exception {
         def sessionCookies = createSession(account)
 
         given()
@@ -222,7 +221,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void logoutDeletesCookiesHtml() throws Exception {
+    void logoutDeletesCookiesHtml() throws Exception {
         def sessionCookies = createSession(account)
 
         Cookies detailedCookies =
@@ -243,7 +242,7 @@ class LogoutIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void logoutRevokesTokensHtml() throws Exception {
+    void logoutRevokesTokensHtml() throws Exception {
         def sessionCookies = createSession(account)
 
         given()

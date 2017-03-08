@@ -20,28 +20,34 @@ import static com.stormpath.tck.util.FrameworkConstants.RegisterRoute
 
 class TestAccount {
     final String randomUUID = UUID.randomUUID().toString()
-    final String email = "fooemail-" + randomUUID + "@testmail.stormpath.com"
+    final String email
     final String givenName = "GivenName-" + randomUUID
     final String surname = "Surname-" + randomUUID
     final String middleName = null
     final String password = "P@sword123!"
-    final String username = email
+    final String username
+    final GuerillaEmail guerillaEmail
 
     String csrf
     Map<String, String> cookies
 
+    // TODO - currently Stormpath specific. Will need to generify when dealing with Okta
     String href
 
+    TestAccount() {
+        guerillaEmail = GuerillaEmailService.createGuerrillaEmail()
+        username = email = guerillaEmail.email
+    }
+
     void registerOnServer() {
-        href =
-            given()
-                .body(getPropertiesMap())
-            .when()
-                .post(RegisterRoute)
-            .then()
-                .statusCode(200)
-            .extract()
-                .path("account.href")
+        href = given()
+            .body(getPropertiesMap())
+        .when()
+            .post(RegisterRoute)
+        .then()
+            .statusCode(200)
+        .extract()
+            .path("account.href")
     }
 
     void setCSRF(String csrf) {

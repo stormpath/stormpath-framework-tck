@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.stormpath.tck.authentication
 
 import com.jayway.restassured.http.ContentType
 import com.stormpath.tck.AbstractIT
-import com.stormpath.tck.util.FrameworkConstants
 import com.stormpath.tck.util.JwtUtils
 import com.stormpath.tck.util.TestAccount
 import org.testng.annotations.Test
@@ -33,7 +31,6 @@ import static org.hamcrest.Matchers.not
 import static org.testng.Assert.assertEquals
 import static org.testng.Assert.assertTrue
 
-@Test
 class CookieIT extends AbstractIT {
 
     /** If access token is invalid, use refresh token to get new access token
@@ -41,7 +38,7 @@ class CookieIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json", "html"])
-    public void serverRefreshesAccessTokenWhenMissing() throws Exception {
+    void serverRefreshesAccessTokenWhenMissing() throws Exception {
         def (String accessToken, String refreshToken) = createTestAccountTokens()
 
         given()
@@ -59,7 +56,7 @@ class CookieIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json", "html"])
-    public void serverDeletesCookiesWhenRefreshingWithInvalidToken() throws Exception {
+    void serverDeletesCookiesWhenRefreshingWithInvalidToken() throws Exception {
         def response = given()
             .cookie("access_token",  "not_a_valid_access_token_at_all")
             .cookie("refresh_token", "not_a_valid_refresh_token_at_all")
@@ -81,7 +78,7 @@ class CookieIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void unauthorizedHtmlRequestIsForwardedToLogin() throws Exception {
+    void unauthorizedHtmlRequestIsForwardedToLogin() throws Exception {
 
         // TODO: This test will probably have to change because we will be updating the spec.
 
@@ -99,12 +96,12 @@ class CookieIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void cookieExpirationMatchesTokenTtl() throws Exception {
+    void cookieExpirationMatchesTokenTtl() throws Exception {
         def account = new TestAccount()
         account.registerOnServer()
         deleteOnClassTeardown(account.href)
 
-        saveCSRFAndCookies(FrameworkConstants.LoginRoute)
+        saveCSRFAndCookies(LoginRoute)
 
         def requestSpecification = given()
             .accept(ContentType.JSON)
@@ -147,7 +144,7 @@ class CookieIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json", "html"])
-    public void refreshTokenAsAccessTokenFails() throws Exception {
+    void refreshTokenAsAccessTokenFails() throws Exception {
         def (String accessToken, String refreshToken) = createTestAccountTokens()
 
         given()

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.stormpath.tck.errors
 
 import com.jayway.restassured.http.ContentType
@@ -24,7 +23,6 @@ import static com.jayway.restassured.RestAssured.given
 import static com.stormpath.tck.util.FrameworkConstants.MeRoute
 import static com.stormpath.tck.util.FrameworkConstants.MissingRoute
 
-@Test
 class ErrorsIT extends AbstractIT {
 
     /**
@@ -32,7 +30,7 @@ class ErrorsIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-sdk-java/issues/706">#706</a>
      */
     @Test(groups=["v100", "html"])
-    public void missingEndpointShouldReturn404() {
+    void missingEndpointShouldReturn404() {
         given()
             .header("Accept", ContentType.HTML)
         .when()
@@ -46,7 +44,7 @@ class ErrorsIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-sdk-java/issues/706">#706</a>
      */
     @Test(groups=["v100", "json"])
-    public void restrictedEndpointShouldReturn401AndWWWAuthenticateHeader() {
+    void restrictedEndpointShouldReturn401AndWWWAuthenticateHeader() {
         given()
             .header("Accept", ContentType.JSON)
         .when()

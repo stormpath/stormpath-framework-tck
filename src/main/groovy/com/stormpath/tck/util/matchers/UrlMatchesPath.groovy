@@ -34,7 +34,7 @@ class UrlMatchesPath extends TypeSafeMatcher {
         return false
     }
 
-    public void describeTo(Description description) {
+    void describeTo(Description description) {
         description.appendText("doesn't match path");
     }
 }
