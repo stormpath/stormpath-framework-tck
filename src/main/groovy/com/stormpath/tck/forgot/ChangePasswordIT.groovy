@@ -20,8 +20,8 @@ import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.path.xml.element.Node
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.responseSpecs.JsonResponseSpec
-import com.stormpath.tck.util.GuerillaEmailService
 import com.stormpath.tck.util.HtmlUtils
+import com.stormpath.tck.util.StringUtils
 import com.stormpath.tck.util.TestAccount
 import org.testng.annotations.Test
 
@@ -33,6 +33,7 @@ import static com.stormpath.tck.util.FrameworkConstants.ForgotRoute
 import static com.stormpath.tck.util.FrameworkConstants.getOauthRoute
 import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
 import static com.stormpath.tck.util.Matchers.urlMatchesPath
+import static com.stormpath.tck.util.TestAccount.Mode.WITH_DISPOSABLE_EMAIL
 import static org.hamcrest.Matchers.allOf
 import static org.hamcrest.Matchers.isEmptyOrNullString
 import static org.hamcrest.Matchers.not
@@ -182,7 +183,7 @@ class ChangePasswordIT extends AbstractIT {
             [type: "password"]
         ]
 
-        def account = new TestAccount()
+        def account = new TestAccount(WITH_DISPOSABLE_EMAIL)
         account.registerOnServer()
         deleteOnClassTeardown(account.href)
 
@@ -194,8 +195,8 @@ class ChangePasswordIT extends AbstractIT {
             .statusCode(200)
 
         // TODO - will need to make this configurable for Okta
-        String rawChangePasswordEmail = GuerillaEmailService.getEmail(account.guerillaEmail, "stormpath.com")
-        String changePasswordHref = GuerillaEmailService.extractChangePasswordHref(rawChangePasswordEmail, "sptoken")
+        String rawChangePasswordEmail = account.getEmail("stormpath.com")
+        String changePasswordHref = StringUtils.extractChangePasswordHref(rawChangePasswordEmail, "sptoken")
 
         def response = given()
             .accept(ContentType.HTML)
@@ -223,7 +224,7 @@ class ChangePasswordIT extends AbstractIT {
     @Test(groups=["v100", "json"])
     void changeEndpointChangesAccountPasswordWhenPostingJson() throws Exception {
 
-        def account = new TestAccount()
+        def account = new TestAccount(WITH_DISPOSABLE_EMAIL)
         account.registerOnServer()
         deleteOnClassTeardown(account.href)
 
@@ -235,9 +236,9 @@ class ChangePasswordIT extends AbstractIT {
             .statusCode(200)
 
         // TODO - will need to make this configurable for Okta
-        String rawChangePasswordEmail = GuerillaEmailService.getEmail(account.guerillaEmail, "stormpath.com")
-        String changePasswordHref = GuerillaEmailService.extractChangePasswordHref(rawChangePasswordEmail, "sptoken")
-        String sptoken = GuerillaEmailService.extractTokenFromHref(changePasswordHref, "sptoken")
+        String rawChangePasswordEmail = account.getEmail("stormpath.com")
+        String changePasswordHref = StringUtils.extractChangePasswordHref(rawChangePasswordEmail, "sptoken")
+        String sptoken = StringUtils.extractTokenFromHref(changePasswordHref, "sptoken")
 
         String newPassword = "N3wP4ssw0rd###"
 

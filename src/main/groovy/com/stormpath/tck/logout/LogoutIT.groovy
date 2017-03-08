@@ -29,12 +29,13 @@ import static com.jayway.restassured.RestAssured.put
 import static com.stormpath.tck.util.CookieUtils.isCookieDeleted
 import static com.stormpath.tck.util.FrameworkConstants.LogoutRoute
 import static com.stormpath.tck.util.Matchers.urlMatchesPath
+import static com.stormpath.tck.util.TestAccount.Mode.WITHOUT_DISPOSABLE_EMAIL
 import static org.hamcrest.Matchers.allOf
 import static org.hamcrest.Matchers.not
 import static org.testng.Assert.assertTrue
 
 class LogoutIT extends AbstractIT {
-    private TestAccount account = new TestAccount()
+    private TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
 
     @BeforeClass(alwaysRun = true)
     void createTestUser() throws Exception {

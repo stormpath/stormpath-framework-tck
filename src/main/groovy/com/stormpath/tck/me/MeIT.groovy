@@ -29,13 +29,14 @@ import static com.jayway.restassured.RestAssured.given
 import static com.jayway.restassured.RestAssured.when
 import static com.stormpath.tck.util.FrameworkConstants.MeRoute
 import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
+import static com.stormpath.tck.util.TestAccount.Mode.WITHOUT_DISPOSABLE_EMAIL
 import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.isEmptyOrNullString
 import static org.hamcrest.Matchers.not
 
 class MeIT extends AbstractIT {
-    private TestAccount account = new TestAccount()
+    private TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
     private String accessToken
 
     @BeforeClass(alwaysRun = true)

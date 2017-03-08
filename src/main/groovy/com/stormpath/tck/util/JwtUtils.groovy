@@ -18,21 +18,17 @@ package com.stormpath.tck.util
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
-public class JwtUtils {
-
-    private static final Logger log = LoggerFactory.getLogger(JwtUtils)
+class JwtUtils {
 
     static String extractJwtClaim(String jwt, String property) {
-        String secret = ApiKey.getSecret()
+        String secret = EnvUtils.getVal("JWT_SIGNING_KEY")
         Claims claims = Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(jwt).getBody()
         return (String) claims.get(property)
     }
 
     static Jws<Claims> parseJwt(String jwt) {
-        String secret = ApiKey.getSecret()
+        String secret = EnvUtils.getVal("JWT_SIGNING_KEY")
         return Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(jwt)
     }
 }

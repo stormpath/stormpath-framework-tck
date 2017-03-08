@@ -28,6 +28,7 @@ import org.testng.annotations.Test
 import static com.jayway.restassured.RestAssured.get
 import static com.jayway.restassured.RestAssured.given
 import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
+import static com.stormpath.tck.util.TestAccount.Mode.WITHOUT_DISPOSABLE_EMAIL
 import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.equalToIgnoringCase
 import static org.hamcrest.Matchers.is
@@ -38,7 +39,7 @@ import static org.testng.Assert.assertNotEquals
 import static org.testng.Assert.assertTrue
 
 class Oauth2IT extends AbstractIT {
-    private TestAccount account = new TestAccount()
+    private TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
 
     @BeforeClass(alwaysRun = true)
     private void createTestAccount() throws Exception {

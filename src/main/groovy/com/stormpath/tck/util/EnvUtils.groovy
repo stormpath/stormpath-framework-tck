@@ -20,6 +20,10 @@ class EnvUtils {
 
     public static final String stormpathHtmlEnabled = getVal("STORMPATH_TCK_HTML_ENABLED", "true")
 
+    static String getVal(String name) {
+        return getVal(name, null)
+    }
+
     static String getVal(String name, String defaultVal) {
 
         //convert to system property format and try that first (they have precedence over environment variables):

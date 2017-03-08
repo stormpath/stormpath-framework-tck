@@ -35,6 +35,7 @@ import static com.jayway.restassured.RestAssured.put
 import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
 import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
 import static com.stormpath.tck.util.Matchers.urlMatchesPath
+import static com.stormpath.tck.util.TestAccount.Mode.WITHOUT_DISPOSABLE_EMAIL
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.allOf
@@ -48,7 +49,7 @@ import static org.testng.Assert.assertTrue
 
 class LoginIT extends AbstractIT {
 
-    private TestAccount account = new TestAccount()
+    private TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
 
     private String getNodeText(Node node, boolean addContentsFirst) {
         StringBuilder builder = new StringBuilder()

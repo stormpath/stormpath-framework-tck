@@ -33,6 +33,7 @@ import static com.jayway.restassured.RestAssured.given
 import static com.stormpath.tck.util.FrameworkConstants.RegisterRoute
 import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
 import static com.stormpath.tck.util.Matchers.urlStartsWithPath
+import static com.stormpath.tck.util.TestAccount.Mode.WITHOUT_DISPOSABLE_EMAIL
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.hasKey
@@ -52,7 +53,7 @@ class RegisterIT extends AbstractIT {
 
     @BeforeMethod(alwaysRun = true)
     void beforeEach() {
-        testAccount = new TestAccount()
+        testAccount = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
     }
 
     private Node findTagWithAttribute(NodeChildren children, String tag, String attributeKey, String attributeValue) {
@@ -242,7 +243,7 @@ class RegisterIT extends AbstractIT {
     @Test(groups=["v100", "json"])
     void registerReturnsSanitizedJsonAccount() throws Exception {
 
-        def testAccount = new TestAccount()
+        def testAccount = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
 
         String createdHref =
             given()
