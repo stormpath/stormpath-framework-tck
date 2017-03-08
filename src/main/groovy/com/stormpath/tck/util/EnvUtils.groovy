@@ -16,9 +16,24 @@
 
 package com.stormpath.tck.util
 
+import static org.testng.FileAssert.fail
+
 class EnvUtils {
 
     public static final String stormpathHtmlEnabled = getVal("STORMPATH_TCK_HTML_ENABLED", "true")
+
+    public static final String jwtSigningKey
+    public static final String facebookClientId
+    public static final String facebookClientSecret
+
+    static {
+        jwtSigningKey = getVal("JWT_SIGNING_KEY")
+        facebookClientId = getVal("FACEBOOK_CLIENT_ID")
+        facebookClientSecret = getVal("FACEBOOK_CLIENT_SECRET")
+        if (jwtSigningKey == null || facebookClientId == null || facebookClientSecret == null) {
+            fail("JWT_SIGNING_KEY, FACEBOOK_CLIENT_ID and FACEBOOK_CLIENT_SECRET environment variables are required")
+        }
+    }
 
     static String getVal(String name) {
         return getVal(name, null)

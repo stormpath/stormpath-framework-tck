@@ -298,8 +298,6 @@ class RegisterIT extends AbstractIT {
                 [name: "password", placeholder: "Password", type: "password"]
         ]
 
-        // Todo: CSRF support
-
         Response response =
             given()
                 .accept(ContentType.HTML)

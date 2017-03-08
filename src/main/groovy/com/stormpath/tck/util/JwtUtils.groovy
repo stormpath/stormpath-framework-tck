@@ -22,13 +22,13 @@ import io.jsonwebtoken.Jwts
 class JwtUtils {
 
     static String extractJwtClaim(String jwt, String property) {
-        String secret = EnvUtils.getVal("JWT_SIGNING_KEY")
+        String secret = EnvUtils.jwtSigningKey
         Claims claims = Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(jwt).getBody()
         return (String) claims.get(property)
     }
 
     static Jws<Claims> parseJwt(String jwt) {
-        String secret = EnvUtils.getVal("JWT_SIGNING_KEY")
+        String secret = EnvUtils.jwtSigningKey
         return Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(jwt)
     }
 }
