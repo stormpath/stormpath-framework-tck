@@ -16,7 +16,7 @@ our customers, especially those that use Stormpath across multiple programming l
 development sanity :)  Comments, suggestions and/or contributions from the Open Source community are most welcome.
 
 **Note:** The most recent version of the TCK does not make *any* direct calls to the Stormpath backend. This is in
-support of Stormpath joining force with Okta. The TCK now interacts exclusively with the integration under test. As a
+support of Stormpath joining forces with Okta. The TCK now interacts exclusively with the integration under test. As a
 result, resources created over the course of the testing can no longer be deleted. There are still some Stormpath 
 specific elements in the TCK (such as the `Account` href). As the SDKs are migrated over to using Okta as a backend, we
 will continue to refactor the TCK accordingly.
