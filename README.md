@@ -15,6 +15,12 @@ This project is mostly used by the Stormpath SDK teams to ensure stability and c
 our customers, especially those that use Stormpath across multiple programming languages. And for our own
 development sanity :)  Comments, suggestions and/or contributions from the Open Source community are most welcome.
 
+**Note:** The most recent version of the TCK does not make *any* direct calls to the Stormpath backend. This is in
+support of Stormpath joining force with Okta. The TCK now interacts exclusively with the integration under test. As a
+result, resources created over the course of the testing can no longer be deleted. There are still some Stormpath 
+specific elements in the TCK (such as the `Account` href). As the SDKs are migrated over to using Okta as a backend, we
+will continue to refactor the TCK accordingly.
+
 ## Getting Started
 
 1. If you haven't installed Maven already:
@@ -29,7 +35,7 @@ development sanity :)  Comments, suggestions and/or contributions from the Open 
 
 Fire up your web application under test.  For example, a Java project might do this:
 
-    mvn jetty:run
+    mvn spring-boot:run
 
 And a node.js project might do this:
 
@@ -38,13 +44,24 @@ And a node.js project might do this:
 Once your web app is running, you can run the TCK against this webapp:
 
     cd stormpath-framework-tck
-    mvn clean verify
+    JWT_SIGNING_KEY=<your JWT signing key> \
+    FACEBOOK_CLIENT_ID=<Facebook id for login tests> \
+    FACEBOOK_CLIENT_SECRET=<Facebook secret for login tests> \
+    mvn clean -Prun-ITs verify
 
 This will run all tests against the targeted webapp.
 
+NOTE: The 3 environment variables shown above are *required* in order to run the TCK.
+
+OAuth2 interactions return tokens that are JWTs. These JWTs are signed and in order to verify the signature, the 
+`JWT_SIGNING_KEY` must be passed in.
+
+There are Facebook Login tests that require the `FACEBOOK_CLIENT_ID` and `FACEBOOK_CLIENT_SECRET` to generate test
+accounts and then ensure that login works against the integration under test.
+
 To run a single suite, name it using the -Dtest flag:
 
-    mvn clean verify -Dtest=LogoutIT
+    mvn clean -Prun-ITs verify -Dtest=LogoutIT
 
 ## Using Maven Profiles to Customize TCK Behavior
 
