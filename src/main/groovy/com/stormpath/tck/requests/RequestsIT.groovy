@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.stormpath.tck.requests
 
 import com.jayway.restassured.http.ContentType
@@ -25,7 +24,6 @@ import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
 import static org.hamcrest.Matchers.allOf
 import static org.hamcrest.Matchers.not
 
-@Test
 class RequestsIT extends AbstractIT {
 
     /**
@@ -33,7 +31,7 @@ class RequestsIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/72">#72</a>
      */
     @Test(groups=["v100", "json"])
-    public void emptyAcceptHeaderShouldGetJson() {
+    void emptyAcceptHeaderShouldGetJson() {
 
         given()
             .header("Accept", "")
@@ -50,7 +48,7 @@ class RequestsIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/72">#72</a>
      */
     @Test(groups=["v100", "json"])
-    public void missingAcceptHeaderShouldGetJson() {
+    void missingAcceptHeaderShouldGetJson() {
 
         given()
         .when()
@@ -66,7 +64,7 @@ class RequestsIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/73">#73</a>
      */
     @Test(groups=["v100", "json"])
-    public void anyAcceptHeaderShouldGetJson() {
+    void anyAcceptHeaderShouldGetJson() {
 
         given()
             .accept(ContentType.ANY)
@@ -83,7 +81,7 @@ class RequestsIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/75">#75</a>
      */
     @Test(groups=["v100", "json"])
-    public void jsonAcceptHeaderShouldReturnJson() {
+    void jsonAcceptHeaderShouldReturnJson() {
 
         given()
             .accept(ContentType.JSON)
@@ -99,7 +97,7 @@ class RequestsIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/75">#75</a>
      */
     @Test(groups=["v100", "html"])
-    public void htmlAcceptHeaderShouldReturnHtml() {
+    void htmlAcceptHeaderShouldReturnHtml() {
 
         given()
             .accept(ContentType.HTML)
@@ -115,7 +113,7 @@ class RequestsIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/76">#76</a>
      */
     @Test(groups=["v100", "html"])
-    public void unknownAcceptHeaderIsNotHandled() {
+    void unknownAcceptHeaderIsNotHandled() {
 
         given()
             .header("Accept", "foo/bar")

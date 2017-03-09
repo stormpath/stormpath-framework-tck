@@ -19,7 +19,6 @@ import com.jayway.restassured.http.ContentType
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.responseSpecs.JsonResponseSpec
 import com.stormpath.tck.util.EnvUtils
-import com.stormpath.tck.util.RestUtils
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
@@ -29,56 +28,16 @@ import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.isEmptyOrNullString
 import static org.hamcrest.Matchers.not
-import static org.testng.Assert.assertNotNull
 
-@Test
 class FacebookSocialLoginIT extends AbstractIT {
     // We are really only going to try testing LoginWithFacebook for now, so might have some things hardcoded.
-
-    private String facebookClientID
-    private String facebookClientSecret
 
     private String facebookTestUserAccessToken
     private String facebookTestUserEmail
 
     @BeforeClass(alwaysRun = true)
     private void getSocialProviderTokens() throws Exception {
-        getSocialProviderIdsFromStormpath()
         getFacebookAccessToken()
-    }
-
-    private void getSocialProviderIdsFromStormpath() {
-        assertNotNull(EnvUtils.stormpathApplicationHref, "We need the Application HREF to perform this test.")
-
-        // Pull account stores
-        List<String> accountStores = given()
-            .header("User-Agent", "stormpath-framework-tck")
-            .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
-            .port(443)
-        .when()
-            .get(EnvUtils.stormpathApplicationHref + "/accountStoreMappings")
-        .then()
-            .statusCode(200)
-        .extract().path("items.accountStore.href")
-
-        // Find the FB account store, then put its client id in the class
-        accountStores.each { accountStore ->
-            Map<String> provider = given()
-                .header("User-Agent", "stormpath-framework-tck")
-                .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
-                .port(443)
-            .when()
-                .get(accountStore + "?expand=provider")
-            .then()
-                .statusCode(200)
-            .extract().path("provider")
-
-            if (provider.get("providerId") == "facebook") {
-                this.facebookClientID = provider.get("clientId")
-                this.facebookClientSecret = provider.get("clientSecret")
-                return
-            }
-        }
     }
 
     private void getFacebookAccessToken() {
@@ -87,7 +46,10 @@ class FacebookSocialLoginIT extends AbstractIT {
             .port(443)
             .param("permissions", "email")
         .when()
-            .post("https://graph.facebook.com/" + facebookClientID + "/accounts/test-users?access_token=" + facebookClientID + "|" + facebookClientSecret)
+            .post(
+                "https://graph.facebook.com/" + EnvUtils.facebookClientId + "/accounts/test-users?access_token=" +
+                EnvUtils.facebookClientId + "|" + EnvUtils.facebookClientSecret
+            )
         .then()
             .statusCode(200)
         .extract().response()
@@ -101,7 +63,7 @@ class FacebookSocialLoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups = ["v100", "json"])
-    public void loginWithValidFacebookAccessTokenSucceeds() throws Exception {
+    void loginWithValidFacebookAccessTokenSucceeds() throws Exception {
         def loginJSON = ["providerData": [
                 "providerId": "facebook",
                 "accessToken": facebookTestUserAccessToken
@@ -126,7 +88,7 @@ class FacebookSocialLoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups = ["v100", "json"])
-    public void loginWithInvalidFacebookAccessTokenFails() throws Exception {
+    void loginWithInvalidFacebookAccessTokenFails() throws Exception {
         def loginJSON = ["providerData": [
                 "providerId": "facebook",
                 "accessToken": "garbageToken"
@@ -147,7 +109,7 @@ class FacebookSocialLoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups = ["v100", "json"])
-    public void loginWithGrantTypeStormpathSocialSucceeds() throws Exception {
+    void loginWithGrantTypeStormpathSocialSucceeds() throws Exception {
 
         given()
             .accept(ContentType.JSON)

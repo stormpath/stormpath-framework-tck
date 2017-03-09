@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.stormpath.tck.forgot
 
 import com.jayway.restassured.http.ContentType
@@ -21,9 +20,8 @@ import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.path.xml.element.Node
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.responseSpecs.JsonResponseSpec
-import com.stormpath.tck.util.EnvUtils
 import com.stormpath.tck.util.HtmlUtils
-import com.stormpath.tck.util.RestUtils
+import com.stormpath.tck.util.StringUtils
 import com.stormpath.tck.util.TestAccount
 import org.testng.annotations.Test
 
@@ -32,41 +30,22 @@ import static com.jayway.restassured.RestAssured.given
 import static com.jayway.restassured.RestAssured.put
 import static com.stormpath.tck.util.FrameworkConstants.ChangeRoute
 import static com.stormpath.tck.util.FrameworkConstants.ForgotRoute
+import static com.stormpath.tck.util.FrameworkConstants.getOauthRoute
 import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
 import static com.stormpath.tck.util.Matchers.urlMatchesPath
-import static org.hamcrest.MatcherAssert.assertThat
+import static com.stormpath.tck.util.TestAccount.Mode.WITH_DISPOSABLE_EMAIL
 import static org.hamcrest.Matchers.allOf
 import static org.hamcrest.Matchers.isEmptyOrNullString
 import static org.hamcrest.Matchers.not
-import static org.testng.Assert.assertNotNull
 
 class ChangePasswordIT extends AbstractIT {
-
-    def getPasswordResetToken(TestAccount account) {
-        assertThat(EnvUtils.stormpathApplicationHref, not(isEmptyOrNullString()))
-
-        String passwordResetHref = given()
-            .header("User-Agent", "stormpath-framework-tck")
-            .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
-            .contentType(ContentType.JSON)
-            .body([ "email": account.email ])
-            .port(443)
-        .when()
-            .post("$EnvUtils.stormpathApplicationHref/passwordResetTokens".toString())
-        .then()
-            .statusCode(200)
-        .extract()
-            .path("href")
-
-        return passwordResetHref.drop(passwordResetHref.lastIndexOf("/") + 1) as String
-    }
 
     /** Only GET and POST should be handled
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/166">#166</a>
      * @throws Exception
      */
     @Test(groups=["v100", "json", "html"])
-    public void changeDoesNotHandlePut() throws Exception {
+    void changeDoesNotHandlePut() throws Exception {
         put(ChangeRoute)
                 .then()
                 .assertThat().statusCode(allOf(not(200), not(500)))
@@ -77,7 +56,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json", "html"])
-    public void changeDoesNotHandleDelete() throws Exception {
+    void changeDoesNotHandleDelete() throws Exception {
         delete(ChangeRoute)
                 .then()
                 .assertThat().statusCode(allOf(not(200), not(500)))
@@ -88,7 +67,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void changeErrorsForInvalidSptokenJson() throws Exception {
+    void changeErrorsForInvalidSptokenJson() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -105,7 +84,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void changeErrorsForMissingSptokenJson() throws Exception {
+    void changeErrorsForMissingSptokenJson() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -121,7 +100,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void changeErrorsForInvalidSptokenWhenPostingJson() throws Exception {
+    void changeErrorsForInvalidSptokenWhenPostingJson() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -141,7 +120,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void changeRedirectsToErrorUriForInvalidSptoken() throws Exception {
+    void changeRedirectsToErrorUriForInvalidSptoken() throws Exception {
 
         given()
             .accept(ContentType.HTML)
@@ -158,7 +137,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void changeRediredctsToForgotUriForMissingSptoken() throws Exception {
+    void changeRediredctsToForgotUriForMissingSptoken() throws Exception {
 
         given()
             .accept(ContentType.HTML)
@@ -174,7 +153,7 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void changeRedirectsToErrorUriForInvalidSptokenWhenPosting() throws Exception {
+    void changeRedirectsToErrorUriForInvalidSptokenWhenPosting() throws Exception {
 
         saveCSRFAndCookies(ForgotRoute)
 
@@ -198,24 +177,31 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void changeRendersFormForValidSptoken() throws Exception {
+    void changeRendersFormForValidSptoken() throws Exception {
         def requiredAttributesList = [
-                [name: "password", type: "password"],
-                [type: "password"]
+            [name: "password", type: "password"],
+            [type: "password"]
         ]
 
-        // TODO: work with CSRF?
-        def account = new TestAccount()
+        def account = new TestAccount(WITH_DISPOSABLE_EMAIL)
         account.registerOnServer()
         deleteOnClassTeardown(account.href)
 
-        def sptoken = getPasswordResetToken(account)
+        given()
+            .body([email: account.email])
+        .when()
+            .post(ForgotRoute)
+        .then()
+            .statusCode(200)
+
+        // TODO - will need to make this configurable for Okta
+        String rawChangePasswordEmail = account.getEmail("stormpath.com")
+        String changePasswordHref = StringUtils.extractChangePasswordHref(rawChangePasswordEmail, "sptoken")
 
         def response = given()
             .accept(ContentType.HTML)
-            .queryParam("sptoken", sptoken)
         .when()
-            .get(ChangeRoute)
+            .get(changePasswordHref)
         .then()
             .statusCode(200)
             .contentType(ContentType.HTML)
@@ -236,14 +222,24 @@ class ChangePasswordIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void changeEndpointChangesAccountPasswordWhenPostingJson() throws Exception {
-        // TODO: work with CSRF?
+    void changeEndpointChangesAccountPasswordWhenPostingJson() throws Exception {
 
-        def account = new TestAccount()
+        def account = new TestAccount(WITH_DISPOSABLE_EMAIL)
         account.registerOnServer()
         deleteOnClassTeardown(account.href)
 
-        String sptoken = getPasswordResetToken(account)
+        given()
+            .body([email: account.email])
+        .when()
+            .post(ForgotRoute)
+        .then()
+            .statusCode(200)
+
+        // TODO - will need to make this configurable for Okta
+        String rawChangePasswordEmail = account.getEmail("stormpath.com")
+        String changePasswordHref = StringUtils.extractChangePasswordHref(rawChangePasswordEmail, "sptoken")
+        String sptoken = StringUtils.extractTokenFromHref(changePasswordHref, "sptoken")
+
         String newPassword = "N3wP4ssw0rd###"
 
         given()
@@ -257,22 +253,15 @@ class ChangePasswordIT extends AbstractIT {
             .body(isEmptyOrNullString())
 
         // Verify that the password is now the new password through a login attempt / OAuth token request
-
-        assertNotNull(EnvUtils.stormpathApplicationHref, "We need the Application HREF to perform this test.")
-
-        // Pull account stores
         given()
-            .header("User-Agent", "stormpath-framework-tck")
-            .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
-            .port(443)
-            .contentType(ContentType.URLENC)
             .param("grant_type", "password")
-            .param("username", account.email)
+            .param("username", account.username)
             .param("password", newPassword)
         .when()
-            .post(EnvUtils.stormpathApplicationHref + "/oauth/token")
+            .post(OauthRoute)
         .then()
             .statusCode(200)
+            .contentType(ContentType.JSON)
             .body("access_token", not(isEmptyOrNullString()))
     }
 }

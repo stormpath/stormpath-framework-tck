@@ -74,6 +74,7 @@
         <restassured.version>2.8.0</restassured.version>
         <slf4j.version>1.7.18</slf4j.version>
         <testng.version>6.9.10</testng.version>
+        <jsoup.version>1.9.2</jsoup.version>
 
         <stormpath.tck.webapp.scheme>http</stormpath.tck.webapp.scheme>
         <stormpath.tck.webapp.host>localhost</stormpath.tck.webapp.host>
@@ -109,6 +110,11 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
             <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
         </dependency>
         <!-- JCL is needed by Rest Assured, but we want to use SLF4J's instead: -->
         <dependency>

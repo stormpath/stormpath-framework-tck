@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.stormpath.tck.login
 
 import com.jayway.restassured.http.ContentType
@@ -36,6 +35,7 @@ import static com.jayway.restassured.RestAssured.put
 import static com.stormpath.tck.util.FrameworkConstants.LoginRoute
 import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
 import static com.stormpath.tck.util.Matchers.urlMatchesPath
+import static com.stormpath.tck.util.TestAccount.Mode.WITHOUT_DISPOSABLE_EMAIL
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.allOf
@@ -47,9 +47,9 @@ import static org.testng.Assert.assertEquals
 import static org.testng.Assert.assertFalse
 import static org.testng.Assert.assertTrue
 
-@Test
 class LoginIT extends AbstractIT {
-    private TestAccount account = new TestAccount()
+
+    private TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
 
     private String getNodeText(Node node, boolean addContentsFirst) {
         StringBuilder builder = new StringBuilder()
@@ -94,7 +94,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
      */
     @Test(groups=["v100", "json", "html"])
-    public void loginDoesNotHandlePut() throws Exception {
+    void loginDoesNotHandlePut() throws Exception {
         put(LoginRoute)
             .then()
                 .assertThat().statusCode(allOf(not(200), not(500)))
@@ -104,7 +104,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
      */
     @Test(groups=["v100", "json", "html"])
-    public void loginDoesNotHandleDelete() throws Exception {
+    void loginDoesNotHandleDelete() throws Exception {
         delete(LoginRoute)
             .then()
                 .assertThat().statusCode(allOf(not(200), not(500)))
@@ -116,7 +116,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void loginServesJsonViewModel() throws Exception {
+    void loginServesJsonViewModel() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -136,7 +136,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void loginViewModelHasFields() throws Exception {
+    void loginViewModelHasFields() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -164,7 +164,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void loginWithUsernameSucceeds() throws Exception {
+    void loginWithUsernameSucceeds() throws Exception {
 
         Map<String, Object>  credentials = new HashMap<>();
         credentials.put("login", account.username)
@@ -187,7 +187,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void loginWithEmailSucceeds() throws Exception {
+    void loginWithEmailSucceeds() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -207,7 +207,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void loginWithEmptyStringFails() throws Exception {
+    void loginWithEmptyStringFails() throws Exception {
 
         Map<String, Object> badCredentials = new HashMap<>();
 
@@ -229,7 +229,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void loginWithEmptyPasswordFails() throws Exception {
+    void loginWithEmptyPasswordFails() throws Exception {
 
         Map<String, Object> badCredentials = new HashMap<>();
 
@@ -252,7 +252,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void loginSucceedsForJson() throws Exception {
+    void loginSucceedsForJson() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -270,7 +270,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void loginJsonDoesNotHaveLinkedResources() throws Exception {
+    void loginJsonDoesNotHaveLinkedResources() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -288,7 +288,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void loginAccountDatetimePropertiesAreIso8601() throws Exception {
+    void loginAccountDatetimePropertiesAreIso8601() throws Exception {
         saveCSRFAndCookies(LoginRoute)
 
         def req =
@@ -323,7 +323,7 @@ class LoginIT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/28">#28</a>
      */
     @Test(groups=["v100", "json"])
-    public void loginErrorsWithBadCredentialsJson() throws Exception {
+    void loginErrorsWithBadCredentialsJson() throws Exception {
 
         Map<String, Object> badCredentials = new HashMap<>();
 
@@ -347,7 +347,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void loginSetsCookiesJson() throws Exception {
+    void loginSetsCookiesJson() throws Exception {
 
         given()
             .accept(ContentType.JSON)
@@ -365,7 +365,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginServesHtmlForm() throws Exception {
+    void loginServesHtmlForm() throws Exception {
 
         Response response =
             given()
@@ -394,7 +394,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginHtmlRendersErrorWithoutUsernameAndPassword() throws Exception {
+    void loginHtmlRendersErrorWithoutUsernameAndPassword() throws Exception {
 
         saveCSRFAndCookies(LoginRoute)
 
@@ -426,7 +426,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginSetsCookiesHtml() throws Exception {
+    void loginSetsCookiesHtml() throws Exception {
 
         saveCSRFAndCookies(LoginRoute)
 
@@ -450,7 +450,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginWithEmailSucceedsHtml() throws Exception {
+    void loginWithEmailSucceedsHtml() throws Exception {
         saveCSRFAndCookies(LoginRoute)
 
         def req = given()
@@ -472,7 +472,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginWithUsernameSucceedsHtml() throws Exception {
+    void loginWithUsernameSucceedsHtml() throws Exception {
         saveCSRFAndCookies(LoginRoute)
 
         def req = given()
@@ -494,7 +494,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginRedirectsToNextUriOnSuccess() throws Exception {
+    void loginRedirectsToNextUriOnSuccess() throws Exception {
 
         saveCSRFAndCookies(LoginRoute)
 
@@ -518,7 +518,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginRendersUnverifiedMessage() throws Exception {
+    void loginRendersUnverifiedMessage() throws Exception {
 
         Response response =
             given()
@@ -543,7 +543,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginRendersVerifiedMessage() throws Exception {
+    void loginRendersVerifiedMessage() throws Exception {
 
         Response response =
             given()
@@ -568,7 +568,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginRendersCreatedMessage() throws Exception {
+    void loginRendersCreatedMessage() throws Exception {
 
         Response response =
                 given()
@@ -593,7 +593,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginRendersForgotMessage() throws Exception {
+    void loginRendersForgotMessage() throws Exception {
 
         Response response =
                 given()
@@ -618,7 +618,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginRendersResetMessage() throws Exception {
+    void loginRendersResetMessage() throws Exception {
 
         Response response =
                 given()
@@ -643,7 +643,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginDoesNotRenderWrongStatusParameter() throws Exception {
+    void loginDoesNotRenderWrongStatusParameter() throws Exception {
 
         Response response =
                 given()
@@ -672,7 +672,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginRendersErrorOnFailure() throws Exception {
+    void loginRendersErrorOnFailure() throws Exception {
 
         saveCSRFAndCookies(LoginRoute)
 
@@ -704,7 +704,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginFormShouldBeOrderedCorrectly() throws Exception {
+    void loginFormShouldBeOrderedCorrectly() throws Exception {
         def requiredAttributesList = [
                 [name: "login", placeholder: "Username or Email", type: "text"],
                 [name: "password", placeholder: "Password", type: "password"]
@@ -732,7 +732,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void loginFormPreservesValuesOnPostback() throws Exception {
+    void loginFormPreservesValuesOnPostback() throws Exception {
 
         saveCSRFAndCookies(LoginRoute)
 
@@ -779,7 +779,7 @@ class LoginIT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "html"])
-    public void testNoRedirectionStickinessHtml() throws Exception {
+    void testNoRedirectionStickinessHtml() throws Exception {
 
         saveCSRFAndCookies("/")
 

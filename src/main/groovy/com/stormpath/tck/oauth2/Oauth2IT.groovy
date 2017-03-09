@@ -21,7 +21,6 @@ import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.responseSpecs.JsonResponseSpec
 import com.stormpath.tck.util.JwtUtils
-import com.stormpath.tck.util.RestUtils
 import com.stormpath.tck.util.TestAccount
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
@@ -29,6 +28,7 @@ import org.testng.annotations.Test
 import static com.jayway.restassured.RestAssured.get
 import static com.jayway.restassured.RestAssured.given
 import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
+import static com.stormpath.tck.util.TestAccount.Mode.WITHOUT_DISPOSABLE_EMAIL
 import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.equalToIgnoringCase
 import static org.hamcrest.Matchers.is
@@ -38,9 +38,8 @@ import static org.hamcrest.Matchers.nullValue
 import static org.testng.Assert.assertNotEquals
 import static org.testng.Assert.assertTrue
 
-@Test
 class Oauth2IT extends AbstractIT {
-    private TestAccount account = new TestAccount()
+    private TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
 
     @BeforeClass(alwaysRun = true)
     private void createTestAccount() throws Exception {
@@ -52,7 +51,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/6">#6</a>
      */
     @Test(groups=["v100", "json"])
-    public void oauthErrorsOnUnsupportedGrantTypes() throws Exception {
+    void oauthErrorsOnUnsupportedGrantTypes() throws Exception {
 
         given()
             .param("grant_type", "foobar_grant")
@@ -68,7 +67,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/7">#7</a>
      */
     @Test(groups=["v100", "json"])
-    public void oauthErrorsOnMissingGrantType() throws Exception {
+    void oauthErrorsOnMissingGrantType() throws Exception {
         given()
             .param("grant_type", "")
         .when()
@@ -83,7 +82,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/15">#15</a>
      */
     @Test(groups=["v100", "json"])
-    public void oauthErrorsOnJsonRequestBody() throws Exception {
+    void oauthErrorsOnJsonRequestBody() throws Exception {
         given()
             .contentType(ContentType.JSON)
             .body([ "hello": "world" ])
@@ -99,7 +98,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/15">#15</a>
      */
     @Test(groups=["v100", "json"])
-    public void oauthErrorsOnEmptyRequestBody() throws Exception {
+    void oauthErrorsOnEmptyRequestBody() throws Exception {
         given()
             .body()
         .when()
@@ -114,7 +113,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/16">#16</a>
      */
     @Test(groups=["v100", "json"])
-    public void oauthDoesntSupportGet() throws Exception {
+    void oauthDoesntSupportGet() throws Exception {
         get(OauthRoute)
             .then()
             .assertThat().statusCode(405)
@@ -124,7 +123,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/11">#11</a>
      */
     @Test(groups=["v100", "json"])
-    public void oauthPasswordGrantWithUsernameSucceeds() throws Exception {
+    void oauthPasswordGrantWithUsernameSucceeds() throws Exception {
 
         String accessToken =
             given()
@@ -147,7 +146,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-sdk-java/issues/612">#612</a>
      */
     @Test(groups=["v100", "json"])
-    public void oauthPasswordGrantWithUsernameSucceedsAndCookiePresent() throws Exception {
+    void oauthPasswordGrantWithUsernameSucceedsAndCookiePresent() throws Exception {
         def cookies = createSession(account)
 
         // @formatter:off
@@ -171,7 +170,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/18">#18</a>
      */
     @Test(groups=["v100", "json"])
-    public void oauthPasswordGrantWithEmailSucceeds() throws Exception {
+    void oauthPasswordGrantWithEmailSucceeds() throws Exception {
 
         String accessToken =
             given()
@@ -192,7 +191,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/205">#205</a>
      */
     @Test(groups=["v100", "json"])
-    public void oauthRefreshGrantWorksWithValidToken() throws Exception {
+    void oauthRefreshGrantWorksWithValidToken() throws Exception {
         Response passwordGrantResponse =
             given()
                 .param("grant_type", "password")
@@ -227,7 +226,7 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/205">#205</a>
      */
     @Test(groups=["v100", "json"])
-    public void oauthRefreshGrantFailsWithInvalidRefreshToken() throws Exception {
+    void oauthRefreshGrantFailsWithInvalidRefreshToken() throws Exception {
         String refreshToken = "GARBAGE"
 
         given()
@@ -248,7 +247,7 @@ class Oauth2IT extends AbstractIT {
      * @throws Exception
      */
     @Test(groups=["v100", "json"])
-    public void oauthErrorsAreTransformedProperly() throws Exception {
+    void oauthErrorsAreTransformedProperly() throws Exception {
 
         given()
             .param("grant_type", "password")
@@ -266,11 +265,14 @@ class Oauth2IT extends AbstractIT {
             .body("error", not(isEmptyOrNullString()))
     }
 
-    /** We should be able to use the client_credentials grant type to get an access token
+    /**
+     * We should be able to use the client_credentials grant type to get an access token
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/8">#8</a>
+     *
+     * TODO - disabling because of Stormpath specific interactions
      */
-    @Test(groups=["v100", "json"])
-    public void oauthClientCredentialsGrantSucceeds() throws Exception {
+    @Test(groups=["v100", "json"], enabled = false)
+    void oauthClientCredentialsGrantSucceeds() throws Exception {
         // Get API keys so we can use it for client credentials
 
         Response apiKeysResource = given()
@@ -312,9 +314,11 @@ class Oauth2IT extends AbstractIT {
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/8">#8</a>
      */
     @Test(groups=["v100", "json"])
-    public void oauthClientCredentialsGrantFailsWithoutAPISecret() throws Exception {
+    void oauthClientCredentialsGrantFailsWithoutAPISecret() throws Exception {
         // Get API keys so we can use it for client credentials
 
+        // TODO - commenting out Stormpath specific interaction
+        /*
         Response apiKeysResource = given()
             .header("User-Agent", "stormpath-framework-tck")
             .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
@@ -328,13 +332,14 @@ class Oauth2IT extends AbstractIT {
             .response()
 
         String apiKeyId = apiKeysResource.body().jsonPath().getString("id")
+        */
 
         // Attempt to get tokens
 
         given()
             .param("grant_type", "client_credentials")
             .auth()
-                .preemptive().basic(apiKeyId, "NOT_A_VALID_API_SECRET")
+                .preemptive().basic("NOT_A_VALID_API_ID", "NOT_A_VALID_API_SECRET")
             .contentType(ContentType.URLENC)
         .when()
             .post(OauthRoute)
