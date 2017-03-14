@@ -30,7 +30,7 @@ import static com.jayway.restassured.RestAssured.given
 import static com.jayway.restassured.RestAssured.put
 import static com.stormpath.tck.util.FrameworkConstants.ChangeRoute
 import static com.stormpath.tck.util.FrameworkConstants.ForgotRoute
-import static com.stormpath.tck.util.FrameworkConstants.getOauthRoute
+import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
 import static com.stormpath.tck.util.HtmlUtils.assertAttributesEqual
 import static com.stormpath.tck.util.Matchers.urlMatchesPath
 import static com.stormpath.tck.util.TestAccount.Mode.WITH_DISPOSABLE_EMAIL
