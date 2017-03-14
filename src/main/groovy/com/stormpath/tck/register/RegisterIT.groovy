@@ -48,7 +48,7 @@ class RegisterIT extends AbstractIT {
 
     @BeforeTest(alwaysRun = true)
     void setUp() {
-        super.setUp();
+        super.setUp()
     }
 
     @BeforeMethod(alwaysRun = true)
