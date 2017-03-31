@@ -26,7 +26,6 @@ import com.stormpath.tck.util.FrameworkConstants
 import com.stormpath.tck.util.HtmlUtils
 import com.stormpath.tck.util.Iso8601Utils
 import com.stormpath.tck.util.TestAccount
-import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.delete
@@ -48,8 +47,6 @@ import static org.testng.Assert.assertFalse
 import static org.testng.Assert.assertTrue
 
 class LoginIT extends AbstractIT {
-
-    private TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
 
     private String getNodeText(Node node, boolean addContentsFirst) {
         StringBuilder builder = new StringBuilder()
@@ -75,7 +72,7 @@ class LoginIT extends AbstractIT {
                 .replaceAll("\\s+\$", "")
     }
 
-    private Map getJsonCredentials() {
+    private Map getJsonCredentials(TestAccount account) {
         Map<String, Object>  credentials = new HashMap<>();
 
         credentials.put("login", account.email)
@@ -84,10 +81,12 @@ class LoginIT extends AbstractIT {
         return credentials
     }
 
-    @BeforeClass(alwaysRun = true)
-    private void createTestAccount() throws Exception {
+    private TestAccount createTestAccount() {
+
+        TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
         account.registerOnServer()
         deleteOnClassTeardown(account.href)
+        return account
     }
 
     /** Only respond to GET and POST
@@ -166,6 +165,8 @@ class LoginIT extends AbstractIT {
     @Test(groups=["v100", "json"])
     void loginWithUsernameSucceeds() throws Exception {
 
+        def account = createTestAccount()
+
         Map<String, Object>  credentials = new HashMap<>();
         credentials.put("login", account.username)
         credentials.put("password", account.password)
@@ -189,10 +190,12 @@ class LoginIT extends AbstractIT {
     @Test(groups=["v100", "json"])
     void loginWithEmailSucceeds() throws Exception {
 
+        def account = createTestAccount()
+
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
-            .body(getJsonCredentials())
+            .body(getJsonCredentials(account))
         .when()
             .post(LoginRoute)
         .then()
@@ -254,10 +257,12 @@ class LoginIT extends AbstractIT {
     @Test(groups=["v100", "json"])
     void loginSucceedsForJson() throws Exception {
 
+        def account = createTestAccount()
+        
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
-            .body(getJsonCredentials())
+            .body(getJsonCredentials(account))
         .when()
             .post(LoginRoute)
         .then()
@@ -272,10 +277,12 @@ class LoginIT extends AbstractIT {
     @Test(groups=["v100", "json"])
     void loginJsonDoesNotHaveLinkedResources() throws Exception {
 
+        def account = createTestAccount()
+
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
-            .body(getJsonCredentials())
+            .body(getJsonCredentials(account))
         .when()
             .post(LoginRoute)
         .then()
@@ -289,13 +296,15 @@ class LoginIT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     void loginAccountDatetimePropertiesAreIso8601() throws Exception {
+
+        def account = createTestAccount()
         saveCSRFAndCookies(LoginRoute)
 
         def req =
             given()
                 .accept(ContentType.JSON)
                 .contentType(ContentType.JSON)
-                .body(getJsonCredentials())
+                .body(getJsonCredentials(account))
 
         setCSRFAndCookies(req, ContentType.JSON)
 
@@ -349,10 +358,12 @@ class LoginIT extends AbstractIT {
     @Test(groups=["v100", "json"])
     void loginSetsCookiesJson() throws Exception {
 
+        def account = createTestAccount()
+
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
-            .body(getJsonCredentials())
+            .body(getJsonCredentials(account))
         .when()
             .post(LoginRoute)
         .then()
@@ -428,6 +439,8 @@ class LoginIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     void loginSetsCookiesHtml() throws Exception {
 
+        def account = createTestAccount()
+
         saveCSRFAndCookies(LoginRoute)
 
         def req = given()
@@ -451,6 +464,8 @@ class LoginIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     void loginWithEmailSucceedsHtml() throws Exception {
+
+        def account = createTestAccount()
         saveCSRFAndCookies(LoginRoute)
 
         def req = given()
@@ -473,6 +488,8 @@ class LoginIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     void loginWithUsernameSucceedsHtml() throws Exception {
+
+        def account = createTestAccount()
         saveCSRFAndCookies(LoginRoute)
 
         def req = given()
@@ -496,6 +513,7 @@ class LoginIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     void loginRedirectsToNextUriOnSuccess() throws Exception {
 
+        def account = createTestAccount()
         saveCSRFAndCookies(LoginRoute)
 
         def req = given()
@@ -781,6 +799,7 @@ class LoginIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     void testNoRedirectionStickinessHtml() throws Exception {
 
+        def account = createTestAccount()
         saveCSRFAndCookies("/")
 
         //Trying to access the "/me" endpoint without authentication; we must be redirected to login
