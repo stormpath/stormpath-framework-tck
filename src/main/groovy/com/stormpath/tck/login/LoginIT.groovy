@@ -81,14 +81,6 @@ class LoginIT extends AbstractIT {
         return credentials
     }
 
-    private TestAccount createTestAccount() {
-
-        TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
-        account.registerOnServer()
-        deleteOnClassTeardown(account.href)
-        return account
-    }
-
     /** Only respond to GET and POST
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/85">#85</a>
      */

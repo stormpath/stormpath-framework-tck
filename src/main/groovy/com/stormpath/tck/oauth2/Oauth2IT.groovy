@@ -21,14 +21,11 @@ import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.responseSpecs.JsonResponseSpec
 import com.stormpath.tck.util.JwtUtils
-import com.stormpath.tck.util.TestAccount
-import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.get
 import static com.jayway.restassured.RestAssured.given
 import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
-import static com.stormpath.tck.util.TestAccount.Mode.WITHOUT_DISPOSABLE_EMAIL
 import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.equalToIgnoringCase
 import static org.hamcrest.Matchers.is
@@ -39,13 +36,6 @@ import static org.testng.Assert.assertNotEquals
 import static org.testng.Assert.assertTrue
 
 class Oauth2IT extends AbstractIT {
-    private TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
-
-    @BeforeClass(alwaysRun = true)
-    private void createTestAccount() throws Exception {
-        account.registerOnServer()
-        deleteOnClassTeardown(account.href)
-    }
 
     /** Unsupported grant type returns error
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/6">#6</a>
@@ -125,6 +115,7 @@ class Oauth2IT extends AbstractIT {
     @Test(groups=["v100", "json"])
     void oauthPasswordGrantWithUsernameSucceeds() throws Exception {
 
+        def account = createTestAccount()
         String accessToken =
             given()
                 .param("grant_type", "password")
@@ -137,7 +128,7 @@ class Oauth2IT extends AbstractIT {
             .extract()
                 .path("access_token")
 
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.account.href)
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href)
     }
 
     /** Password grant flow with username/password and access_token cookie present
@@ -147,6 +138,8 @@ class Oauth2IT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     void oauthPasswordGrantWithUsernameSucceedsAndCookiePresent() throws Exception {
+
+        def account = createTestAccount()
         def cookies = createSession(account)
 
         // @formatter:off
@@ -163,7 +156,7 @@ class Oauth2IT extends AbstractIT {
                      .extract()
                      .path("access_token")
         // @formatter:on
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.account.href)
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href)
     }
 
     /** Password grant flow with email/password
@@ -172,6 +165,7 @@ class Oauth2IT extends AbstractIT {
     @Test(groups=["v100", "json"])
     void oauthPasswordGrantWithEmailSucceeds() throws Exception {
 
+        def account = createTestAccount()
         String accessToken =
             given()
                 .param("grant_type", "password")
@@ -184,7 +178,7 @@ class Oauth2IT extends AbstractIT {
             .extract()
                 .path("access_token")
 
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.account.href)
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href)
     }
 
     /** Refresh grant flow
@@ -192,6 +186,8 @@ class Oauth2IT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     void oauthRefreshGrantWorksWithValidToken() throws Exception {
+
+        def account = createTestAccount()
         Response passwordGrantResponse =
             given()
                 .param("grant_type", "password")
@@ -219,7 +215,7 @@ class Oauth2IT extends AbstractIT {
                 .path("access_token")
 
         assertNotEquals(accessToken, newAccessToken, "The new access token should not equal to the old access token")
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == this.account.href, "The access token should be a valid jwt for the test user")
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href, "The access token should be a valid jwt for the test user")
     }
 
     /** Refresh grant flow should fail without valid refresh token
@@ -275,6 +271,7 @@ class Oauth2IT extends AbstractIT {
     void oauthClientCredentialsGrantSucceeds() throws Exception {
         // Get API keys so we can use it for client credentials
 
+        def account = createTestAccount()
         Response apiKeysResource = given()
             .header("User-Agent", "stormpath-framework-tck")
             .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())

@@ -255,4 +255,11 @@ abstract class AbstractIT {
             this.classResourcesToDelete.add(resourceHref)
         }
     }
+
+    protected TestAccount createTestAccount() {
+        TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
+        account.registerOnServer()
+        deleteOnClassTeardown(account.href)
+        return account
+    }
 }

@@ -20,8 +20,6 @@ import com.jayway.restassured.path.xml.XmlPath
 import com.jayway.restassured.path.xml.element.Node
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.util.HtmlUtils
-import com.stormpath.tck.util.TestAccount
-import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.delete
@@ -29,7 +27,6 @@ import static com.jayway.restassured.RestAssured.given
 import static com.jayway.restassured.RestAssured.put
 import static com.stormpath.tck.util.FrameworkConstants.ForgotRoute
 import static com.stormpath.tck.util.Matchers.urlMatchesPath
-import static com.stormpath.tck.util.TestAccount.Mode.WITHOUT_DISPOSABLE_EMAIL
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.allOf
 import static org.hamcrest.Matchers.isEmptyOrNullString
@@ -38,14 +35,7 @@ import static org.testng.Assert.assertEquals
 
 class ForgotPasswordIT extends AbstractIT {
 
-    private TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
     private static final invalidEmail = "foo+notarealemail@bar.baz"
-
-    @BeforeClass
-    private void createTestAccount() throws Exception {
-        account.registerOnServer()
-        deleteOnClassTeardown(account.href)
-    }
 
     /** Only GET and POST should be handled
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/165">#165</a>
@@ -89,6 +79,9 @@ class ForgotPasswordIT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     void forgotSucceedsWhenPostingValidEmailJson() throws Exception {
+
+        def account = createTestAccount()
+
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
@@ -169,6 +162,7 @@ class ForgotPasswordIT extends AbstractIT {
     @Test(groups=["v100", "html"])
     void forgotRedirectsToNextUriWhenPostingValidEmail() throws Exception {
 
+        def account = createTestAccount()
         saveCSRFAndCookies(ForgotRoute)
 
         def req = given()
