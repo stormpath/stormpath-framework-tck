@@ -35,13 +35,6 @@ import static org.hamcrest.Matchers.not
 import static org.testng.Assert.assertTrue
 
 class LogoutIT extends AbstractIT {
-    private TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
-
-    @BeforeClass(alwaysRun = true)
-    void createTestUser() throws Exception {
-        account.registerOnServer()
-        deleteOnClassTeardown(account.href)
-    }
 
     private void assertCookiesAreDeleted(Cookies cookies) throws Exception {
         assertTrue(isCookieDeleted(cookies.get("access_token")))
@@ -115,6 +108,8 @@ class LogoutIT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     void logoutDeletesCookiesJson() throws Exception {
+
+        def account = createTestAccount()
         def sessionCookies = createSession(account)
 
         Cookies detailedCookies =
@@ -136,6 +131,8 @@ class LogoutIT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     void logoutReturns200OKOnSuccess() throws Exception {
+
+        def account = createTestAccount()
         def sessionCookies = createSession(account)
 
         given()
@@ -153,6 +150,8 @@ class LogoutIT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     void logoutRevokesTokensInCookiesAfterSuccessJson() throws Exception {
+
+        def account = createTestAccount()
         def sessionCookies = createSession(account)
 
         given()
@@ -205,6 +204,8 @@ class LogoutIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     void logoutRedirectsToNextUriOnSuccess() throws Exception {
+
+        def account = createTestAccount()
         def sessionCookies = createSession(account)
 
         given()
@@ -223,6 +224,8 @@ class LogoutIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     void logoutDeletesCookiesHtml() throws Exception {
+
+        def account = createTestAccount()
         def sessionCookies = createSession(account)
 
         Cookies detailedCookies =
@@ -244,6 +247,8 @@ class LogoutIT extends AbstractIT {
      */
     @Test(groups=["v100", "html"])
     void logoutRevokesTokensHtml() throws Exception {
+
+        def account = createTestAccount()
         def sessionCookies = createSession(account)
 
         given()
