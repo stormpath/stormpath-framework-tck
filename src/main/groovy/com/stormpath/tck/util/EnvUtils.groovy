@@ -22,16 +22,19 @@ class EnvUtils {
 
     public static final String stormpathHtmlEnabled = getVal("STORMPATH_TCK_HTML_ENABLED", "true")
 
-    public static final String jwtSigningKey
     public static final String facebookClientId
     public static final String facebookClientSecret
 
+    public static final String jwtSigningKeyModulus
+    public static final String jwtSigningKeyExponent
+
     static {
-        jwtSigningKey = getVal("JWT_SIGNING_KEY")
+        jwtSigningKeyModulus = getVal("JWT_SIGNING_KEY_MOD")
+        jwtSigningKeyExponent = getVal("JWT_SIGNING_KEY_EXP")
         facebookClientId = getVal("FACEBOOK_CLIENT_ID")
         facebookClientSecret = getVal("FACEBOOK_CLIENT_SECRET")
-        if (jwtSigningKey == null || facebookClientId == null || facebookClientSecret == null) {
-            fail("JWT_SIGNING_KEY, FACEBOOK_CLIENT_ID and FACEBOOK_CLIENT_SECRET environment variables are required")
+        if (jwtSigningKeyModulus == null || jwtSigningKeyExponent == null || facebookClientId == null || facebookClientSecret == null) {
+            fail("JWT_SIGNING_KEY_MOD, JWT_SIGNING_KEY_EXP, FACEBOOK_CLIENT_ID and FACEBOOK_CLIENT_SECRET environment variables are required. The JWT signing key modulus (n) and exponent (e) can be found at https://<your-org>.oktapreview.com/oauth2/<authServerId>/v1/keys")
         }
     }
 

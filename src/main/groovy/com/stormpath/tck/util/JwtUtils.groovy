@@ -19,16 +19,23 @@ import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts
 
+import java.security.Key
+import java.security.KeyFactory
+import java.security.spec.RSAPublicKeySpec
+
 class JwtUtils {
+    static Key getPublicKey() {
+        def modulus = new BigInteger(1, Base64.getUrlDecoder().decode(EnvUtils.jwtSigningKeyModulus))
+        def exponent = new BigInteger(1, Base64.getUrlDecoder().decode(EnvUtils.jwtSigningKeyExponent))
+        return KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(modulus, exponent))
+    }
 
     static String extractJwtClaim(String jwt, String property) {
-        String secret = EnvUtils.jwtSigningKey
-        Claims claims = Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(jwt).getBody()
+        Claims claims = Jwts.parser().setSigningKey(getPublicKey()).parseClaimsJws(jwt).getBody()
         return (String) claims.get(property)
     }
 
     static Jws<Claims> parseJwt(String jwt) {
-        String secret = EnvUtils.jwtSigningKey
-        return Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(jwt)
+        return Jwts.parser().setSigningKey(getPublicKey()).parseClaimsJws(jwt)
     }
 }
