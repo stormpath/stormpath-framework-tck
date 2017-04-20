@@ -188,14 +188,14 @@ class ChangePasswordIT extends AbstractIT {
         deleteOnClassTeardown(account.href)
 
         given()
-            .body([email: account.email])
+            .contentType(ContentType.URLENC)
+            .param("email", account.email)
         .when()
             .post(ForgotRoute)
         .then()
             .statusCode(200)
 
-        // TODO - will need to make this configurable for Okta
-        String rawChangePasswordEmail = account.getEmail("stormpath.com")
+        String rawChangePasswordEmail = account.getEmail("okta.com")
         String changePasswordHref = StringUtils.extractChangePasswordHref(rawChangePasswordEmail, "sptoken")
 
         def response = given()
@@ -229,14 +229,14 @@ class ChangePasswordIT extends AbstractIT {
         deleteOnClassTeardown(account.href)
 
         given()
+            .contentType(ContentType.JSON)
             .body([email: account.email])
         .when()
             .post(ForgotRoute)
         .then()
             .statusCode(200)
 
-        // TODO - will need to make this configurable for Okta
-        String rawChangePasswordEmail = account.getEmail("stormpath.com")
+        String rawChangePasswordEmail = account.getEmail("okta.com")
         String changePasswordHref = StringUtils.extractChangePasswordHref(rawChangePasswordEmail, "sptoken")
         String sptoken = StringUtils.extractTokenFromHref(changePasswordHref, "sptoken")
 
