@@ -128,7 +128,7 @@ class Oauth2IT extends AbstractIT {
             .extract()
                 .path("access_token")
 
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href)
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.email)
     }
 
     /** Password grant flow with username/password and access_token cookie present
@@ -156,7 +156,7 @@ class Oauth2IT extends AbstractIT {
                      .extract()
                      .path("access_token")
         // @formatter:on
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href)
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.email)
     }
 
     /** Password grant flow with email/password
@@ -178,7 +178,7 @@ class Oauth2IT extends AbstractIT {
             .extract()
                 .path("access_token")
 
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href)
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.email)
     }
 
     /** Refresh grant flow
@@ -215,7 +215,7 @@ class Oauth2IT extends AbstractIT {
                 .path("access_token")
 
         assertNotEquals(accessToken, newAccessToken, "The new access token should not equal to the old access token")
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href, "The access token should be a valid jwt for the test user")
+        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.email, "The access token should be a valid jwt for the test user")
     }
 
     /** Refresh grant flow should fail without valid refresh token
