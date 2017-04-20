@@ -129,15 +129,6 @@ class CookieIT extends AbstractIT {
         } else {
             assertTrue accessTokenCookie.maxAge * 1000L + now - accessTokenTtl  < 2000
         }
-
-        def refreshTokenCookie = response.detailedCookies.get("refresh_token")
-        def refreshTokenTtl = JwtUtils.parseJwt(refreshTokenCookie.value).getBody().getExpiration().time
-        // some integrations use max-age and some use expires
-        if (refreshTokenCookie.expiryDate) {
-            assertEquals refreshTokenCookie.expiryDate.time, refreshTokenTtl
-        } else {
-            assertTrue refreshTokenCookie.maxAge * 1000L + now - refreshTokenTtl  < 2000
-        }
     }
 
     /** Passing refresh token as access token should fail
