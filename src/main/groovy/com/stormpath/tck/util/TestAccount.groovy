@@ -99,7 +99,7 @@ class TestAccount {
         String emailId = null
         int count = 0
 
-        while (emailId == null && count++ < 30) {
+        while (emailId == null && count++ < 90) {
             def jsonResponse =
                 get(GUERILLA_MAIL_BASE + "?f=get_email_list&offset=0&sid_token=" + guerillaEmail.getToken()).asString()
 
