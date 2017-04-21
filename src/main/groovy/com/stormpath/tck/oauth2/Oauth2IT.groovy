@@ -32,8 +32,7 @@ import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.isEmptyOrNullString
 import static org.hamcrest.Matchers.not
 import static org.hamcrest.Matchers.nullValue
-import static org.testng.Assert.assertNotEquals
-import static org.testng.Assert.assertTrue
+import static org.testng.Assert.*
 
 class Oauth2IT extends AbstractIT {
 
@@ -128,7 +127,7 @@ class Oauth2IT extends AbstractIT {
             .extract()
                 .path("access_token")
 
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href)
+        assertTrue isAccountSubInClaim(account, accessToken)
     }
 
     /** Password grant flow with username/password and access_token cookie present
@@ -142,6 +141,8 @@ class Oauth2IT extends AbstractIT {
         def account = createTestAccount()
         def cookies = createSession(account)
 
+        // UGGGG
+
         // @formatter:off
         String accessToken =
                 given()
@@ -153,10 +154,10 @@ class Oauth2IT extends AbstractIT {
                      .post(OauthRoute)
                 .then()
                      .spec(JsonResponseSpec.validAccessAndRefreshTokens())
-                     .extract()
+                 .extract()
                      .path("access_token")
         // @formatter:on
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href)
+        assertTrue isAccountSubInClaim(account, accessToken)
     }
 
     /** Password grant flow with email/password
@@ -178,7 +179,7 @@ class Oauth2IT extends AbstractIT {
             .extract()
                 .path("access_token")
 
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href)
+        assertTrue isAccountSubInClaim(account, accessToken)
     }
 
     /** Refresh grant flow
@@ -215,7 +216,7 @@ class Oauth2IT extends AbstractIT {
                 .path("access_token")
 
         assertNotEquals(accessToken, newAccessToken, "The new access token should not equal to the old access token")
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href, "The access token should be a valid jwt for the test user")
+        assertTrue isAccountSubInClaim(account, accessToken)
     }
 
     /** Refresh grant flow should fail without valid refresh token
@@ -310,7 +311,7 @@ class Oauth2IT extends AbstractIT {
     /** We shouldn't be able to use client credentials to get an access token without a API secret
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/8">#8</a>
      */
-    @Test(groups=["v100", "json"])
+    @Test(groups=["v100", "json", "client_credentials"])
     void oauthClientCredentialsGrantFailsWithoutAPISecret() throws Exception {
         // Get API keys so we can use it for client credentials
 
@@ -344,5 +345,10 @@ class Oauth2IT extends AbstractIT {
             .statusCode(401)
             .contentType(ContentType.JSON)
             .body("error", is("invalid_client"))
+    }
+
+    private boolean isAccountSubInClaim(def account, String jwt) {
+        def sub = JwtUtils.extractJwtClaim(jwt, "sub")
+        return account.href == sub || account.email == sub
     }
 }

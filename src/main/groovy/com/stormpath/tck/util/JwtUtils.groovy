@@ -17,18 +17,71 @@ package com.stormpath.tck.util
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
+import io.jsonwebtoken.JwsHeader
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.SigningKeyResolver
+import io.jsonwebtoken.impl.DefaultJwtParser
+import io.jsonwebtoken.impl.crypto.JwtSignatureValidator
+
+import java.security.Key
 
 class JwtUtils {
 
+
+
     static String extractJwtClaim(String jwt, String property) {
-        String secret = EnvUtils.jwtSigningKey
-        Claims claims = Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(jwt).getBody()
-        return (String) claims.get(property)
+        return parseJwt(jwt).getBody().get(property)
     }
 
     static Jws<Claims> parseJwt(String jwt) {
-        String secret = EnvUtils.jwtSigningKey
-        return Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(jwt)
+
+        if (EnvUtils.jwtValidationEnabled) {
+            String secret = EnvUtils.jwtSigningKey
+            return Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(jwt)
+        }
+        else {
+            return parseJwtWithoutValidation(jwt)
+        }
+    }
+
+    private static Jws<Claims> parseJwtWithoutValidation(String jwt) {
+        return new DefaultJwtParser() {
+            protected JwtSignatureValidator createSignatureValidator(SignatureAlgorithm alg, Key key) {
+                return new JwtSignatureValidator() {
+                    @Override
+                    boolean isValid(String jwtWithoutSignature, String base64UrlEncodedSignature) {
+                        return true
+                    }
+                }
+            }
+        }.setSigningKeyResolver(new SigningKeyResolver() {
+            @Override
+            Key resolveSigningKey(JwsHeader header, Claims claims) {
+                return new DummyKey()
+            }
+
+            @Override
+            Key resolveSigningKey(JwsHeader header, String plaintext) {
+                return new DummyKey()
+            }
+        }).parseClaimsJws(jwt)
+    }
+
+    static class DummyKey implements Key {
+        @Override
+        String getAlgorithm() {
+            return null
+        }
+
+        @Override
+        String getFormat() {
+            return null
+        }
+
+        @Override
+        byte[] getEncoded() {
+            return new byte[0]
+        }
     }
 }

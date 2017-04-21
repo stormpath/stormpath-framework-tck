@@ -30,6 +30,7 @@ import static com.stormpath.tck.util.TestAccount.Mode.WITHOUT_DISPOSABLE_EMAIL
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.not
 import static org.testng.Assert.assertEquals
+import static org.testng.Assert.assertNotNull
 import static org.testng.Assert.assertTrue
 
 class CookieIT extends AbstractIT {
@@ -68,8 +69,14 @@ class CookieIT extends AbstractIT {
         .extract()
             .response()
 
-        assertTrue(isCookieDeleted(response.detailedCookies.get("access_token")))
-        assertTrue(isCookieDeleted(response.detailedCookies.get("refresh_token")))
+        def accessTokenCookie = response.detailedCookies.get("access_token")
+        def refreshTokenCookie = response.detailedCookies.get("refresh_token")
+
+        assertNotNull(accessTokenCookie, "Cookie 'access_token'")
+        assertNotNull(refreshTokenCookie, "Cookie 'refresh_token")
+
+        assertTrue(isCookieDeleted(accessTokenCookie))
+        assertTrue(isCookieDeleted(refreshTokenCookie))
     }
 
     /** Reject unauthorized text/html requests with 302 to login route
@@ -105,18 +112,18 @@ class CookieIT extends AbstractIT {
         saveCSRFAndCookies(LoginRoute)
 
         def requestSpecification = given()
-            .accept(ContentType.JSON)
-            .contentType(ContentType.JSON)
-            .body([ "login": account.email, "password": account.password ])
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(["login": account.email, "password": account.password])
 
         setCSRFAndCookies(requestSpecification, ContentType.JSON);
 
         def response = requestSpecification
-            .when()
+                .when()
                 .post(LoginRoute)
-            .then()
+                .then()
                 .statusCode(200)
-            .extract()
+                .extract()
                 .response()
 
         def now = new Date().time
@@ -127,16 +134,21 @@ class CookieIT extends AbstractIT {
         if (accessTokenCookie.expiryDate) {
             assertEquals accessTokenCookie.expiryDate.time, accessTokenTtl
         } else {
-            assertTrue accessTokenCookie.maxAge * 1000L + now - accessTokenTtl  < 2000
+            assertTrue accessTokenCookie.maxAge * 1000L + now - accessTokenTtl < 2000
         }
 
         def refreshTokenCookie = response.detailedCookies.get("refresh_token")
-        def refreshTokenTtl = JwtUtils.parseJwt(refreshTokenCookie.value).getBody().getExpiration().time
-        // some integrations use max-age and some use expires
-        if (refreshTokenCookie.expiryDate) {
-            assertEquals refreshTokenCookie.expiryDate.time, refreshTokenTtl
-        } else {
-            assertTrue refreshTokenCookie.maxAge * 1000L + now - refreshTokenTtl  < 2000
+        assertNotNull(refreshTokenCookie)
+
+        // Okta does NOT use a JWT for the refresh token
+        if (refreshTokenCookie.getValue().split("\\.").length == 3) {
+            def refreshTokenTtl = JwtUtils.parseJwt(refreshTokenCookie.value).getBody().getExpiration().time
+            // some integrations use max-age and some use expires
+            if (refreshTokenCookie.expiryDate) {
+                assertEquals refreshTokenCookie.expiryDate.time, refreshTokenTtl
+            } else {
+                assertTrue refreshTokenCookie.maxAge * 1000L + now - refreshTokenTtl < 2000
+            }
         }
     }
 

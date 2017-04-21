@@ -25,8 +25,10 @@ class EnvUtils {
     public static final String jwtSigningKey
     public static final String facebookClientId
     public static final String facebookClientSecret
+    public static final boolean jwtValidationEnabled
 
     static {
+        jwtValidationEnabled = getVal("STORMPATH_TCK_VALIDATE_JWT", "true").toBoolean()
         jwtSigningKey = getVal("JWT_SIGNING_KEY")
         facebookClientId = getVal("FACEBOOK_CLIENT_ID")
         facebookClientSecret = getVal("FACEBOOK_CLIENT_SECRET")

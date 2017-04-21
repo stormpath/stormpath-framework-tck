@@ -50,6 +50,7 @@ abstract class AbstractIT {
     static final private String webappUrlPortSuffix = toPortSuffix(webappUrlScheme, webappUrlPort)
     static final private String defaultWebappBaseUrl = "$webappUrlScheme://$webappUrlHost$webappUrlPortSuffix"
     static final String webappBaseUrl = getVal("STORMPATH_TCK_WEBAPP_URL", defaultWebappBaseUrl)
+    static final String fromEmailDomain = getVal("STORMPATH_TCK_EMAIL_DOMAIN", "stormpath.com")
 
     static final private List<String> possibleCSRFKeys = ['_csrf', 'csrfToken', 'authenticity_token', 'st']
 
