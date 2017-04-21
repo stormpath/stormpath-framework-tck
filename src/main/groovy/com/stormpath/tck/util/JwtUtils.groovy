@@ -15,16 +15,20 @@
  */
 package com.stormpath.tck.util
 
+import groovy.json.JsonSlurper
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
 import io.jsonwebtoken.JwsHeader
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.SigningKeyResolver
-import io.jsonwebtoken.impl.DefaultJwtParser
-import io.jsonwebtoken.impl.crypto.JwtSignatureValidator
+import io.jsonwebtoken.lang.Assert
+import org.apache.commons.codec.binary.Base64
 
 import java.security.Key
+import java.security.KeyFactory
+import java.security.NoSuchAlgorithmException
+import java.security.spec.InvalidKeySpecException
+import java.security.spec.RSAPublicKeySpec
 
 class JwtUtils {
 
@@ -36,52 +40,63 @@ class JwtUtils {
 
     static Jws<Claims> parseJwt(String jwt) {
 
-        if (EnvUtils.jwtValidationEnabled) {
+
+        if (EnvUtils.jwtSigningKeysUrl) {
+            return Jwts.parser().setSigningKeyResolver(new URLSigningKeyResolver(EnvUtils.jwtSigningKeysUrl)).parseClaimsJws(jwt)
+        }
+        else {
             String secret = EnvUtils.jwtSigningKey
             return Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(jwt)
         }
-        else {
-            return parseJwtWithoutValidation(jwt)
-        }
     }
 
-    private static Jws<Claims> parseJwtWithoutValidation(String jwt) {
-        return new DefaultJwtParser() {
-            protected JwtSignatureValidator createSignatureValidator(SignatureAlgorithm alg, Key key) {
-                return new JwtSignatureValidator() {
-                    @Override
-                    boolean isValid(String jwtWithoutSignature, String base64UrlEncodedSignature) {
-                        return true
-                    }
+    private static class URLSigningKeyResolver implements SigningKeyResolver {
+        def json
+
+        URLSigningKeyResolver(String keysUrl) {
+            def jsonSlurper = new JsonSlurper()
+            json = jsonSlurper.parse(new URL(keysUrl))
+        }
+
+        @Override
+        Key resolveSigningKey(JwsHeader header, Claims claims) {
+            return getKey(header)
+        }
+
+        @Override
+        Key resolveSigningKey(JwsHeader header, String plaintext) {
+            return getKey(header)
+        }
+
+        private Key getKey(JwsHeader header) {
+            String keyId = header.getKeyId()
+            String keyAlgorithm = header.getAlgorithm()
+
+            if (!"RS256".equals(keyAlgorithm)) {
+                throw new UnsupportedOperationException("Only 'RS256' key algorithm is supported.")
+            }
+
+            def key = null
+            for (def keyElement : json.keys) {
+                if (keyId.equals(keyElement.kid)) {
+                    key = keyElement
+                    break
                 }
             }
-        }.setSigningKeyResolver(new SigningKeyResolver() {
-            @Override
-            Key resolveSigningKey(JwsHeader header, Claims claims) {
-                return new DummyKey()
+            Assert.notNull(key, "Key with 'kid' of "+keyId+" could not be found.")
+
+            try {
+
+                BigInteger modulus = new BigInteger(1, Base64.decodeBase64(key.n))
+                BigInteger publicExponent = new BigInteger(1, Base64.decodeBase64(key.e))
+                return KeyFactory.getInstance("RSA").generatePublic(
+                        new RSAPublicKeySpec(modulus, publicExponent))
+
+            } catch (NoSuchAlgorithmException e) {
+                throw new UnsupportedOperationException("Failed to load key Algorithm", e)
+            } catch (InvalidKeySpecException e) {
+                throw new UnsupportedOperationException("Failed to load key", e)
             }
-
-            @Override
-            Key resolveSigningKey(JwsHeader header, String plaintext) {
-                return new DummyKey()
-            }
-        }).parseClaimsJws(jwt)
-    }
-
-    static class DummyKey implements Key {
-        @Override
-        String getAlgorithm() {
-            return null
-        }
-
-        @Override
-        String getFormat() {
-            return null
-        }
-
-        @Override
-        byte[] getEncoded() {
-            return new byte[0]
         }
     }
 }
