@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.jayway.restassured.http.ContentType
 
 import static com.jayway.restassured.RestAssured.get
 import static com.jayway.restassured.RestAssured.given
@@ -62,6 +63,7 @@ class TestAccount {
 
     void registerOnServer() {
         href = given()
+            .contentType(ContentType.JSON)
             .body(getPropertiesMap())
         .when()
             .post(RegisterRoute)
@@ -97,7 +99,7 @@ class TestAccount {
         String emailId = null
         int count = 0
 
-        while (emailId == null && count++ < 30) {
+        while (emailId == null && count++ < 90) {
             def jsonResponse =
                 get(GUERILLA_MAIL_BASE + "?f=get_email_list&offset=0&sid_token=" + guerillaEmail.getToken()).asString()
 
