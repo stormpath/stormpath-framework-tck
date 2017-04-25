@@ -194,8 +194,7 @@ class ChangePasswordIT extends AbstractIT {
         .then()
             .statusCode(200)
 
-        // TODO - will need to make this configurable for Okta
-        String rawChangePasswordEmail = account.getEmail("stormpath.com")
+        String rawChangePasswordEmail = account.getEmail(fromEmailDomain)
         String changePasswordHref = StringUtils.extractChangePasswordHref(rawChangePasswordEmail, "sptoken")
 
         def response = given()
@@ -235,8 +234,7 @@ class ChangePasswordIT extends AbstractIT {
         .then()
             .statusCode(200)
 
-        // TODO - will need to make this configurable for Okta
-        String rawChangePasswordEmail = account.getEmail("stormpath.com")
+        String rawChangePasswordEmail = account.getEmail(fromEmailDomain)
         String changePasswordHref = StringUtils.extractChangePasswordHref(rawChangePasswordEmail, "sptoken")
         String sptoken = StringUtils.extractTokenFromHref(changePasswordHref, "sptoken")
 
