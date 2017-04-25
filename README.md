@@ -49,6 +49,12 @@ Once your web app is running, you can run the TCK against this webapp:
     FACEBOOK_CLIENT_SECRET=<Facebook secret for login tests> \
     mvn clean -Prun-ITs verify
 
+**NOTE:** If you are running against in Okta application you will need to include the following environment variables:
+
+    STORMPATH_TCK_VALIDATE_JWT_URL=https://dev-123456.oktapreview.com/oauth2/<as_id>/v1/keys
+    STORMPATH_TCK_EMAIL_DOMAIN=<your from email domain>
+
+
 This will run all tests against the targeted webapp.
 
 NOTE: The 3 environment variables shown above are *required* in order to run the TCK.

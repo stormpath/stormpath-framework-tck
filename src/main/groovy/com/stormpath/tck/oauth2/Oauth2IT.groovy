@@ -32,8 +32,7 @@ import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.isEmptyOrNullString
 import static org.hamcrest.Matchers.not
 import static org.hamcrest.Matchers.nullValue
-import static org.testng.Assert.assertNotEquals
-import static org.testng.Assert.assertTrue
+import static org.testng.Assert.*
 
 class Oauth2IT extends AbstractIT {
 
@@ -128,7 +127,7 @@ class Oauth2IT extends AbstractIT {
             .extract()
                 .path("access_token")
 
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href)
+        assertTrue isAccountSubInClaim(account, accessToken)
     }
 
     /** Password grant flow with username/password and access_token cookie present
@@ -153,10 +152,10 @@ class Oauth2IT extends AbstractIT {
                      .post(OauthRoute)
                 .then()
                      .spec(JsonResponseSpec.validAccessAndRefreshTokens())
-                     .extract()
+                 .extract()
                      .path("access_token")
         // @formatter:on
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href)
+        assertTrue isAccountSubInClaim(account, accessToken)
     }
 
     /** Password grant flow with email/password
@@ -178,7 +177,7 @@ class Oauth2IT extends AbstractIT {
             .extract()
                 .path("access_token")
 
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href)
+        assertTrue isAccountSubInClaim(account, accessToken)
     }
 
     /** Refresh grant flow
@@ -215,7 +214,7 @@ class Oauth2IT extends AbstractIT {
                 .path("access_token")
 
         assertNotEquals(accessToken, newAccessToken, "The new access token should not equal to the old access token")
-        assertTrue(JwtUtils.extractJwtClaim(accessToken, "sub") == account.href, "The access token should be a valid jwt for the test user")
+        assertTrue isAccountSubInClaim(account, accessToken)
     }
 
     /** Refresh grant flow should fail without valid refresh token
@@ -344,5 +343,10 @@ class Oauth2IT extends AbstractIT {
             .statusCode(401)
             .contentType(ContentType.JSON)
             .body("error", is("invalid_client"))
+    }
+
+    private boolean isAccountSubInClaim(def account, String jwt) {
+        def sub = JwtUtils.extractJwtClaim(jwt, "sub")
+        return account.href == sub || account.email == sub
     }
 }
