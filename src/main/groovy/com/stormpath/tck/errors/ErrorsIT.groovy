@@ -22,6 +22,7 @@ import org.testng.annotations.Test
 import static com.jayway.restassured.RestAssured.given
 import static com.stormpath.tck.util.FrameworkConstants.MeRoute
 import static com.stormpath.tck.util.FrameworkConstants.MissingRoute
+import static org.hamcrest.core.StringStartsWith.startsWith;
 
 class ErrorsIT extends AbstractIT {
 
@@ -52,6 +53,6 @@ class ErrorsIT extends AbstractIT {
         .then()
             .statusCode(401)
             // 401 with Accept JSON header does not return JSON
-            .header("WWW-Authenticate", "Bearer realm=\"My Application\"")
+            .header("WWW-Authenticate", startsWith("Bearer"))
     }
 }
