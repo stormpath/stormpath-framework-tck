@@ -234,6 +234,9 @@ class ChangePasswordIT extends AbstractIT {
         .then()
             .statusCode(200)
 
+        // sleep between requests okta rate limiting
+        Thread.sleep(1000)
+
         String rawChangePasswordEmail = account.getEmail(fromEmailDomain)
         String changePasswordHref = StringUtils.extractChangePasswordHref(rawChangePasswordEmail, "sptoken")
         String sptoken = StringUtils.extractTokenFromHref(changePasswordHref, "sptoken")
@@ -249,6 +252,9 @@ class ChangePasswordIT extends AbstractIT {
         .then()
             .statusCode(200)
             .body(isEmptyOrNullString())
+
+        // sleep between requests okta rate limiting
+        Thread.sleep(1000)
 
         // Verify that the password is now the new password through a login attempt / OAuth token request
         given()

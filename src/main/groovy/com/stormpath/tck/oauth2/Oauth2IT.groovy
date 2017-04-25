@@ -141,6 +141,9 @@ class Oauth2IT extends AbstractIT {
         def account = createTestAccount()
         def cookies = createSession(account)
 
+        // Okta rate limiting on user/password requests
+        Thread.sleep(1000)
+
         // @formatter:off
         String accessToken =
                 given()
