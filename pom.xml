@@ -80,6 +80,7 @@
         <stormpath.tck.webapp.host>localhost</stormpath.tck.webapp.host>
         <stormpath.tck.webapp.port>8080</stormpath.tck.webapp.port>
         <failsafe.groups>v100,json,html</failsafe.groups>
+        <failsafe.excludedGroups>stormpath_only</failsafe.excludedGroups>
         
     </properties>
 
@@ -197,6 +198,7 @@
                                 <stormpath.tck.webapp.port>${stormpath.tck.webapp.port}</stormpath.tck.webapp.port>
                             </systemProperties>
                             <groups>${failsafe.groups}</groups>
+                            <excludedGroups>${failsafe.excludedGroups}</excludedGroups>
                         </configuration>
                         <executions>
                             <execution>

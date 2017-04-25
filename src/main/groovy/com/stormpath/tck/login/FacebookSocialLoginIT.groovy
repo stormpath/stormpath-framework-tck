@@ -62,7 +62,7 @@ class FacebookSocialLoginIT extends AbstractIT {
      * Attempts to login with the Facebook Access Token, and expects an account object back.
      * @throws Exception
      */
-    @Test(groups = ["v100", "json"])
+    @Test(groups = ["v100", "json", "stormpath_only"])
     void loginWithValidFacebookAccessTokenSucceeds() throws Exception {
         def loginJSON = ["providerData": [
                 "providerId": "facebook",
@@ -87,7 +87,7 @@ class FacebookSocialLoginIT extends AbstractIT {
      * Attempts to login with an invalid access token, and should fail.
      * @throws Exception
      */
-    @Test(groups = ["v100", "json"])
+    @Test(groups = ["v100", "json", "stormpath_only"])
     void loginWithInvalidFacebookAccessTokenFails() throws Exception {
         def loginJSON = ["providerData": [
                 "providerId": "facebook",
@@ -108,7 +108,7 @@ class FacebookSocialLoginIT extends AbstractIT {
      * Attempts to use grant_type=stormpath_social with the Facebook Access Token, and expects an access_token back.
      * @throws Exception
      */
-    @Test(groups = ["v100", "json"])
+    @Test(groups = ["v100", "json", "stormpath_only"])
     void loginWithGrantTypeStormpathSocialSucceeds() throws Exception {
 
         given()
