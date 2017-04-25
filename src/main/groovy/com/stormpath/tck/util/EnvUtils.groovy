@@ -25,13 +25,20 @@ class EnvUtils {
     public static final String jwtSigningKey
     public static final String facebookClientId
     public static final String facebookClientSecret
+    public static final String jwtSigningKeysUrl
 
     static {
+        jwtSigningKeysUrl = getVal("STORMPATH_TCK_VALIDATE_JWT_URL")
         jwtSigningKey = getVal("JWT_SIGNING_KEY")
         facebookClientId = getVal("FACEBOOK_CLIENT_ID")
         facebookClientSecret = getVal("FACEBOOK_CLIENT_SECRET")
+
+        if (jwtSigningKeysUrl == null && jwtSigningKey == null) {
+            fail("One of JWT_SIGNING_KEY or STORMPATH_TCK_VALIDATE_JWT_URL environment variables is required")
+        }
+
         if (jwtSigningKey == null || facebookClientId == null || facebookClientSecret == null) {
-            fail("JWT_SIGNING_KEY, FACEBOOK_CLIENT_ID and FACEBOOK_CLIENT_SECRET environment variables are required")
+            fail("FACEBOOK_CLIENT_ID and FACEBOOK_CLIENT_SECRET environment variables are required")
         }
     }
 
