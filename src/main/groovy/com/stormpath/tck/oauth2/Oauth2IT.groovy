@@ -20,6 +20,7 @@ import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.responseSpecs.JsonResponseSpec
+import com.stormpath.tck.util.EnvUtils
 import com.stormpath.tck.util.JwtUtils
 import org.testng.annotations.Test
 
@@ -266,35 +267,15 @@ class Oauth2IT extends AbstractIT {
     /**
      * We should be able to use the client_credentials grant type to get an access token
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/8">#8</a>
-     *
-     * TODO - disabling because of Stormpath specific interactions
      */
-    @Test(groups=["v100", "json"], enabled = false)
+    @Test(groups=["v100", "json"])
     void oauthClientCredentialsGrantSucceeds() throws Exception {
-        // Get API keys so we can use it for client credentials
-
-        def account = createTestAccount()
-        Response apiKeysResource = given()
-            .header("User-Agent", "stormpath-framework-tck")
-            .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
-            .header("Content-Type", "application/json")
-            .port(443)
-        .when()
-            .post(account.href + "/apiKeys")
-        .then()
-            .statusCode(201)
-        .extract()
-            .response()
-
-        String apiKeyId = apiKeysResource.body().jsonPath().getString("id")
-        String apiKeySecret = apiKeysResource.body().jsonPath().getString("secret")
 
         // Attempt to get tokens
-
         given()
             .param("grant_type", "client_credentials")
             .auth()
-                .preemptive().basic(apiKeyId, apiKeySecret)
+                .preemptive().basic(EnvUtils.clientCredentialsId, EnvUtils.clientCredentialsSecret)
             .contentType(ContentType.URLENC)
         .when()
             .post(OauthRoute)
