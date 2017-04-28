@@ -304,27 +304,6 @@ class Oauth2IT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     void oauthClientCredentialsGrantFailsWithoutAPISecret() throws Exception {
-        // Get API keys so we can use it for client credentials
-
-        // TODO - commenting out Stormpath specific interaction
-        /*
-        Response apiKeysResource = given()
-            .header("User-Agent", "stormpath-framework-tck")
-            .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
-            .header("Content-Type", "application/json")
-            .port(443)
-        .when()
-            .post(account.href + "/apiKeys")
-        .then()
-            .statusCode(201)
-        .extract()
-            .response()
-
-        String apiKeyId = apiKeysResource.body().jsonPath().getString("id")
-        */
-
-        // Attempt to get tokens
-
         given()
             .param("grant_type", "client_credentials")
             .auth()

@@ -116,9 +116,7 @@ class LoginIT extends AbstractIT {
         .then()
             .statusCode(200)
             .contentType(ContentType.JSON)
-            .body("size()", is(2))
             .body(".", hasKey("form"))
-            .body(".", hasKey("accountStores"))
     }
 
     /**

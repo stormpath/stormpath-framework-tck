@@ -188,6 +188,7 @@ class ChangePasswordIT extends AbstractIT {
         deleteOnClassTeardown(account.href)
 
         given()
+            .contentType(ContentType.JSON)
             .body([email: account.email])
         .when()
             .post(ForgotRoute)

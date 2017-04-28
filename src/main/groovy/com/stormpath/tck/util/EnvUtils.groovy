@@ -38,7 +38,7 @@ class EnvUtils {
             fail("One of JWT_SIGNING_KEY or STORMPATH_TCK_VALIDATE_JWT_URL environment variables is required")
         }
 
-        if (jwtSigningKey == null || facebookClientId == null || facebookClientSecret == null) {
+        if (jwtSigningKey != null && (facebookClientId == null || facebookClientSecret == null)) {
             fail("FACEBOOK_CLIENT_ID and FACEBOOK_CLIENT_SECRET environment variables are required")
         }
     }
