@@ -19,10 +19,10 @@ import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.responseSpecs.AccountResponseSpec
-import com.stormpath.tck.util.EnvUtils
 import com.stormpath.tck.util.TestAccount
 import io.jsonwebtoken.Jwt
 import io.jsonwebtoken.Jwts
+import org.apache.commons.codec.binary.Base64
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.Test
 
@@ -37,7 +37,21 @@ import static org.hamcrest.Matchers.isEmptyOrNullString
 import static org.hamcrest.Matchers.not
 
 class MeIT extends AbstractIT {
-    private TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
+
+    final String clientCredentialsId = Base64.encodeBase64String(UUID.randomUUID().toString().getBytes())
+    final String clientCredentialsSecret = Base64.encodeBase64String(UUID.randomUUID().toString().getBytes())
+
+    private TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL) {
+        @Override
+        def getPropertiesMap() {
+            return [email: email,
+                    password: password,
+                    givenName: givenName,
+                    surname: surname,
+                    customData: [stormpathApiKey_1: "${clientCredentialsId}:${clientCredentialsSecret}".toString()]]
+        }
+    }
+
     private String accessTokenFromPassword
     private String accessTokenFromClientCredentials
 
@@ -59,11 +73,13 @@ class MeIT extends AbstractIT {
             .extract()
                 .path("access_token")
 
+        sleep(1000)
+
         accessTokenFromClientCredentials =
             given()
                 .param("grant_type", "client_credentials")
                 .auth()
-                    .preemptive().basic(EnvUtils.clientCredentialsId, EnvUtils.clientCredentialsSecret)
+                    .preemptive().basic(clientCredentialsId, clientCredentialsSecret)
                 .contentType(ContentType.URLENC)
             .when()
                 .post(OauthRoute)

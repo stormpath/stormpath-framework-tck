@@ -20,13 +20,15 @@ import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.responseSpecs.JsonResponseSpec
-import com.stormpath.tck.util.EnvUtils
 import com.stormpath.tck.util.JwtUtils
+import com.stormpath.tck.util.TestAccount
+import org.apache.commons.codec.binary.Base64
 import org.testng.annotations.Test
 
 import static com.jayway.restassured.RestAssured.get
 import static com.jayway.restassured.RestAssured.given
 import static com.stormpath.tck.util.FrameworkConstants.OauthRoute
+import static com.stormpath.tck.util.TestAccount.Mode.WITHOUT_DISPOSABLE_EMAIL
 import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.equalToIgnoringCase
 import static org.hamcrest.Matchers.is
@@ -271,11 +273,14 @@ class Oauth2IT extends AbstractIT {
     @Test(groups=["v100", "json"])
     void oauthClientCredentialsGrantSucceeds() throws Exception {
 
+        def account = createTestAccount()
+        Thread.sleep(1000) // sleep to get around rate limiting
+
         // Attempt to get tokens
         given()
             .param("grant_type", "client_credentials")
             .auth()
-                .preemptive().basic(EnvUtils.clientCredentialsId, EnvUtils.clientCredentialsSecret)
+                .preemptive().basic(account.clientCredentialsId, account.clientCredentialsSecret)
             .contentType(ContentType.URLENC)
         .when()
             .post(OauthRoute)
@@ -332,5 +337,26 @@ class Oauth2IT extends AbstractIT {
     private boolean isAccountSubInClaim(def account, String jwt) {
         def sub = JwtUtils.extractJwtClaim(jwt, "sub")
         return account.href == sub || account.email == sub
+    }
+
+    @Override
+    protected TestAccount createTestAccount() {
+        TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL) {
+
+            final String clientCredentialsId = Base64.encodeBase64String(UUID.randomUUID().toString().getBytes())
+            final String clientCredentialsSecret = Base64.encodeBase64String(UUID.randomUUID().toString().getBytes())
+
+            @Override
+            def getPropertiesMap() {
+                return [email: email,
+                        password: password,
+                        givenName: givenName,
+                        surname: surname,
+                        customData: [stormpathApiKey_1: "${clientCredentialsId}:${clientCredentialsSecret}".toString()]]
+            }
+        }
+        account.registerOnServer()
+        deleteOnClassTeardown(account.href)
+        return account
     }
 }
