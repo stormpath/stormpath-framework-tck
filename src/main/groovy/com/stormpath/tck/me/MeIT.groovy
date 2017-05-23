@@ -110,6 +110,19 @@ class MeIT extends AbstractIT {
         }
     }
 
+    @Test(groups=["v100", "json"])
+    void meWithCookieAuthFromClientCredentialsReturnsJsonUser() throws Exception {
+        ["text/html", "application/json", "*/*", ""].each { contentType ->
+            given()
+                .header("Accept", contentType)
+                .cookie("access_token", accessTokenFromClientCredentials)
+            .when()
+                .get(MeRoute)
+            .then()
+                .spec(AccountResponseSpec.matchesAccount(account))
+        }
+    }
+
     /**
      * We should be returning a user, and it should always be JSON.
      * @see https://github.com/stormpath/stormpath-framework-tck/issues/61
