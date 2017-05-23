@@ -19,6 +19,7 @@ import com.jayway.restassured.http.ContentType
 import com.jayway.restassured.response.Response
 import com.stormpath.tck.AbstractIT
 import com.stormpath.tck.responseSpecs.AccountResponseSpec
+import com.stormpath.tck.util.EnvUtils
 import com.stormpath.tck.util.TestAccount
 import io.jsonwebtoken.Jwt
 import io.jsonwebtoken.Jwts
@@ -37,13 +38,14 @@ import static org.hamcrest.Matchers.not
 
 class MeIT extends AbstractIT {
     private TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL)
-    private String accessToken
+    private String accessTokenFromPassword
+    private String accessTokenFromClientCredentials
 
     @BeforeClass(alwaysRun = true)
-    private void getTestAccountAccessToken() throws Exception {
+    private void getTestAccountAccessTokens() throws Exception {
         account.registerOnServer()
 
-        accessToken =
+        accessTokenFromPassword =
             given()
                 .param("grant_type", "password")
                 .param("username", account.username)
@@ -56,6 +58,22 @@ class MeIT extends AbstractIT {
                 .body("access_token", not(isEmptyOrNullString()))
             .extract()
                 .path("access_token")
+
+        accessTokenFromClientCredentials =
+            given()
+                .param("grant_type", "client_credentials")
+                .auth()
+                    .preemptive().basic(EnvUtils.clientCredentialsId, EnvUtils.clientCredentialsSecret)
+                .contentType(ContentType.URLENC)
+            .when()
+                .post(OauthRoute)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("access_token", not(isEmptyOrNullString()))
+            .extract()
+                .path("access_token")
+
         deleteOnClassTeardown(account.href)
     }
 
@@ -84,7 +102,7 @@ class MeIT extends AbstractIT {
         ["text/html", "application/json", "*/*", ""].each { contentType ->
             given()
                 .header("Accept", contentType)
-                .cookie("access_token", accessToken)
+                .cookie("access_token", accessTokenFromPassword)
             .when()
                 .get(MeRoute)
             .then()
@@ -102,12 +120,23 @@ class MeIT extends AbstractIT {
     @Test(groups=["v100", "json"])
     void meWithBearerAuthReturnsJsonUser() throws Exception {
         given()
-            .auth().oauth2(accessToken)
+            .auth().oauth2(accessTokenFromPassword)
         .when()
             .get(MeRoute)
         .then()
             .spec(AccountResponseSpec.matchesAccount(account))
     }
+
+    @Test(groups=["v100", "json"])
+    void meWithBearerAuthFromClientCredentialsReturnsJsonUser() throws Exception {
+        given()
+            .auth().oauth2(accessTokenFromClientCredentials)
+        .when()
+            .get(MeRoute)
+        .then()
+            .spec(AccountResponseSpec.matchesAccount(account))
+    }
+
 
     /**
      * Me should take Basic auth with an account's API keys as well.
@@ -149,7 +178,7 @@ class MeIT extends AbstractIT {
     @Test(groups=["v100", "json"])
     void meWithCookieAuthStripsLinkedResources() throws Exception {
         given()
-            .cookie("access_token", accessToken)
+            .cookie("access_token", accessTokenFromPassword)
         .when()
             .get(MeRoute)
         .then()
@@ -165,7 +194,7 @@ class MeIT extends AbstractIT {
     @Test(groups=["v100", "json"])
     void meWithBearerAuthStripsLinkedResources() throws Exception {
         given()
-            .auth().oauth2(accessToken)
+            .auth().oauth2(accessTokenFromPassword)
         .when()
             .get(MeRoute)
         .then()
@@ -181,7 +210,7 @@ class MeIT extends AbstractIT {
     @Test(groups=["v100", "json"])
     void meWithCookieAuthHasNoCacheHeaders() throws Exception {
         given()
-            .cookie("access_token", accessToken)
+            .cookie("access_token", accessTokenFromPassword)
         .when()
             .get(MeRoute)
         .then()
@@ -200,7 +229,7 @@ class MeIT extends AbstractIT {
     @Test(groups=["v100", "json"])
     void meWithBearerAuthHasNoCacheHeaders() throws Exception {
         given()
-            .auth().oauth2(accessToken)
+            .auth().oauth2(accessTokenFromPassword)
         .when()
             .get(MeRoute)
         .then()
@@ -215,7 +244,7 @@ class MeIT extends AbstractIT {
      */
     @Test(groups=["v100", "json"])
     void unsignedAccessTokensShouldFail() throws Exception {
-        String unsignedAccessToken = changeJwtAlgorithmToNone(accessToken)
+        String unsignedAccessToken = changeJwtAlgorithmToNone(accessTokenFromPassword)
 
         given()
             .auth().oauth2(unsignedAccessToken)
