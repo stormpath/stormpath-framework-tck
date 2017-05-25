@@ -44,6 +44,7 @@ class TestAccount {
     final String password = "P@sword123!"
     final String username
     final GuerillaEmail guerillaEmail
+    final Map customData
 
     String csrf
     Map<String, String> cookies
@@ -51,7 +52,7 @@ class TestAccount {
     // TODO - currently Stormpath specific. Will need to generify when dealing with Okta
     String href
 
-    TestAccount(Mode mode) {
+    TestAccount(Mode mode, Map<String, Object> customData) {
         if (mode == Mode.WITH_DISPOSABLE_EMAIL) {
             guerillaEmail = createGuerrillaEmail()
             username = email = guerillaEmail.email
@@ -59,6 +60,12 @@ class TestAccount {
             guerillaEmail = null
             username = email = "fooemail-" + randomUUID + "@testmail.stormpath.com"
         }
+
+        this.customData = customData
+    }
+
+    TestAccount(Mode mode) {
+        this(mode, null)
     }
 
     void registerOnServer() {
@@ -82,7 +89,11 @@ class TestAccount {
     }
 
     def getPropertiesMap() {
-        return [email: email, password: password, givenName: givenName, surname: surname]
+        def map = [email: email, password: password, givenName: givenName, surname: surname]
+        if (customData != null ) {
+            map.put("customData", customData)
+        }
+        return map
     }
 
     GuerillaEmail createGuerrillaEmail() {
