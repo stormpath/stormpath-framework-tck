@@ -149,7 +149,7 @@ class Oauth2IT extends AbstractIT {
         def cookies = createSession(account)
 
         // Okta rate limiting on user/password requests
-        Thread.sleep(1000)
+        rateLimitSleep()
 
         // @formatter:off
         String accessToken =
@@ -278,7 +278,7 @@ class Oauth2IT extends AbstractIT {
     void oauthClientCredentialsGrantSucceeds() throws Exception {
 
         def account = createTestAccount()
-        Thread.sleep(1000) // sleep to get around rate limiting
+        rateLimitSleep() // sleep to get around rate limiting
 
         // Attempt to get tokens
         given()

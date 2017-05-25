@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.jayway.restassured.http.ContentType
+import com.stormpath.tck.AbstractIT
 
 import static com.jayway.restassured.RestAssured.get
 import static com.jayway.restassured.RestAssured.given
@@ -133,7 +134,7 @@ class TestAccount {
                     }
                 }
             }
-            Thread.sleep(1000)
+            AbstractIT.rateLimitSleep()
         }
 
         if (emailId == null) {
