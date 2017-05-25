@@ -41,16 +41,7 @@ class MeIT extends AbstractIT {
     final String clientCredentialsId = Base64.encodeBase64String(UUID.randomUUID().toString().getBytes())
     final String clientCredentialsSecret = Base64.encodeBase64String(UUID.randomUUID().toString().getBytes())
 
-    private TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL) {
-        @Override
-        def getPropertiesMap() {
-            return [email: email,
-                    password: password,
-                    givenName: givenName,
-                    surname: surname,
-                    customData: [stormpathApiKey_1: "${clientCredentialsId}:${clientCredentialsSecret}".toString()]]
-        }
-    }
+    private TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL, [stormpathApiKey_1: "${clientCredentialsId}:${clientCredentialsSecret}".toString()])
 
     private String accessTokenFromPassword
     private String accessTokenFromClientCredentials

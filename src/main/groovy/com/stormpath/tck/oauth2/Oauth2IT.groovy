@@ -39,6 +39,10 @@ import static org.testng.Assert.*
 
 class Oauth2IT extends AbstractIT {
 
+
+    final String clientCredentialsId = Base64.encodeBase64String(UUID.randomUUID().toString().getBytes())
+    final String clientCredentialsSecret = Base64.encodeBase64String(UUID.randomUUID().toString().getBytes())
+
     /** Unsupported grant type returns error
      * @see <a href="https://github.com/stormpath/stormpath-framework-tck/issues/6">#6</a>
      */
@@ -280,7 +284,7 @@ class Oauth2IT extends AbstractIT {
         given()
             .param("grant_type", "client_credentials")
             .auth()
-                .preemptive().basic(account.clientCredentialsId, account.clientCredentialsSecret)
+                .preemptive().basic(clientCredentialsId, clientCredentialsSecret)
             .contentType(ContentType.URLENC)
         .when()
             .post(OauthRoute)
@@ -341,20 +345,9 @@ class Oauth2IT extends AbstractIT {
 
     @Override
     protected TestAccount createTestAccount() {
-        TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL) {
 
-            final String clientCredentialsId = Base64.encodeBase64String(UUID.randomUUID().toString().getBytes())
-            final String clientCredentialsSecret = Base64.encodeBase64String(UUID.randomUUID().toString().getBytes())
+        TestAccount account = new TestAccount(WITHOUT_DISPOSABLE_EMAIL, [stormpathApiKey_1: "${clientCredentialsId}:${clientCredentialsSecret}".toString()])
 
-            @Override
-            def getPropertiesMap() {
-                return [email: email,
-                        password: password,
-                        givenName: givenName,
-                        surname: surname,
-                        customData: [stormpathApiKey_1: "${clientCredentialsId}:${clientCredentialsSecret}".toString()]]
-            }
-        }
         account.registerOnServer()
         deleteOnClassTeardown(account.href)
         return account
