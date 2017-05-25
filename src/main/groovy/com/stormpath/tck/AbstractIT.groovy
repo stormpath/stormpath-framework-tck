@@ -263,4 +263,11 @@ abstract class AbstractIT {
         deleteOnClassTeardown(account.href)
         return account
     }
+
+    static void rateLimitSleep(int ms = 1000) {
+
+        if (Boolean.valueOf(EnvUtils.stormpathRateLimitEnabled)) {
+            Thread.sleep(ms)
+        }
+    }
 }

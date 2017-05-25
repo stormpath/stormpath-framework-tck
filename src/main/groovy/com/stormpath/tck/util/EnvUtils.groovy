@@ -21,6 +21,7 @@ import static org.testng.FileAssert.fail
 class EnvUtils {
 
     public static final String stormpathHtmlEnabled = getVal("STORMPATH_TCK_HTML_ENABLED", "true")
+    public static final String stormpathRateLimitEnabled = getVal("STORMPATH_TCK_RATE_LIMIT_ENABLED", "true")
 
     public static final String jwtSigningKey
     public static final String facebookClientId
