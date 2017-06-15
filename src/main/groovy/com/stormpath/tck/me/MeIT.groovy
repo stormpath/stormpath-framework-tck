@@ -165,7 +165,7 @@ class MeIT extends AbstractIT {
      * TODO - disabling test to remove Stormpath specific behavior
      */
     @Test(groups=["v100", "json"], enabled=false)
-    void meWithBasicAuthReturnsJsonUser() throws Exception {
+    void meWithApiKeyBasicAuthReturnsJsonUser() throws Exception {
         Response apiKeysResource = given()
             .header("User-Agent", "stormpath-framework-tck")
             .header("Authorization", RestUtils.getBasicAuthorizationHeaderValue())
@@ -183,6 +183,20 @@ class MeIT extends AbstractIT {
 
         given()
             .auth().preemptive().basic(apiKeyId, apiKeySecret)
+        .when()
+            .get(MeRoute)
+        .then()
+            .spec(AccountResponseSpec.matchesAccount(account))
+    }
+
+    /**
+     * Test that Basic with user/password works against /me
+     */
+    @Test(groups=["v100", "json"])
+    void meWithBasicAuthReturnsJsonUser() throws Exception {
+
+        given()
+            .auth().preemptive().basic(account.username, account.password)
         .when()
             .get(MeRoute)
         .then()
