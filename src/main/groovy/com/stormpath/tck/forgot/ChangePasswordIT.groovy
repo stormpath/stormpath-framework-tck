@@ -162,6 +162,7 @@ class ChangePasswordIT extends AbstractIT {
             .contentType(ContentType.URLENC)
             .queryParam("sptoken", "NOTEVENCLOSETOVALID")
             .param("password", "foobar123!")
+            .param("confirmPassword", "foobar123!")
 
         setCSRFAndCookies(req, ContentType.HTML)
 
